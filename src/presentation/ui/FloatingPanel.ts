@@ -1,0 +1,50 @@
+import { Container, Graphics, Text } from "pixi.js";
+import { createStyledButton, type StyledButton } from "./button.ts";
+
+export class FloatingPanel extends Container {
+  readonly storyButton: StyledButton;
+  private readonly badge = new Graphics();
+  private readonly rateLabel: Text;
+
+  constructor(onStory: () => void) {
+    super();
+    this.label = "left floating story/idle panel";
+    this.storyButton = createStyledButton("ИСТОРИЯ", {
+      width: 58,
+      height: 52,
+      fontSize: 8,
+      fill: 0x673b8f,
+      stroke: 0xd187e8,
+      radius: 14,
+      onPress: onStory,
+    });
+    this.rateLabel = new Text({
+      text: "+0.25\n/сек",
+      style: {
+        fontFamily: "Arial",
+        fontSize: 8,
+        fontWeight: "700",
+        fill: "#ffd4f4",
+        align: "center",
+        lineHeight: 11,
+      },
+    });
+    this.rateLabel.anchor.set(0.5);
+    this.rateLabel.position.set(29, 77);
+    this.badge
+      .roundRect(0, 60, 58, 35, 12)
+      .fill({ color: 0x241833, alpha: 0.94 });
+    this.badge
+      .roundRect(0, 60, 58, 35, 12)
+      .stroke({ color: 0x764b93, alpha: 0.74, width: 1 });
+    this.addChild(this.badge, this.storyButton.node, this.rateLabel);
+  }
+
+  resize(x: number, y: number): void {
+    this.position.set(x, y);
+  }
+
+  setRate(rate: number): void {
+    this.rateLabel.text = `+${rate.toFixed(2)}\n/сек`;
+  }
+}
