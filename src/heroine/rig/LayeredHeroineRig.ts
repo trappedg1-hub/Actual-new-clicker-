@@ -1,4 +1,5 @@
 import { Circle, Container, Graphics, Rectangle, Text } from "pixi.js";
+import { findRigLayer } from "../../app/frameLoop.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { startIdlePose } from "../poses/idlePose.ts";
 import { playZoneReaction } from "../reactions/zoneReactions.ts";
@@ -23,6 +24,7 @@ const FILL = 0x5f3b86;
 export class LayeredHeroineRig extends Container {
   readonly layers: HeroineRigLayers;
   private readonly glow: Graphics;
+  private placeholderTag: Text | null = null;
 
   constructor(
     onTap: (zone: HeroineTouchZone, localX: number, localY: number) => void,
@@ -39,9 +41,11 @@ export class LayeredHeroineRig extends Container {
     const head = this.createHead();
     const frontHair = this.createFrontHair();
 
-    const eyes = head.getChildByLabel("eyes") as Container;
-    const eyelids = head.getChildByLabel("eyelids") as Container;
-    const mouth = head.getChildByLabel("mouth") as Container;
+    // The placeholder layers are labelled "eyes placeholder layer" etc. Looking them up
+    // by the short name returned null and the whole rig constructor threw (blank screen).
+    const eyes = findRigLayer(head, "eyes");
+    const eyelids = findRigLayer(head, "eyelids");
+    const mouth = findRigLayer(head, "mouth");
 
     this.layers = {
       backHair,
@@ -97,6 +101,7 @@ export class LayeredHeroineRig extends Container {
     tag.position.set(0, 188);
     tag.alpha = 0.78;
     tag.eventMode = "none";
+    this.placeholderTag = tag;
     this.addChild(tag);
 
     startIdlePose({ torso, frontHair, backHair, eyes, eyelids });
@@ -114,6 +119,23 @@ export class LayeredHeroineRig extends Container {
 
   reactToTap(zone: HeroineTouchZone): void {
     playZoneReaction(this.layers, zone);
+  }
+
+  /**
+   * Keeps the "TECHNICAL LAYER PLACEHOLDER" caption inside the free area of the screen.
+   *
+   * On narrow (280-320 px) and landscape viewports the caption used to collide with the
+   * touch-zone hint under the rig. `bottomLimitPx` is the y coordinate, in scene space,
+   * that the caption must stay above; `null` restores the default position.
+   */
+  setTagBottomLimit(bottomLimitPx: number | null): void {
+    if (!this.placeholderTag) return;
+    if (bottomLimitPx === null) {
+      this.placeholderTag.position.set(0, 188);
+      return;
+    }
+    const tagOffset = Number.isFinite(bottomLimitPx) ? bottomLimitPx : 188;
+    this.placeholderTag.position.set(0, Math.min(188, tagOffset));
   }
 
   private createBackHair(): Container {

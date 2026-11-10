@@ -5,6 +5,7 @@ import { createInitialGameState } from "../../domain/economy/initialState.ts";
 import { GameRepository } from "../../persistence/indexeddb/GameRepository.ts";
 import { SaveCoordinator } from "../../persistence/SaveCoordinator.ts";
 import { GameSession } from "../GameSession.ts";
+import { advanceFrame, resizeRendererAndScene } from "../frameLoop.ts";
 import { MainScene } from "../scenes/MainScene.ts";
 
 function announceBootError(message: string): void {
@@ -36,6 +37,10 @@ export async function bootstrapGame(): Promise<void> {
   app.canvas.tabIndex = 0;
 
   // Pixi Actions is advanced on this application ticker; it pauses with the renderer when hidden.
+  //
+  // Animations keep using the clamped `deltaMS` (a huge jump must not teleport the rig),
+  // while the economy gets the raw `elapsedMS` further down. Both callbacks share the same
+  // ticker so a slow frame cannot be counted twice.
   app.ticker.add((ticker) => Action.tick(ticker.deltaMS));
 
   const repository = new GameRepository();
@@ -61,14 +66,24 @@ export async function bootstrapGame(): Promise<void> {
   const scene = new MainScene(session, { save: () => saver.request() });
   app.stage.addChild(scene);
 
+  // `ResizeObserver` reports the host's CSS size, but `app.screen` only follows it once the
+  // renderer itself has been resized. Resizing the scene alone left the canvas at the old
+  // height on devices with a safe area, pushing the bottom UI under the home indicator.
   const resizeScene = (): void => {
-    scene.resize(app.screen.width, app.screen.height);
+    resizeRendererAndScene(app, scene);
   };
   resizeScene();
   const resizeObserver = new ResizeObserver(resizeScene);
   resizeObserver.observe(host);
 
-  app.ticker.add((ticker) => scene.update(ticker.deltaMS));
+  // The economy is advanced by real elapsed time, not by frame count. `ticker.deltaMS` is
+  // clamped to 100 ms (minFPS 10), so at 4 FPS ~64% of the passive income was lost.
+  let frameNowMs = Date.now();
+  app.ticker.add((ticker) => {
+    const frame = advanceFrame(ticker, frameNowMs, false);
+    frameNowMs = frame.nowMs;
+    if (!frame.skipped) scene.update(frame.elapsedMs);
+  });
 
   if (loadIssue) {
     scene.applyOfflineProgress(0, 0, false);

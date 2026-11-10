@@ -178,6 +178,17 @@ export class MainScene extends Container {
     }
     this.heroine.position.set(heroineCenterX, heroineCenterY);
     this.heroine.setScaleForViewport(heroineScale);
+    // The "TECHNICAL LAYER PLACEHOLDER" caption sits 188 px below the rig origin at scale 1.
+    // On short/narrow viewports that row overlaps the touch-zone hint, so constrain it to the
+    // free space above the hint and convert the pixel limit back into rig-local units.
+    const hintTop = portrait
+      ? heightSafe - 66 - 82 - 8 - 18
+      : heightSafe - 68 - 12;
+    // A 22 px gap keeps the caption legible next to the hint on a 280 px screen.
+    const tagLimitLocal = (hintTop - 22 - heroineCenterY) / heroineScale;
+    this.heroine.setTagBottomLimit(
+      Number.isFinite(tagLimitLocal) ? tagLimitLocal : null,
+    );
     this.dialogue.resize(widthSafe, heightSafe);
     this.renderState();
   }
