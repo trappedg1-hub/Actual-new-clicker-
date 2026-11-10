@@ -25,8 +25,10 @@
       "gitBlobSha": "cb09b41c4cdad1f73676019258fa5bdc45c38d5a",
       "patEquivalent": "art-studio/style/style-anchor-anime.png (3f3d0d6)",
       "recoveryDocRefs": "§2.1–§2.4, §9 п.2, [С-2], [С-8]",
-      "status": "INTAKE — reference received, NOT approved as a master",
-      "modified": false
+      "status": "INTAKE — identity CONFIRMED as the style reference; NOT yet approved as a master for generation",
+      "modified": false,
+      "confirmedAs": "heroine-anime-01.png / style-anchor-anime.png — THE style reference, confirmed by the user 2026-11-10",
+      "note": "The names heroine-anime-01.png (conversation) and style-anchor-anime.png (STYLE-LOCK.json / PAT) refer to this one reference. A second, separate style reference file is not required. Byte identity with the PNG in PAT cannot be verified: this file is WebP and PAT holds only a 7-char git prefix."
     },
     {
       "path": "art-studio/references/originals/IMG_4037_campus-outfit.webp",
@@ -64,10 +66,20 @@
     }
   ],
   "stages": {
-    "00-intake": "COMPLETE — references received and committed",
+    "00-intake": "COMPLETE — references received, committed, and style reference identity confirmed ([С-8])",
     "01-campus": "NOT STARTED — awaiting plan approval",
     "02-style": "NOT STARTED",
     "03-rigpose": "NOT STARTED",
     "04-slicing-prep": "NOT STARTED"
+  },
+  "updatedAt": "2026-11-10",
+  "decisions": {
+    "C-8": {
+      "question": "Is heroine-anime-01.png the same reference as style/style-anchor-anime.png, or a second file?",
+      "status": "RESOLVED by user 2026-11-10",
+      "answer": "IMG_4036_style-reference.webp is that very style reference; one reference, no second file needed.",
+      "source": "user message: «Это тот самый style reference»",
+      "affects": "docs/HEROINE-01-recovery.md §8 [С-8], §9 п.2–3 (document NOT modified, per the no-documentation-changes constraint)"
+    }
   }
 }
