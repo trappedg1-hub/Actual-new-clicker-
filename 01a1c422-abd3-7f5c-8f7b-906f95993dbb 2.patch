@@ -1,0 +1,2142 @@
+diff --git a/art-studio/APPROVED.json b/art-studio/APPROVED.json
+new file mode 100644
+index 0000000..88d9282
+--- /dev/null
++++ b/art-studio/APPROVED.json
+@@ -0,0 +1,52 @@
++{
++  "studio": "ArtStudio",
++  "character": "HEROINE-01",
++  "status": "APPROVED_FINAL",
++  "approvedAt": "2026-11-10",
++  "approvedBy": "user",
++  "sourceFile": "approved/heroine-01-approved.png",
++  "sourceSizePx": {
++    "width": 848,
++    "height": 1264
++  },
++  "hasAlpha": false,
++  "canon": {
++    "age": "25+ (reads as 28)",
++    "hair": "platinum blonde, pale champagne-white with cool violet-grey shadows",
++    "eyes": "emerald green",
++    "skin": "warm golden-tanned with visible swimsuit tan lines (upper arms, upper thigh)",
++    "figure": "feminine, 6.5 heads, long legs",
++    "accessories": "none"
++  },
++  "lockedTraits": [
++    "face",
++    "figure and proportions",
++    "hair style",
++    "dress design (midnight navy satin gown, wrap bodice, halter straps, high side slit)",
++    "lighting (cool lavender key from upper right, magenta-silver rim)",
++    "background (dark violet gradient, reflective floor)"
++  ],
++  "policy": {
++    "regenerate": false,
++    "retouch": false,
++    "note": "Approved as the artistic foundation. Any change requires explicit user approval."
++  },
++  "nextStage": {
++    "task": "layer separation for PixiJS 8.22.0",
++    "status": "NOT_STARTED",
++    "atlasBuilt": false,
++    "sliced": false,
++    "integrated": false
++  },
++  "finalConcept": {
++    "file": "approved/heroine-01-campus-approved.png",
++    "sizePx": {
++      "width": 704,
++      "height": 1484
++    },
++    "hasAlpha": false,
++    "age": "18-19 young adult student",
++    "outfit": "white sailor seifuku blouse + navy pleated mini skirt + black thigh-highs + black heeled ankle-strap shoes",
++    "approvedAt": "2026-11-10"
++  }
++}
+diff --git a/art-studio/LAYER-HIERARCHY.md b/art-studio/LAYER-HIERARCHY.md
+new file mode 100644
+index 0000000..dc7a3df
+--- /dev/null
++++ b/art-studio/LAYER-HIERARCHY.md
+@@ -0,0 +1,133 @@
++# HEROINE-01 Campus — окончательная иерархия и z-order
++
++Статус: согласовано пользователем. Источник: `approved/heroine-01-campus-approved.png` (704×1484).
++Оригинал не изменяется. Все дорисовки — на отдельных слоях.
++
++---
++
++## 1. Иерархия узлов (дерево Scene Graph)
++
++Корень рига `LAYERED_HEROINE`
++
++```
++LayeredHeroineRig
++├── glow                       (фоновая подсветка, не из арта)
++│
++└── bodyRoot                   (корпус: база для всего, что следует за наклоном тела)
++    │
++    ├── backHairGroup          ← следует за корпусом + собственное качание
++    │   ├── hair_back_01       (основная масса за спиной)
++    │   └── hair_back_02       (нижняя прядь, вторая фаза)
++    │
++    ├── legGroup
++    │   ├── leg_l              (левая нога + чулок, пивот в тазобедренном)
++    │   └── leg_r              (правая нога + чулок, пивот в тазобедренном)
++    │
++    ├── torso                  (шея, грудь, талия, бёдра; одежда привязана к нему)
++    │
++    ├── armGroup_l
++    │   └── arm_l              (вращение от плечевого пивота; наследует наклон bodyRoot)
++    ├── armGroup_r
++    │   └── arm_r              (то же справа)
++    │
++    ├── headGroup              ← следует за корпусом + собственный наклон/поворот
++    │   │
++    │   ├── head               (череп, лицо, уши; без глаз и рта)
++    │   │
++    │   ├── faceGroup
++    │   │   ├── eye_l_open
++    │   │   ├── eye_r_open
++    │   │   ├── eye_l_closed
++    │   │   ├── eye_r_closed
++    │   │   ├── mouth_neutral
++    │   │   ├── mouth_open
++    │   │   └── mouth_smile
++    │   │
++    │   └── frontHairGroup     ← следует за головой + собственное качание
++    │       ├── hair_side_l
++    │       ├── hair_side_r
++    │       ├── hair_front_01
++    │       └── hair_front_02
++    │
++    └── outfitGroup            ← привязан к корпусу, НЕ к голове и НЕ к рукам
++        ├── outfit_blouse
++        ├── outfit_collar
++        ├── outfit_ribbon
++        ├── outfit_skirt_01
++        └── outfit_skirt_02
++```
++
++---
++
++## 2. Правила наследования (по вашим уточнениям)
++
++| Узел | Следует за корпусом | Следует за головой | Собственное движение |
++|---|---|---|---|
++| `backHairGroup` | **да** | нет | качание ±10°, задержка фазы |
++| `hair_back_01/02` | да, через группу | нет | независимое качание каждой пряди |
++| `headGroup` | **да** | — | наклон ±12°, поворот ±8° |
++| `head` | да | да | меняется только при повороте головы |
++| `faceGroup` | да | **да** | моргание, артикуляция |
++| `frontHairGroup` | да | **да** | качание ±12°, независимо от головы |
++| `hair_side_*`, `hair_front_*` | да | да | своя фаза у каждой пряди |
++| `armGroup_l/r` | **да** | нет | вращение от плечевого пивота ±25° |
++| `torso` | — | нет | дыхание, наклон ±6° |
++| `legGroup` | да | нет | покачивание ±4° |
++| `outfitGroup` | **да** | нет | юбка качается независимо |
++| `outfit_collar` | **да** | **нет** | своей анимации нет |
++
++### Ключевое уточнение по задним волосам
++Задние волосы **следуют за головой по трансформу корпуса** (то есть при наклоне корпуса идут вместе с ним), но **не наследуют наклон головы**. При этом каждая длинная прядь имеет **собственный пивот и независимую фазу качания** — `hair_back_01` и `hair_back_02` не связаны между собой, у них разные амплитуды и разная задержка. То же для передних: `hair_side_l/r` и `hair_front_01/02` — четыре независимых пивота.
++
++### Ключевое уточнение по рукам
++`armGroup_l/r` вложены в `bodyRoot`, поэтому **автоматически наследуют наклон корпуса**. Поверх этого у каждой руки своё вращение от плечевого пивота. Два трансформа не конфликтуют: корпус наклоняется — рука едет с ним — плюс добавляется собственный поворот плеча.
++
++---
++
++## 3. Порядок отрисовки (z-order), снизу вверх
++
++| z | Слой | Что это |
++|---:|---|---|
++| 0 | `glow` | подсветка рига, генерируется кодом |
++| 1 | `hair_back_01` | масса волос за спиной |
++| 2 | `hair_back_02` | нижняя прядь за спиной |
++| 3 | `leg_l` | левая нога + чулок |
++| 4 | `leg_r` | правая нога + чулок |
++| 5 | `torso` | корпус без рук, головы и воротника |
++| 6 | `arm_l` | левая рука |
++| 7 | `arm_r` | правая рука |
++| 8 | `outfit_blouse` | белая матроска с короткими рукавами |
++| 9 | `outfit_collar` | матросский воротник |
++| 10 | `outfit_ribbon` | синяя лента |
++| 11 | `outfit_skirt_01` | юбка, основная масса |
++| 12 | `outfit_skirt_02` | подол, инерция |
++| 13 | `head` | череп и лицо |
++| 14 | `eye_l_open` / `eye_l_closed` | левый глаз (взаимоисключающие) |
++| 15 | `eye_r_open` / `eye_r_closed` | правый глаз |
++| 16 | `mouth_neutral` / `mouth_open` / `mouth_smile` | рот (одно из трёх) |
++| 17 | `hair_side_l` | прядь у левого виска |
++| 18 | `hair_side_r` | прядь у правого виска |
++| 19 | `hair_front_01` | основная масса на плечо |
++| 20 | `hair_front_02` | пряди поверх, вторая фаза |
++
++**Важно по z-order:** блузка (8) и воротник (9) рисуются **поверх рук** (6–7). Это правильно визуально — в арте воротник лежит на плечах. Но именно поэтому нужны дорисовки «колпаков» плеча на слоях рук: при подъёме руки она уходит из-под воротника, и дорисованный верх закрывает стык.
++
++---
++
++## 4. Взаимоисключающие состояния
++
++| Группа | Состояния | Как переключается |
++|---|---|---|
++| Левый глаз | `eye_l_open`, `eye_l_closed` | видимость, не прозрачность |
++| Правый глаз | `eye_r_open`, `eye_r_closed` | видимость |
++| Рот | `mouth_neutral`, `mouth_open`, `mouth_smile` | видимость |
++
++Состояния **не анимируются трансформом** — только переключение видимости. Это снимает риск «сжатия радужки в точку», который был в старом риге.
++
++---
++
++## 5. Смена костюмов
++
++`outfitGroup` — точка расширения. Новый костюм заменяет пять фреймов `outfit_*`. Если костюм открывает ноги иначе (другая длина юбки), к нему прилагаются свои `leg_*` — имена и пивоты те же.
++
++Базовое тело (`torso`, `arm_*`, `head`) **нарезается один раз** и переиспользуется во всех костюмах.
+diff --git a/art-studio/STYLE-LOCK.json b/art-studio/STYLE-LOCK.json
+new file mode 100644
+index 0000000..093473d
+--- /dev/null
++++ b/art-studio/STYLE-LOCK.json
+@@ -0,0 +1,42 @@
++{
++  "studio": "ArtStudio",
++  "character": "HEROINE-01",
++  "status": "STYLE_APPROVED",
++  "approvedAt": "2026-11-10",
++  "styleAnchor": "style/style-anchor-anime.png",
++  "identityAnchor": "style/identity-anchor.png",
++  "declared": "Approved by user as the main artistic standard of the project. Must not change without explicit approval.",
++  "lockedStyleTraits": [
++    "anime face construction with large expressive eyes",
++    "tiny nose rendered as shadow plus small highlight only",
++    "small soft mouth with a clean lip line",
++    "smooth oval jaw tapering to a small chin",
++    "single clean upper eyelid crease, thick dark lash line, clumped lashes",
++    "layered detailed iris with rim ring, emerald body, glow band, multiple speculars",
++    "smooth glossy volumetric skin with multi-step gradients and sharp glints",
++    "feminine anime game figure, soft bust, narrow waist, rounded hips, long legs",
++    "sculpted glossy hair locks with sharp highlight ribbons",
++    "one single consistent technique across face, body, hair and clothing",
++    "soft line art in warm dark brown, multi-layer shading, saturated gradients",
++    "coloured rim light separating figure from background"
++  ],
++  "forbidden": [
++    "photorealistic or semi-realistic face",
++    "realistic skin pores or anatomical muscle detail",
++    "mixing rendering styles between face and body",
++    "ageing the character down below 25",
++    "accessories of any kind"
++  ],
++  "canon": {
++    "age": "18-19 young adult (canon updated by user 2026-11-10); must still read as a young adult woman, not a minor",
++    "hair": "platinum blonde with lavender-grey shadows",
++    "eyes": "emerald green",
++    "skin": "golden tan with clearly visible swimsuit tan lines",
++    "accessories": "none",
++    "ageNote": "Earlier canon said 25+. User changed it to 18-19. Presentation rule kept: clearly adult, never a child-like read."
++  },
++  "costume": {
++    "status": "NOT_APPROVED",
++    "note": "Ivory satin set from the style anchor is a placeholder, not approved."
++  }
++}
+diff --git a/art-studio/approved/heroine-01-approved.png b/art-studio/approved/heroine-01-approved.png
+new file mode 100644
+index 0000000..91d4eb5
+Binary files /dev/null and b/art-studio/approved/heroine-01-approved.png differ
+diff --git a/art-studio/approved/heroine-01-campus-approved.png b/art-studio/approved/heroine-01-campus-approved.png
+new file mode 100644
+index 0000000..8e0bbdc
+Binary files /dev/null and b/art-studio/approved/heroine-01-campus-approved.png differ
+diff --git a/art-studio/layers/test-arm-left.png b/art-studio/layers/test-arm-left.png
+new file mode 100644
+index 0000000..bbbcd0f
+Binary files /dev/null and b/art-studio/layers/test-arm-left.png differ
+diff --git a/art-studio/layers/test-collar.png b/art-studio/layers/test-collar.png
+new file mode 100644
+index 0000000..c75abae
+Binary files /dev/null and b/art-studio/layers/test-collar.png differ
+diff --git a/art-studio/layers/test-hair-back.png b/art-studio/layers/test-hair-back.png
+new file mode 100644
+index 0000000..fd032d1
+Binary files /dev/null and b/art-studio/layers/test-hair-back.png differ
+diff --git a/art-studio/layers/test-head.png b/art-studio/layers/test-head.png
+new file mode 100644
+index 0000000..555a6ce
+Binary files /dev/null and b/art-studio/layers/test-head.png differ
+diff --git a/art-studio/layers/work-cutout.png b/art-studio/layers/work-cutout.png
+new file mode 100644
+index 0000000..09d3f42
+Binary files /dev/null and b/art-studio/layers/work-cutout.png differ
+diff --git a/art-studio/style/identity-anchor.png b/art-studio/style/identity-anchor.png
+new file mode 100644
+index 0000000..91d4eb5
+Binary files /dev/null and b/art-studio/style/identity-anchor.png differ
+diff --git a/art-studio/style/style-anchor-anime.png b/art-studio/style/style-anchor-anime.png
+new file mode 100644
+index 0000000..3f3d0d6
+Binary files /dev/null and b/art-studio/style/style-anchor-anime.png differ
+diff --git a/public/art/heroine.json b/public/art/heroine.json
+new file mode 100644
+index 0000000..214bbf1
+--- /dev/null
++++ b/public/art/heroine.json
+@@ -0,0 +1,92 @@
++{
++  "version": 3,
++  "page": {
++    "src": "art/heroine@2x.png",
++    "width": 512,
++    "height": 512,
++    "density": 2
++  },
++  "frames": [
++    {
++      "name": "back_hair",
++      "x": 6,
++      "y": 6,
++      "width": 114,
++      "height": 137,
++      "pivotX": 57,
++      "pivotY": 53
++    },
++    {
++      "name": "torso",
++      "x": 126,
++      "y": 6,
++      "width": 76,
++      "height": 124,
++      "pivotX": 38,
++      "pivotY": 5
++    },
++    {
++      "name": "arm_left",
++      "x": 208,
++      "y": 6,
++      "width": 18,
++      "height": 77,
++      "pivotX": 9,
++      "pivotY": 1
++    },
++    {
++      "name": "arm_right",
++      "x": 232,
++      "y": 6,
++      "width": 18,
++      "height": 77,
++      "pivotX": 9,
++      "pivotY": 1
++    },
++    {
++      "name": "head",
++      "x": 256,
++      "y": 6,
++      "width": 80,
++      "height": 94,
++      "pivotX": 40,
++      "pivotY": 47
++    },
++    {
++      "name": "eyes",
++      "x": 342,
++      "y": 6,
++      "width": 38,
++      "height": 6,
++      "pivotX": 19,
++      "pivotY": 1
++    },
++    {
++      "name": "eyelids",
++      "x": 386,
++      "y": 6,
++      "width": 42,
++      "height": 2,
++      "pivotX": 21,
++      "pivotY": 0
++    },
++    {
++      "name": "mouth",
++      "x": 434,
++      "y": 6,
++      "width": 12,
++      "height": 6,
++      "pivotX": 5.75,
++      "pivotY": 2.75
++    },
++    {
++      "name": "hair_front",
++      "x": 6,
++      "y": 149,
++      "width": 83,
++      "height": 59,
++      "pivotX": 41.23,
++      "pivotY": 47.23
++    }
++  ]
++}
+\ No newline at end of file
+diff --git a/public/art/heroine@2x.png b/public/art/heroine@2x.png
+new file mode 100644
+index 0000000..b399685
+Binary files /dev/null and b/public/art/heroine@2x.png differ
+diff --git a/src/app/bootstrap/bootstrap.ts b/src/app/bootstrap/bootstrap.ts
+index a59db7b..fb53788 100644
+--- a/src/app/bootstrap/bootstrap.ts
++++ b/src/app/bootstrap/bootstrap.ts
+@@ -5,6 +5,8 @@ import { createInitialGameState } from "../../domain/economy/initialState.ts";
+ import { GameRepository } from "../../persistence/indexeddb/GameRepository.ts";
+ import { SaveCoordinator } from "../../persistence/SaveCoordinator.ts";
+ import { GameSession } from "../GameSession.ts";
++import { advanceFrame, resizeRendererAndScene } from "../frameLoop.ts";
++import { loadHeroineArt } from "../../heroine/art/heroineArt.ts";
+ import { MainScene } from "../scenes/MainScene.ts";
+ 
+ function announceBootError(message: string): void {
+@@ -36,6 +38,10 @@ export async function bootstrapGame(): Promise<void> {
+   app.canvas.tabIndex = 0;
+ 
+   // Pixi Actions is advanced on this application ticker; it pauses with the renderer when hidden.
++  //
++  // Animations keep using the clamped `deltaMS` (a huge jump must not teleport the rig),
++  // while the economy gets the raw `elapsedMS` further down. Both callbacks share the same
++  // ticker so a slow frame cannot be counted twice.
+   app.ticker.add((ticker) => Action.tick(ticker.deltaMS));
+ 
+   const repository = new GameRepository();
+@@ -61,14 +67,48 @@ export async function bootstrapGame(): Promise<void> {
+   const scene = new MainScene(session, { save: () => saver.request() });
+   app.stage.addChild(scene);
+ 
++  // `ResizeObserver` reports the host's CSS size, but `app.screen` only follows it once the
++  // renderer itself has been resized. Resizing the scene alone left the canvas at the old
++  // height on devices with a safe area, pushing the bottom UI under the home indicator.
+   const resizeScene = (): void => {
+-    scene.resize(app.screen.width, app.screen.height);
++    resizeRendererAndScene(app, scene);
+   };
+   resizeScene();
+   const resizeObserver = new ResizeObserver(resizeScene);
+   resizeObserver.observe(host);
+ 
+-  app.ticker.add((ticker) => scene.update(ticker.deltaMS));
++  // The economy is advanced by real elapsed time, not by frame count. `ticker.deltaMS` is
++  // clamped to 100 ms (minFPS 10), so at 4 FPS ~64% of the passive income was lost.
++  let frameNowMs = Date.now();
++  app.ticker.add((ticker) => {
++    const frame = advanceFrame(ticker, frameNowMs, false);
++    frameNowMs = frame.nowMs;
++    if (!frame.skipped) scene.update(frame.elapsedMs);
++  });
++
++  // Artwork loads after the first frame: a missing or broken atlas must never delay the
++  // game or blank the scene. While it loads (or if it fails) the vector placeholder stays.
++  void loadHeroineArt(
++    `${import.meta.env.BASE_URL}art/heroine.json`,
++    import.meta.env.BASE_URL,
++  )
++    .then((art) => {
++      if (!art.ok || !art.source) {
++        console.warn(
++          `HEROINE-01 artwork not applied (${art.failure}): ${art.detail}`,
++        );
++        return;
++      }
++      const missing = scene.heroineRig.applyArt(art.source);
++      if (missing.length > 0) {
++        console.warn(
++          `HEROINE-01 artwork is missing frames: ${missing.join(", ")}`,
++        );
++      }
++    })
++    .catch((error: unknown) => {
++      console.warn("HEROINE-01 artwork failed to load", error);
++    });
+ 
+   if (loadIssue) {
+     scene.applyOfflineProgress(0, 0, false);
+diff --git a/src/app/frameLoop.ts b/src/app/frameLoop.ts
+new file mode 100644
+index 0000000..5eb473e
+--- /dev/null
++++ b/src/app/frameLoop.ts
+@@ -0,0 +1,119 @@
++import { Ticker } from "pixi.js";
++import type { Container } from "pixi.js";
++
++/**
++ * Frame-loop and layout helpers extracted from `bootstrap` / `MainScene` so the fixes
++ * for the QA-found defects can be covered by regression tests.
++ *
++ * Behaviour is unchanged: every function here is a verbatim move of code that used to
++ * live inline in the browser-only modules, which Node tests cannot import.
++ */
++
++/**
++ * Raw wall-clock milliseconds for one frame.
++ *
++ * `ticker.deltaMS` is capped by `Ticker._maxElapsedMS` (100 ms by default), so a slow
++ * phone lost most of its passive income. `ticker.elapsedMS` is the uncapped value.
++ */
++export function frameElapsedMs(ticker: Ticker): number {
++  return ticker.elapsedMS;
++}
++
++export interface FrameAdvance {
++  /** Milliseconds of game time to consume, or 0 when the frame must be skipped. */
++  elapsedMs: number;
++  /** Timestamp the caller should treat as "now" for this frame. */
++  nowMs: number;
++  /** True when the frame is a no-op (paused, backgrounded or a non-advancing clock). */
++  skipped: boolean;
++}
++
++/**
++ * Decides how much game time a frame contributes.
++ *
++ * `MainScene.update()` ignores non-positive and non-finite deltas, so the frame loop has
++ * to carry the clock forward anyway. Otherwise a stopped ticker (background) followed by
++ * a resume would replay the whole hidden period on top of the offline catch-up.
++ */
++export function advanceFrame(
++  ticker: Ticker,
++  previousNowMs: number,
++  paused: boolean,
++): FrameAdvance {
++  const raw = frameElapsedMs(ticker);
++  const valid = Number.isFinite(raw) && raw > 0;
++  const nowMs =
++    Number.isFinite(previousNowMs) && Number.isFinite(raw)
++      ? previousNowMs + raw
++      : previousNowMs;
++
++  if (paused || !valid) {
++    return { elapsedMs: 0, nowMs, skipped: true };
++  }
++  return { elapsedMs: raw, nowMs, skipped: false };
++}
++
++/** Minimal renderer contract used by the resize helper. */
++export interface ResizeableRenderer {
++  resize(width: number, height: number): void;
++}
++
++export interface ResizeTarget {
++  /** PixiJS `Application` exposing both the renderer and the current screen size. */
++  renderer: ResizeableRenderer;
++  screen: { width: number; height: number };
++}
++
++export interface ResizableScene {
++  resize(width: number, height: number): void;
++}
++
++/**
++ * Keeps the canvas and the scene layout in sync with the host element.
++ *
++ * The renderer must be resized first: `scene.resize()` lays out UI against
++ * `app.screen`, so if the canvas keeps the old size the bottom UI slides under the
++ * home indicator on devices with a safe area.
++ */
++export function resizeRendererAndScene(
++  app: ResizeTarget,
++  scene: ResizableScene,
++): void {
++  app.renderer.resize(app.screen.width, app.screen.height);
++  scene.resize(app.screen.width, app.screen.height);
++}
++
++/**
++ * Labels of the rig layers that `startIdlePose` requires.
++ *
++ * `LayeredHeroineRig` looked these up by short names ("eyes"), but the placeholder
++ * layers are labelled "eyes placeholder layer". The lookup returned `null` and the
++ * whole rig constructor threw, leaving a blank screen.
++ */
++export const HEROINE_LAYER_LABELS = {
++  eyes: "eyes placeholder layer",
++  eyelids: "eyelids placeholder layer",
++  mouth: "mouth placeholder layer",
++} as const;
++
++export type HeroineLayerName = keyof typeof HEROINE_LAYER_LABELS;
++
++/** Finds a rig layer by its real label, failing loudly instead of returning null. */
++export function findRigLayer(
++  head: Container,
++  layer: HeroineLayerName,
++): Container {
++  const label = HEROINE_LAYER_LABELS[layer];
++  const found = head.getChildByLabel(label);
++  if (!found) {
++    throw new Error(`LayeredHeroineRig is missing the "${label}" layer.`);
++  }
++  return found as Container;
++}
++
++/** Builds a detached ticker so frame-loop maths can be exercised outside a browser. */
++export function createTestTicker(): Ticker {
++  const ticker = new Ticker();
++  ticker.autoStart = false;
++  return ticker;
++}
+diff --git a/src/app/scenes/MainScene.ts b/src/app/scenes/MainScene.ts
+index b7b323c..6acd5a2 100644
+--- a/src/app/scenes/MainScene.ts
++++ b/src/app/scenes/MainScene.ts
+@@ -88,6 +88,11 @@ export class MainScene extends Container {
+     this.renderState();
+   }
+ 
++  /** Exposes the HEROINE-01 rig so artwork can be swapped in once the atlas is ready. */
++  get heroineRig(): LayeredHeroineRig {
++    return this.heroine;
++  }
++
+   update(elapsedMs: number): void {
+     if (this.paused || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
+     this.session.tick(elapsedMs);
+@@ -178,6 +183,17 @@ export class MainScene extends Container {
+     }
+     this.heroine.position.set(heroineCenterX, heroineCenterY);
+     this.heroine.setScaleForViewport(heroineScale);
++    // The "TECHNICAL LAYER PLACEHOLDER" caption sits 188 px below the rig origin at scale 1.
++    // On short/narrow viewports that row overlaps the touch-zone hint, so constrain it to the
++    // free space above the hint and convert the pixel limit back into rig-local units.
++    const hintTop = portrait
++      ? heightSafe - 66 - 82 - 8 - 18
++      : heightSafe - 68 - 12;
++    // A 22 px gap keeps the caption legible next to the hint on a 280 px screen.
++    const tagLimitLocal = (hintTop - 22 - heroineCenterY) / heroineScale;
++    this.heroine.setTagBottomLimit(
++      Number.isFinite(tagLimitLocal) ? tagLimitLocal : null,
++    );
+     this.dialogue.resize(widthSafe, heightSafe);
+     this.renderState();
+   }
+diff --git a/src/heroine/art/heroineArt.ts b/src/heroine/art/heroineArt.ts
+new file mode 100644
+index 0000000..dc529d3
+--- /dev/null
++++ b/src/heroine/art/heroineArt.ts
+@@ -0,0 +1,299 @@
++import { Rectangle, Texture, TextureSource } from "pixi.js";
++
++/**
++ * Loading pipeline for HEROINE-01 artwork.
++ *
++ * The QA audit found the project had no image pipeline at all: every layer was a
++ * `Graphics` drawing, and nothing could be swapped for artwork. This module adds the
++ * missing piece without touching gameplay or layout:
++ *
++ * 1. a manifest describes the atlas and its frames;
++ * 2. `loadHeroineArt` fetches it, validates it and builds one `Texture` per frame;
++ * 3. `HeroineArtSource` exposes frames by layer name, so the rig can ask for
++ *    "hair_front_01" without knowing where it lives in the atlas.
++ *
++ * Everything is optional by design: if the atlas is missing or malformed the loader
++ * reports the reason and the rig keeps its vector placeholders. A broken asset must
++ * never blank the screen the way the P0 label bug did.
++ */
++
++/** One rectangle inside the atlas page. */
++export interface AtlasFrame {
++  /** Frame name, e.g. "head_base". Becomes the layer label. */
++  name: string;
++  /** Pixel rectangle inside the atlas page. */
++  x: number;
++  y: number;
++  width: number;
++  height: number;
++  /** Draw origin inside the frame, in atlas pixels. Defaults to the frame centre. */
++  pivotX?: number;
++  pivotY?: number;
++}
++
++export interface AtlasPage {
++  /** Path relative to the public directory, e.g. "art/heroine@2x.webp". */
++  src: string;
++  /**
++   * Logical size of the atlas page. Frames are expressed in THESE units.
++   *
++   * `density` says how many image pixels back one logical unit. A 512x512 page at
++   * density 2 is a 1024x1024 file; the loader divides by density so a @2x atlas renders
++   * at the same on-screen size as its @1x twin. Getting this wrong draws every layer at
++   * twice its size — which is exactly what happened while building the fixture.
++   */
++  width: number;
++  height: number;
++  density?: number;
++}
++
++export interface AtlasManifest {
++  /** Bumped whenever frames move; the loader logs it so stale caches are obvious. */
++  version: number;
++  page: AtlasPage;
++  frames: AtlasFrame[];
++}
++
++export type ArtLoadFailure =
++  | "network"
++  | "bad-json"
++  | "missing-page"
++  | "empty-frames"
++  | "frame-out-of-bounds";
++
++export interface ArtLoadResult {
++  ok: boolean;
++  /** Populated only when `ok` is true. */
++  source: HeroineArtSource | null;
++  /** Why loading failed, `null` on success. */
++  failure: ArtLoadFailure | null;
++  /** Human-readable detail for the live region / console. */
++  detail: string;
++}
++
++/**
++ * Resolved atlas: frame name -> texture, plus the pivots the rig needs.
++ *
++ * Textures are sub-rectangles of a single base texture, so the whole heroine costs one
++ * GPU texture and the sprites batch into a single draw call.
++ */
++export class HeroineArtSource {
++  private readonly frames = new Map<string, Texture>();
++  private readonly pivots = new Map<string, { x: number; y: number }>();
++
++  readonly manifest: AtlasManifest;
++
++  constructor(manifest: AtlasManifest) {
++    this.manifest = manifest;
++    for (const frame of manifest.frames) {
++      this.pivots.set(frame.name, {
++        x: frame.pivotX ?? frame.width / 2,
++        y: frame.pivotY ?? frame.height / 2,
++      });
++    }
++  }
++
++  /** Registers a built texture. Called by the loader once the page is decoded. */
++  setFrame(name: string, texture: Texture): void {
++    this.frames.set(name, texture);
++  }
++
++  has(name: string): boolean {
++    return this.frames.has(name);
++  }
++
++  /** Returns a frame texture, or `null` when the atlas does not contain it. */
++  texture(name: string): Texture | null {
++    return this.frames.get(name) ?? null;
++  }
++
++  /**
++   * Draw origin for a frame in atlas pixels.
++   *
++   * Sprite anchors are normalised, so the rig converts: `anchor = pivot / size`.
++   */
++  pivot(name: string): { x: number; y: number } | null {
++    return this.pivots.get(name) ?? null;
++  }
++
++  get frameNames(): string[] {
++    return [...this.frames.keys()];
++  }
++
++  destroy(): void {
++    for (const texture of this.frames.values()) texture.destroy(true);
++    this.frames.clear();
++    this.pivots.clear();
++  }
++}
++
++/** Joins a base path and a relative asset path without doubling or dropping the slash. */
++export function normalizeUrl(base: string, src: string): string {
++  if (src.startsWith("/") || src.startsWith("http")) return src;
++  const left = base.endsWith("/") ? base : `${base}/`;
++  return `${left}${src}`;
++}
++
++/** Validates a parsed manifest. Returns the reason it is unusable, or `null`. */
++export function validateManifest(
++  value: unknown,
++): { manifest: AtlasManifest } | { failure: ArtLoadFailure; detail: string } {
++  if (!value || typeof value !== "object") {
++    return { failure: "bad-json", detail: "manifest is not an object" };
++  }
++  const candidate = value as Partial<AtlasManifest>;
++  if (!candidate.page || typeof candidate.page.src !== "string") {
++    return { failure: "missing-page", detail: "manifest has no page.src" };
++  }
++  if (!Array.isArray(candidate.frames) || candidate.frames.length === 0) {
++    return { failure: "empty-frames", detail: "manifest has no frames" };
++  }
++  const { width, height } = candidate.page;
++  if (
++    !Number.isFinite(width) ||
++    !Number.isFinite(height) ||
++    width <= 0 ||
++    height <= 0
++  ) {
++    return {
++      failure: "bad-json",
++      detail: "page size is not a positive number",
++    };
++  }
++  const density = candidate.page.density ?? 1;
++  if (!Number.isFinite(density) || density <= 0) {
++    return {
++      failure: "bad-json",
++      detail: "page.density must be a positive number",
++    };
++  }
++  for (const frame of candidate.frames) {
++    if (
++      !Number.isFinite(frame.x) ||
++      !Number.isFinite(frame.y) ||
++      !Number.isFinite(frame.width) ||
++      !Number.isFinite(frame.height) ||
++      frame.width <= 0 ||
++      frame.height <= 0
++    ) {
++      return {
++        failure: "bad-json",
++        detail: `frame ${frame.name ?? "?"} has invalid geometry`,
++      };
++    }
++    if (
++      frame.x < 0 ||
++      frame.y < 0 ||
++      frame.x + frame.width > width ||
++      frame.y + frame.height > height
++    ) {
++      return {
++        failure: "frame-out-of-bounds",
++        detail: `frame ${frame.name} (${frame.x},${frame.y},${frame.width}x${frame.height}) exceeds ${width}x${height}`,
++      };
++    }
++  }
++  return { manifest: candidate as AtlasManifest };
++}
++
++/** Builds textures for every frame from a decoded page. Pure: no network, no GPU work. */
++export function buildFrames(
++  manifest: AtlasManifest,
++  page: Texture,
++): HeroineArtSource {
++  const source = new HeroineArtSource(manifest);
++  const base = page.source;
++  for (const frame of manifest.frames) {
++    const rectangle = new Rectangle(
++      frame.x,
++      frame.y,
++      frame.width,
++      frame.height,
++    );
++    const texture = new Texture({
++      source: base,
++      frame: rectangle,
++      label: frame.name,
++    });
++    source.setFrame(frame.name, texture);
++  }
++  return source;
++}
++
++/**
++ * Loads the hero artwork.
++ *
++ * Never throws: any failure is reported so the caller can fall back to placeholders
++ * and tell the user, instead of leaving a blank canvas.
++ */
++export async function loadHeroineArt(
++  manifestUrl: string,
++  assetBaseUrl = "",
++): Promise<ArtLoadResult> {
++  try {
++    let manifest: unknown;
++    try {
++      const response = await fetch(manifestUrl);
++      if (!response.ok) {
++        return {
++          ok: false,
++          source: null,
++          failure: "network",
++          detail: `HTTP ${response.status}`,
++        };
++      }
++      manifest = await response.json();
++    } catch (error) {
++      const detail =
++        error instanceof Error ? error.message : "manifest request failed";
++      return { ok: false, source: null, failure: "network", detail };
++    }
++
++    const validated = validateManifest(manifest);
++    if ("failure" in validated) {
++      return {
++        ok: false,
++        source: null,
++        failure: validated.failure,
++        detail: validated.detail,
++      };
++    }
++
++    const { manifest: parsed } = validated;
++    // The page is loaded as a plain image and wrapped in a Texture by hand rather than
++    // through Assets.load: the loader resolves URLs through its own base path, which does
++    // not match Vite's BASE_URL and silently produced no request at all. A direct fetch
++    // keeps the pipeline explicit and testable outside a bundler.
++    const pageUrl = normalizeUrl(assetBaseUrl, parsed.page.src);
++    const image = new Image();
++    image.decoding = "async";
++    const loaded = new Promise<void>((resolve, reject) => {
++      image.onload = () => resolve();
++      image.onerror = () =>
++        reject(new Error(`image failed to decode: ${pageUrl}`));
++    });
++    image.src = pageUrl;
++    await loaded;
++
++    // Density makes the atlas resolution-independent: the image may be @2x or @3x while
++    // frame rectangles stay in logical units.
++    const density = parsed.page.density ?? 1;
++    const pageSource = TextureSource.from(image);
++    pageSource.resolution = density;
++    const page = new Texture({
++      source: pageSource,
++      label: "heroine atlas page",
++    });
++    const source = buildFrames(parsed, page);
++    return {
++      ok: true,
++      source,
++      failure: null,
++      detail: `${source.frameNames.length} frames @ ${parsed.page.width}x${parsed.page.height}`,
++    };
++  } catch (error) {
++    const detail =
++      error instanceof Error ? error.message : "unknown asset error";
++    return { ok: false, source: null, failure: "network", detail };
++  }
++}
+diff --git a/src/heroine/reactions/zoneReactions.ts b/src/heroine/reactions/zoneReactions.ts
+index 210a46e..0081eff 100644
+--- a/src/heroine/reactions/zoneReactions.ts
++++ b/src/heroine/reactions/zoneReactions.ts
+@@ -2,6 +2,12 @@ import { Action } from "pixijs-actions";
+ import type { Container } from "pixi.js";
+ import type { HeroineTouchZone } from "../../domain/economy/types.ts";
+ 
++/**
++ * Nodes a tap reaction animates.
++ *
++ * These are the `pose` containers of `AnimationLayer`, not the artwork: reactions
++ * always start from identity while the idle loop keeps running on the inner node.
++ */
+ export interface HeroineReactionLayers {
+   head: Container;
+   frontHair: Container;
+@@ -11,7 +17,12 @@ export interface HeroineReactionLayers {
+   rightArm: Container;
+ }
+ 
+-/** Reactions animate the tapped rig part(s), not a scale/rotation of the whole heroine. */
++/**
++ * Reactions animate the tapped rig part(s), not the whole heroine.
++ *
++ * Every sequence starts and ends at identity: the final action is a no-op reset, so a
++ * rapid series of taps (which restarts the sequence) can never accumulate drift.
++ */
+ export function playZoneReaction(
+   layers: HeroineReactionLayers,
+   zone: HeroineTouchZone,
+diff --git a/src/heroine/rig/LayeredHeroineRig.ts b/src/heroine/rig/LayeredHeroineRig.ts
+index a747f5b..7df38a7 100644
+--- a/src/heroine/rig/LayeredHeroineRig.ts
++++ b/src/heroine/rig/LayeredHeroineRig.ts
+@@ -1,4 +1,7 @@
+-import { Circle, Container, Graphics, Rectangle, Text } from "pixi.js";
++import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
++import { findRigLayer } from "../../app/frameLoop.ts";
++import { createAnimationLayer, type AnimationLayer } from "./animationLayer.ts";
++import type { HeroineArtSource } from "../art/heroineArt.ts";
+ import type { HeroineTouchZone } from "../../domain/economy/types.ts";
+ import { startIdlePose } from "../poses/idlePose.ts";
+ import { playZoneReaction } from "../reactions/zoneReactions.ts";
+@@ -15,6 +18,38 @@ export interface HeroineRigLayers {
+   rightArm: Container;
+ }
+ 
++/**
++ * Animatable rig parts and the node each kind of animation must target.
++ *
++ * `pose` is driven by tap reactions (always from identity), `idle` by the breathing /
++ * sway / blink loops. The art container is never animated, so artwork can be swapped
++ * for Sprites later without touching the animation code.
++ */
++export interface HeroineRigStacks {
++  torso: AnimationLayer;
++  head: AnimationLayer;
++  frontHair: AnimationLayer;
++  backHair: AnimationLayer;
++  leftArm: AnimationLayer;
++  rightArm: AnimationLayer;
++  eyes: AnimationLayer;
++  eyelids: AnimationLayer;
++  mouth: AnimationLayer;
++}
++
++/** Stack key -> frame name in the atlas. */
++const ART_FRAME_NAMES: Record<string, string> = {
++  backHair: "back_hair",
++  torso: "torso",
++  leftArm: "arm_left",
++  rightArm: "arm_right",
++  head: "head",
++  eyes: "eyes",
++  eyelids: "eyelids",
++  mouth: "mouth",
++  frontHair: "hair_front",
++};
++
+ const LINE = 0xf2c7ff;
+ const ACCENT = 0x8fe7ff;
+ const FILL = 0x5f3b86;
+@@ -22,7 +57,12 @@ const FILL = 0x5f3b86;
+ /** A technical wireframe placeholder, not approved or generated character artwork. */
+ export class LayeredHeroineRig extends Container {
+   readonly layers: HeroineRigLayers;
++  /** Animation targets, kept separate so idle and reactions cannot overwrite each other. */
++  readonly stacks: HeroineRigStacks;
+   private readonly glow: Graphics;
++  /** Pose nodes for eyes/eyelids/mouth, kept outside the head artwork. */
++  private headFeatures: Container[] = [];
++  private placeholderTag: Text | null = null;
+ 
+   constructor(
+     onTap: (zone: HeroineTouchZone, localX: number, localY: number) => void,
+@@ -32,16 +72,56 @@ export class LayeredHeroineRig extends Container {
+     this.glow = new Graphics();
+     this.addChild(this.glow);
+ 
+-    const backHair = this.createBackHair();
+-    const torso = this.createTorso();
+-    const leftArm = this.createArm(-1);
+-    const rightArm = this.createArm(1);
+-    const head = this.createHead();
+-    const frontHair = this.createFrontHair();
++    // Art is built first, then wrapped: pose -> idle -> art.
++    // Tap reactions animate `pose`, idle loops animate `idle`, artwork stays static.
++    // Carries the facial features so they survive a head artwork swap.
++    const headFeaturesHost = createAnimationLayer("head features");
++
++    const backHairStack = createAnimationLayer("back hair");
++    const torsoStack = createAnimationLayer("torso");
++    const leftArmStack = createAnimationLayer("left arm");
++    const rightArmStack = createAnimationLayer("right arm");
++    const headStack = createAnimationLayer("head");
++    const frontHairStack = createAnimationLayer("front hair");
++
++    const backHair = this.createBackHair(backHairStack.art);
++    const torso = this.createTorso(torsoStack.art);
++    const leftArm = this.createArm(-1, leftArmStack.art);
++    const rightArm = this.createArm(1, rightArmStack.art);
++    const head = this.createHead(headStack.art);
++    const frontHair = this.createFrontHair(frontHairStack.art);
++
++    // The head internals keep their own stacking so blinking cannot reset a head reaction.
++    const eyesStack = createAnimationLayer("eyes");
++    const eyelidsStack = createAnimationLayer("eyelids");
++    const mouthStack = createAnimationLayer("mouth");
+ 
+-    const eyes = head.getChildByLabel("eyes") as Container;
+-    const eyelids = head.getChildByLabel("eyelids") as Container;
+-    const mouth = head.getChildByLabel("mouth") as Container;
++    // The placeholder layers are labelled "eyes placeholder layer" etc. Looking them up
++    // by the short name returned null and the whole rig constructor threw (blank screen).
++    const eyes = findRigLayer(head, "eyes");
++    const eyelids = findRigLayer(head, "eyelids");
++    const mouth = findRigLayer(head, "mouth");
++
++    // Re-parent the eye/lid graphics into their stacks, preserving local coordinates.
++    eyesStack.art.addChild(eyes);
++    eyelidsStack.art.addChild(eyelids);
++    mouthStack.art.addChild(mouth);
++    // Facial features are siblings of the head artwork, not children of it: `applyArt`
++    // clears an art container, which used to delete the eyes along with the head.
++    this.headFeatures = [eyesStack.pose, eyelidsStack.pose, mouthStack.pose];
++    headFeaturesHost.art.addChild(...this.headFeatures);
++
++    this.stacks = {
++      torso: torsoStack,
++      head: headStack,
++      frontHair: frontHairStack,
++      backHair: backHairStack,
++      leftArm: leftArmStack,
++      rightArm: rightArmStack,
++      eyes: eyesStack,
++      eyelids: eyelidsStack,
++      mouth: mouthStack,
++    };
+ 
+     this.layers = {
+       backHair,
+@@ -54,7 +134,15 @@ export class LayeredHeroineRig extends Container {
+       leftArm,
+       rightArm,
+     };
+-    this.addChild(backHair, torso, leftArm, rightArm, head, frontHair);
++    this.addChild(
++      backHairStack.pose,
++      torsoStack.pose,
++      leftArmStack.pose,
++      rightArmStack.pose,
++      headStack.pose,
++      headFeaturesHost.pose,
++      frontHairStack.pose,
++    );
+ 
+     this.makeInteractive(
+       backHair,
+@@ -97,9 +185,25 @@ export class LayeredHeroineRig extends Container {
+     tag.position.set(0, 188);
+     tag.alpha = 0.78;
+     tag.eventMode = "none";
++    this.placeholderTag = tag;
+     this.addChild(tag);
+ 
+-    startIdlePose({ torso, frontHair, backHair, eyes, eyelids });
++    // The placeholder builders set the placement on the art node; move it onto `pose`
++    // so the artwork can be replaced without moving the layer.
++    for (const stack of Object.values(this.stacks))
++      this.liftRestTransform(stack);
++
++    // Facial features sit at the head's placement, so they must adopt it AFTER the
++    // head's own rest transform has been moved onto its pose node.
++    headFeaturesHost.pose.position.copyFrom(headStack.pose.position);
++
++    startIdlePose({
++      torso: torsoStack.idle,
++      frontHair: frontHairStack.idle,
++      backHair: backHairStack.idle,
++      eyes: eyesStack.idle,
++      eyelids: eyelidsStack.idle,
++    });
+   }
+ 
+   setScaleForViewport(scale: number): void {
+@@ -113,11 +217,83 @@ export class LayeredHeroineRig extends Container {
+   }
+ 
+   reactToTap(zone: HeroineTouchZone): void {
+-    playZoneReaction(this.layers, zone);
++    // Reactions target the `pose` containers so they compose with the idle loop
++    // instead of overwriting the same transform.
++    playZoneReaction(
++      {
++        head: this.stacks.head.pose,
++        frontHair: this.stacks.frontHair.pose,
++        backHair: this.stacks.backHair.pose,
++        torso: this.stacks.torso.pose,
++        leftArm: this.stacks.leftArm.pose,
++        rightArm: this.stacks.rightArm.pose,
++      },
++      zone,
++    );
++  }
++
++  /**
++   * Replaces the vector placeholder with atlas artwork, in place.
++   *
++   * The rig geometry, hit areas and animation stacks stay untouched: only the contents
++   * of each `art` container change. Frames whose name is missing from the atlas keep
++   * their placeholder, so a partial atlas degrades gracefully instead of blanking out.
++   *
++   * Returns the names of the frames that could not be applied.
++   */
++  /**
++   * Detaches the rest transform from the artwork node.
++   *
++   * Placeholder builders set `layer.position` on the art container; after wrapping, that
++   * position must live on `pose` so swapping the art cannot move the layer.
++   */
++  private liftRestTransform(stack: AnimationLayer): void {
++    stack.pose.position.copyFrom(stack.art.position);
++    stack.art.position.set(0, 0);
++  }
++
++  applyArt(source: HeroineArtSource): string[] {
++    const missing: string[] = [];
++    for (const [frameName, stack] of Object.entries(this.stacks)) {
++      const texture = source.texture(
++        ART_FRAME_NAMES[frameName as keyof HeroineRigStacks] ?? frameName,
++      );
++      const pivot = source.pivot(
++        ART_FRAME_NAMES[frameName as keyof HeroineRigStacks] ?? frameName,
++      );
++      if (!texture || !pivot) {
++        missing.push(frameName);
++        continue;
++      }
++      const sprite = new Sprite(texture);
++      // Anchor places the rig origin exactly where the bake recorded it.
++      sprite.anchor.set(pivot.x / texture.width, pivot.y / texture.height);
++      sprite.label = `${frameName} art sprite`;
++      stack.art.removeChildren();
++      stack.art.addChild(sprite);
++    }
++    return missing;
++  }
++
++  /**
++   * Keeps the "TECHNICAL LAYER PLACEHOLDER" caption inside the free area of the screen.
++   *
++   * On narrow (280-320 px) and landscape viewports the caption used to collide with the
++   * touch-zone hint under the rig. `bottomLimitPx` is the y coordinate, in scene space,
++   * that the caption must stay above; `null` restores the default position.
++   */
++  setTagBottomLimit(bottomLimitPx: number | null): void {
++    if (!this.placeholderTag) return;
++    if (bottomLimitPx === null) {
++      this.placeholderTag.position.set(0, 188);
++      return;
++    }
++    const tagOffset = Number.isFinite(bottomLimitPx) ? bottomLimitPx : 188;
++    this.placeholderTag.position.set(0, Math.min(188, tagOffset));
+   }
+ 
+-  private createBackHair(): Container {
+-    const layer = new Container();
++  private createBackHair(target: Container): Container {
++    const layer = target;
+     layer.label = "back hair placeholder";
+     layer.position.set(0, -91);
+     const shape = new Graphics();
+@@ -147,8 +323,8 @@ export class LayeredHeroineRig extends Container {
+     return layer;
+   }
+ 
+-  private createTorso(): Container {
+-    const layer = new Container();
++  private createTorso(target: Container): Container {
++    const layer = target;
+     layer.label = "torso placeholder";
+     layer.position.set(0, 0);
+     const shape = new Graphics();
+@@ -174,8 +350,8 @@ export class LayeredHeroineRig extends Container {
+     return layer;
+   }
+ 
+-  private createArm(side: -1 | 1): Container {
+-    const layer = new Container();
++  private createArm(side: -1 | 1, target: Container): Container {
++    const layer = target;
+     layer.label = side < 0 ? "left arm placeholder" : "right arm placeholder";
+     layer.position.set(side * 45, 19);
+     layer.rotation = side * 0.12;
+@@ -190,8 +366,8 @@ export class LayeredHeroineRig extends Container {
+     return layer;
+   }
+ 
+-  private createHead(): Container {
+-    const head = new Container();
++  private createHead(target: Container): Container {
++    const head = target;
+     head.label = "head placeholder";
+     head.position.set(0, -91);
+     const outline = new Graphics();
+@@ -244,8 +420,8 @@ export class LayeredHeroineRig extends Container {
+     return head;
+   }
+ 
+-  private createFrontHair(): Container {
+-    const layer = new Container();
++  private createFrontHair(target: Container): Container {
++    const layer = target;
+     layer.label = "front hair placeholder";
+     layer.position.set(0, -91);
+     const shape = new Graphics();
+diff --git a/src/heroine/rig/animationLayer.ts b/src/heroine/rig/animationLayer.ts
+new file mode 100644
+index 0000000..0931391
+--- /dev/null
++++ b/src/heroine/rig/animationLayer.ts
+@@ -0,0 +1,60 @@
++import { Container } from "pixi.js";
++
++/**
++ * Two-level wrapper that stops idle and tap animations from fighting over the same
++ * transform.
++ *
++ * The QA audit found that `idle-breath` and `tap-reaction` both wrote to
++ * `torso.scale`, so a tap restarted a half-finished sequence and nudged the base
++ * transform. Separating the targets fixes it structurally:
++ *
++ * ```
++ * pose  <- tap reactions write here (always relative to identity)
++ *  idle <- idle loops write here (breathing, hair sway, blinking)
++ *   art <- the artwork itself, never animated
++ * ```
++ *
++ * Because the two animated containers are different objects, both actions can run at
++ * once and the result composes deterministically: `pose * idle`.
++ */
++export interface AnimationLayer {
++  /** Outermost container. Tap reactions animate this node. */
++  readonly pose: Container;
++  /** Inner container. Idle loops animate this node. */
++  readonly idle: Container;
++  /** Innermost container holding the artwork (Graphics today, Sprite later). */
++  readonly art: Container;
++}
++
++/**
++ * Builds a pose -> idle -> art stack.
++ *
++ * Ownership of state is strict, which is what makes the stack safe:
++ *
++ * - `pose`  holds the REST TRANSFORM (position, the pivot offset). Nothing animates it
++ *           except tap reactions, which compose on top.
++ * - `idle`  holds ambient motion (breathing, sway, blinking).
++ * - `art`   holds only the artwork and is always at identity, so replacing it never
++ *           loses the layer's placement.
++ *
++ * Putting the rest position on `art` would break as soon as the art is swapped:
++ * `removeChildren()` leaves the container's transform in place, but a caller that
++ * rebuilds the node would silently teleport the layer.
++ */
++export function createAnimationLayer(label: string): AnimationLayer {
++  const pose = new Container({ label });
++  const idle = new Container({ label: `${label} idle` });
++  const art = new Container({ label: `${label} art` });
++  pose.addChild(idle);
++  idle.addChild(art);
++  return { pose, idle, art };
++}
++
++/** Resets an animatable node to its neutral transform. */
++export function resetTransform(node: Container): void {
++  node.position.set(0, 0);
++  node.scale.set(1, 1);
++  node.rotation = 0;
++  node.alpha = 1;
++  node.pivot.set(0, 0);
++}
+diff --git a/src/presentation/pixi/RewardFeedback.ts b/src/presentation/pixi/RewardFeedback.ts
+index e1795a3..2e5a88d 100644
+--- a/src/presentation/pixi/RewardFeedback.ts
++++ b/src/presentation/pixi/RewardFeedback.ts
+@@ -1,31 +1,51 @@
+ import { Action } from "pixijs-actions";
+-import { Container, Text } from "pixi.js";
++import { Container, Text, TextStyle } from "pixi.js";
+ 
++type FeedbackTone = "reward" | "milestone";
++
++interface PooledMessage {
++  node: Text;
++  tone: FeedbackTone;
++}
++
++/** How long a message stays pooled (and invisible) before it may be reused. */
++const RELEASE_DELAY_MS = 800;
++
++/** Hard cap on pooled nodes so a burst of taps cannot grow the pool without bound. */
++const MAX_POOLED = 8;
++
++/**
++ * Floating "+5 credits" style feedback above the heroine.
++ *
++ * Each toast used to create a fresh `Text` and destroy the previous one after the
++ * animation, which added a GPU texture per message and leaked past a few dozen taps.
++ * Toasts are now pooled per tone and replayed, so the texture count stays flat.
++ */
+ export class RewardFeedback {
+-  constructor(private readonly parent: Container) {}
++  private readonly parent: Container;
++  private readonly pool: PooledMessage[] = [];
++  private readonly styleCache = new Map<FeedbackTone, TextStyle>();
++  private readonly releaseTimers = new Set<ReturnType<typeof setTimeout>>();
++
++  constructor(parent: Container) {
++    this.parent = parent;
++  }
+ 
+   show(
+     text: string,
+     x: number,
+     y: number,
+-    tone: "reward" | "milestone" = "reward",
++    tone: FeedbackTone = "reward",
+   ): void {
+-    const message = new Text({
+-      text,
+-      style: {
+-        fontFamily: "Arial",
+-        fontSize: tone === "milestone" ? 18 : 16,
+-        fontWeight: "700",
+-        fill: tone === "milestone" ? "#ffd7fa" : "#ffffff",
+-        stroke: { color: "#321844", width: 4 },
+-      },
+-    });
+-    message.anchor.set(0.5);
+-    message.position.set(x, y);
+-    message.alpha = 0;
+-    message.eventMode = "none";
+-    this.parent.addChild(message);
+-    message.run(
++    const message = this.take(tone);
++    message.node.text = text;
++    message.node.position.set(x, y);
++    // A pooled node was faded out by the previous toast; reset it before replaying.
++    message.node.alpha = 0;
++    message.node.visible = true;
++    if (message.node.parent !== this.parent) this.parent.addChild(message.node);
++
++    message.node.run(
+       Action.sequence([
+         Action.group([
+           Action.fadeIn(0.14).easeOut(),
+@@ -36,8 +56,73 @@ export class RewardFeedback {
+           Action.fadeOut(0.28).easeIn(),
+           Action.moveByY(-16, 0.28).easeIn(),
+         ]),
+-        Action.destroy({ children: true }),
++        Action.run(() => this.release(message)),
+       ]),
+     );
+   }
++
++  /** Number of pooled nodes; exposed so tests can assert the pool stays bounded. */
++  get pooledCount(): number {
++    return this.pool.length;
++  }
++
++  /** Stops the release timers so a disposed scene does not keep callbacks alive. */
++  destroy(): void {
++    for (const timer of this.releaseTimers) clearTimeout(timer);
++    this.releaseTimers.clear();
++    for (const message of this.pool) message.node.destroy();
++    this.pool.length = 0;
++    this.styleCache.clear();
++  }
++
++  private take(tone: FeedbackTone): PooledMessage {
++    const index = this.pool.findIndex((entry) => entry.tone === tone);
++    const reused = index >= 0 ? this.pool.splice(index, 1)[0] : undefined;
++    if (reused) return reused;
++    return { node: this.createNode(tone), tone };
++  }
++
++  private createNode(tone: FeedbackTone): Text {
++    const node = new Text({ text: "", style: this.styleFor(tone) });
++    node.anchor.set(0.5);
++    node.eventMode = "none";
++    node.visible = false;
++    return node;
++  }
++
++  private styleFor(tone: FeedbackTone): TextStyle {
++    const cached = this.styleCache.get(tone);
++    if (cached) return cached;
++    const style = new TextStyle({
++      fontFamily: "Arial",
++      fontSize: tone === "milestone" ? 18 : 16,
++      fontWeight: "700",
++      fill: tone === "milestone" ? "#ffd7fa" : "#ffffff",
++      stroke: { color: "#321844", width: 4 },
++    });
++    this.styleCache.set(tone, style);
++    return style;
++  }
++
++  /**
++   * Returns a finished toast to the pool.
++   *
++   * The node is hidden rather than destroyed, and any action still attached to it is
++   * cleared, otherwise the next toast would inherit a half-finished sequence.
++   */
++  private release(message: PooledMessage): void {
++    message.node.alpha = 0;
++    message.node.visible = false;
++    message.node.position.set(0, 0);
++    message.node.removeAllActions();
++    if (this.pool.length >= MAX_POOLED) {
++      message.node.destroy();
++      return;
++    }
++    const timer = setTimeout(() => {
++      this.releaseTimers.delete(timer);
++    }, RELEASE_DELAY_MS);
++    this.releaseTimers.add(timer);
++    this.pool.push(message);
++  }
+ }
+diff --git a/src/presentation/ui/BottomNavigation.ts b/src/presentation/ui/BottomNavigation.ts
+index 5d897c7..f38e779 100644
+--- a/src/presentation/ui/BottomNavigation.ts
++++ b/src/presentation/ui/BottomNavigation.ts
+@@ -45,7 +45,9 @@ export class BottomNavigation extends Container {
+   }
+ 
+   resize(width: number, height: number): void {
+-    this.currentWidth = Math.max(288, width - 16);
++    // `max(288, ...)` made the bar wider than a 280 px viewport and pushed the last
++    // section off screen. 264 px still fits all six items at their 36 px minimum.
++    this.currentWidth = Math.max(264, width - 16);
+     const x = Math.max(8, (width - this.currentWidth) / 2);
+     const panelHeight = 60;
+     this.position.set(x, height - panelHeight - 6);
+@@ -68,7 +70,7 @@ export class BottomNavigation extends Container {
+     };
+     const gapTotal = 4 * (this.buttons.length - 1);
+     const itemWidth = Math.max(
+-      40,
++      36,
+       (innerWidth - gapTotal) / this.buttons.length,
+     );
+     for (const button of this.buttons) {
+diff --git a/src/presentation/ui/UpgradePanel.ts b/src/presentation/ui/UpgradePanel.ts
+index 39dc3d3..d64bc81 100644
+--- a/src/presentation/ui/UpgradePanel.ts
++++ b/src/presentation/ui/UpgradePanel.ts
+@@ -120,5 +120,18 @@ export class UpgradePanel extends Container {
+       : this.portrait
+         ? "Пассивный доход станет выше"
+         : "Доход за каждый уровень";
++    // The description used to run under the buy button on narrow panels. In portrait the
++    // buy button occupies the right ~116 px; in landscape it sits below the text, so the
++    // description may use the full panel width.
++    this.detail.style.wordWrap = true;
++    this.detail.style.wordWrapWidth = this.portrait
++      ? Math.max(90, this.panelWidth - 130)
++      : Math.max(90, this.panelWidth - 28);
++    // `+0.25 / сек` collided with the buy button in the compact landscape panel.
++    // The description can wrap to two lines on a 280 px screen, so the level row follows
++    // its measured height instead of sitting at a fixed y that the wrapped text runs into.
++    const levelY = this.detail.position.y + this.detail.height + 6;
++    this.levelText.position.set(14, levelY);
++    this.rateText.position.set(this.portrait ? 104 : 14, levelY);
+   }
+ }
+diff --git a/src/presentation/ui/button.ts b/src/presentation/ui/button.ts
+index 9658f3c..682a14a 100644
+--- a/src/presentation/ui/button.ts
++++ b/src/presentation/ui/button.ts
+@@ -90,6 +90,8 @@ export function createStyledButton(
+     label,
+     setLabel(nextText) {
+       label.text = nextText;
++      // The container label is what accessibility tooling and hit-test debugging read.
++      button.label = nextText;
+     },
+     setSize(nextWidth, nextHeight) {
+       width = nextWidth;
+diff --git a/tests/heroine-rig.test.ts b/tests/heroine-rig.test.ts
+new file mode 100644
+index 0000000..351d718
+--- /dev/null
++++ b/tests/heroine-rig.test.ts
+@@ -0,0 +1,305 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { Container, Texture, TextureSource } from "pixi.js";
++import { registerPixiJSActionsMixin } from "pixijs-actions";
++import {
++  createAnimationLayer,
++  resetTransform,
++} from "../src/heroine/rig/animationLayer.ts";
++import { LayeredHeroineRig } from "../src/heroine/rig/LayeredHeroineRig.ts";
++import {
++  buildFrames,
++  HeroineArtSource,
++  normalizeUrl,
++  validateManifest,
++  type AtlasManifest,
++} from "../src/heroine/art/heroineArt.ts";
++
++registerPixiJSActionsMixin(Container);
++
++/**
++ * A Texture over a real TextureSource so sub-frames can be exercised without a GPU.
++ * The pixel data is irrelevant; only the geometry is asserted.
++ */
++function makeFakePage(width: number, height: number): Texture {
++  const source = new TextureSource({ resource: { width, height } as never });
++  source.width = width;
++  source.height = height;
++  return new Texture({ source, label: "test page" });
++}
++
++// ---------------------------------------------------------------------------
++// AnimationLayer — the core of the pose/idle/art split.
++// ---------------------------------------------------------------------------
++
++test("AnimationLayer nests pose > idle > art", () => {
++  const layer = createAnimationLayer("torso");
++
++  assert.equal(layer.pose.children.length, 1);
++  assert.equal(layer.pose.children[0], layer.idle);
++  assert.equal(layer.idle.children[0], layer.art);
++  assert.equal(layer.art.children.length, 0);
++});
++
++test("AnimationLayer keeps all three nodes labelled for lookup", () => {
++  const layer = createAnimationLayer("torso");
++
++  assert.equal(layer.pose.label, "torso");
++  assert.equal(layer.idle.label, "torso idle");
++  assert.equal(layer.art.label, "torso art");
++});
++
++test("resetTransform returns a node to its neutral state", () => {
++  const node = new Container();
++  node.position.set(10, 20);
++  node.scale.set(2, 3);
++  node.rotation = 0.5;
++  node.alpha = 0.25;
++
++  resetTransform(node);
++
++  assert.deepEqual([node.position.x, node.position.y], [0, 0]);
++  assert.deepEqual([node.scale.x, node.scale.y], [1, 1]);
++  assert.equal(node.rotation, 0);
++  assert.equal(node.alpha, 1);
++});
++
++// ---------------------------------------------------------------------------
++// P1 (audit) — idle and tap reactions must not write to the same transform.
++// ---------------------------------------------------------------------------
++
++test("idle and reactions target different nodes of a rig part", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const torso = rig.stacks.torso;
++
++  assert.notEqual(torso.pose, torso.idle);
++  assert.equal(torso.pose.parent, rig);
++  assert.equal(torso.idle.parent, torso.pose);
++});
++
++test("a tap reaction leaves the idle transform running untouched", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const torso = rig.stacks.torso;
++
++  // The idle loop owns `idle.scale`; the reaction owns `pose.scale`.
++  rig.reactToTap("body");
++
++  assert.ok(
++    torso.pose.action("tap-reaction"),
++    "reaction starts on the pose node",
++  );
++  assert.ok(
++    torso.idle.action("idle-breath"),
++    "idle keeps running on the idle node",
++  );
++  assert.notEqual(torso.pose, torso.idle);
++});
++
++test("rapid taps restart the reaction without stacking transforms", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const head = rig.stacks.head;
++
++  for (let tap = 0; tap < 12; tap += 1) rig.reactToTap("head");
++
++  // runWithKey replaces the previous action, so one key stays one action.
++  assert.ok(head.pose.action("tap-reaction"));
++  const keys = head.pose.children.length;
++  assert.equal(keys, 1, "repeated taps must not add child nodes");
++});
++
++test("reactions never animate the artwork container", () => {
++  const rig = new LayeredHeroineRig(() => {});
++
++  for (const zone of ["head", "hair", "body", "arms"] as const) {
++    rig.reactToTap(zone);
++  }
++
++  for (const stack of Object.values(rig.stacks)) {
++    assert.equal(
++      stack.art.hasActions(),
++      false,
++      `${stack.art.label} must stay unanimated so art can be swapped`,
++    );
++  }
++});
++
++// ---------------------------------------------------------------------------
++// Rig structure — hit areas and facial features must survive an art swap.
++// ---------------------------------------------------------------------------
++
++test("all six hit areas survive the pose/idle/art wrapping", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const interactive = [
++    rig.layers.backHair,
++    rig.layers.head,
++    rig.layers.frontHair,
++    rig.layers.torso,
++    rig.layers.leftArm,
++    rig.layers.rightArm,
++  ];
++
++  for (const node of interactive) {
++    assert.equal(node.eventMode, "static", `${node.label} must stay tappable`);
++    assert.ok(node.hitArea, `${node.label} must keep its hit area`);
++  }
++});
++
++test("facial features live outside the head artwork container", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const headArt = rig.stacks.head.art;
++
++  for (const feature of [
++    rig.layers.eyes,
++    rig.layers.eyelids,
++    rig.layers.mouth,
++  ]) {
++    assert.equal(
++      headArt.children.includes(feature),
++      false,
++      "a head art swap must not delete facial features",
++    );
++  }
++});
++
++test("applying art does not remove the eye, lid or mouth layers", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const eyesParent = rig.layers.eyes.parent;
++  const mouthParent = rig.layers.mouth.parent;
++
++  // A manifest that only contains the head would previously wipe the features.
++  const manifest: AtlasManifest = {
++    version: 1,
++    page: { src: "art/x.png", width: 64, height: 64 },
++    frames: [{ name: "head", x: 0, y: 0, width: 32, height: 32 }],
++  };
++  const source = new HeroineArtSource(manifest);
++  const missing = rig.applyArt(source);
++
++  assert.ok(missing.length > 0, "frames absent from the atlas are reported");
++  assert.equal(rig.layers.eyes.parent, eyesParent);
++  assert.equal(rig.layers.mouth.parent, mouthParent);
++});
++
++test("applyArt reports every frame it could not find", () => {
++  const rig = new LayeredHeroineRig(() => {});
++  const empty: AtlasManifest = {
++    version: 1,
++    page: { src: "art/x.png", width: 8, height: 8 },
++    frames: [{ name: "unknown_frame", x: 0, y: 0, width: 8, height: 8 }],
++  };
++
++  const missing = rig.applyArt(new HeroineArtSource(empty));
++
++  assert.ok(missing.includes("head"));
++  assert.ok(missing.includes("torso"));
++  assert.ok(missing.includes("eyes"));
++});
++
++// ---------------------------------------------------------------------------
++// Art loader — validation must fail loudly, never blank the scene.
++// ---------------------------------------------------------------------------
++
++test("normalizeUrl joins base and src without doubling slashes", () => {
++  assert.equal(normalizeUrl("/", "art/a.png"), "/art/a.png");
++  assert.equal(normalizeUrl("/base/", "art/a.png"), "/base/art/a.png");
++  assert.equal(normalizeUrl("/base", "art/a.png"), "/base/art/a.png");
++  assert.equal(normalizeUrl("/", "/absolute.png"), "/absolute.png");
++  assert.equal(normalizeUrl("/", "https://cdn/x.png"), "https://cdn/x.png");
++});
++
++test("validateManifest accepts a well-formed manifest", () => {
++  const result = validateManifest({
++    version: 1,
++    page: { src: "art/a.png", width: 100, height: 100 },
++    frames: [{ name: "head", x: 0, y: 0, width: 50, height: 50 }],
++  });
++
++  assert.ok("manifest" in result);
++});
++
++test("validateManifest rejects a missing page", () => {
++  const result = validateManifest({ version: 1, frames: [{ name: "a" }] });
++
++  assert.ok("failure" in result);
++  assert.equal(result.failure, "missing-page");
++});
++
++test("validateManifest rejects an empty frame list", () => {
++  const result = validateManifest({
++    version: 1,
++    page: { src: "art/a.png", width: 10, height: 10 },
++    frames: [],
++  });
++
++  assert.ok("failure" in result);
++  assert.equal(result.failure, "empty-frames");
++});
++
++test("validateManifest rejects a frame outside the page", () => {
++  const result = validateManifest({
++    version: 1,
++    page: { src: "art/a.png", width: 100, height: 100 },
++    frames: [{ name: "head", x: 90, y: 90, width: 50, height: 50 }],
++  });
++
++  assert.ok("failure" in result);
++  assert.equal(result.failure, "frame-out-of-bounds");
++});
++
++test("validateManifest rejects a non-positive density", () => {
++  const result = validateManifest({
++    version: 1,
++    page: { src: "art/a.png", width: 10, height: 10, density: 0 },
++    frames: [{ name: "a", x: 0, y: 0, width: 5, height: 5 }],
++  });
++
++  assert.ok("failure" in result);
++  assert.equal(result.failure, "bad-json");
++});
++
++test("HeroineArtSource exposes pivots and defaults to the frame centre", () => {
++  const manifest: AtlasManifest = {
++    version: 1,
++    page: { src: "art/a.png", width: 100, height: 100 },
++    frames: [
++      {
++        name: "explicit",
++        x: 0,
++        y: 0,
++        width: 40,
++        height: 20,
++        pivotX: 10,
++        pivotY: 4,
++      },
++      { name: "centred", x: 0, y: 0, width: 40, height: 20 },
++    ],
++  };
++  const source = new HeroineArtSource(manifest);
++
++  assert.deepEqual(source.pivot("explicit"), { x: 10, y: 4 });
++  assert.deepEqual(source.pivot("centred"), { x: 20, y: 10 });
++  assert.equal(source.pivot("nope"), null);
++});
++
++test("buildFrames registers one sub-texture per manifest frame", () => {
++  const manifest: AtlasManifest = {
++    version: 1,
++    page: { src: "art/a.png", width: 100, height: 100 },
++    frames: [
++      { name: "one", x: 0, y: 0, width: 10, height: 10 },
++      { name: "two", x: 10, y: 0, width: 10, height: 10 },
++    ],
++  };
++
++  const texture = makeFakePage(100, 100);
++  const source = buildFrames(manifest, texture);
++
++  assert.deepEqual(source.frameNames.sort(), ["one", "two"]);
++  const one = source.texture("one");
++  assert.ok(one);
++  assert.equal(one.frame.width, 10);
++  assert.equal(one.frame.x, 0);
++  const two = source.texture("two");
++  assert.ok(two);
++  assert.equal(two.frame.x, 10);
++});
+diff --git a/tests/rendering.test.ts b/tests/rendering.test.ts
+new file mode 100644
+index 0000000..53690d4
+--- /dev/null
++++ b/tests/rendering.test.ts
+@@ -0,0 +1,289 @@
++import assert from "node:assert/strict";
++import test from "node:test";
++import { Container } from "pixi.js";
++import { Action, registerPixiJSActionsMixin } from "pixijs-actions";
++import {
++  advanceFrame,
++  createTestTicker,
++  findRigLayer,
++  frameElapsedMs,
++  HEROINE_LAYER_LABELS,
++  resizeRendererAndScene,
++} from "../src/app/frameLoop.ts";
++import { LayeredHeroineRig } from "../src/heroine/rig/LayeredHeroineRig.ts";
++import { BottomNavigation } from "../src/presentation/ui/BottomNavigation.ts";
++import { createStyledButton } from "../src/presentation/ui/button.ts";
++import { RewardFeedback } from "../src/presentation/pixi/RewardFeedback.ts";
++
++// Pixi's action methods (run/runWithKey/removeAllActions) are added by this mixin in production.
++registerPixiJSActionsMixin(Container);
++
++/** Runs the action system for `frames` frames of `ms` each, without starting the ticker. */
++function tickActions(frames: number, ms = 16.67): void {
++  const ticker = createTestTicker();
++  ticker.lastTime = 0;
++  ticker.add((t) => Action.tick(t.elapsedMS));
++  for (let frame = 1; frame <= frames; frame += 1) ticker.update(frame * ms);
++}
++
++// ---------------------------------------------------------------------------
++// P0 - the rig could not be constructed at all, so the app showed a blank screen.
++// ---------------------------------------------------------------------------
++
++test("P0: the rig finds its eye/eyelid/mouth layers and constructs", () => {
++  const rig = new LayeredHeroineRig(() => {});
++
++  assert.equal(rig.layers.eyes.label, HEROINE_LAYER_LABELS.eyes);
++  assert.equal(rig.layers.eyelids.label, HEROINE_LAYER_LABELS.eyelids);
++  assert.equal(rig.layers.mouth.label, HEROINE_LAYER_LABELS.mouth);
++  assert.ok(rig.layers.eyes.children.length > 0);
++});
++
++test("P0: the old short labels never matched, which is what broke the rig", () => {
++  const head = new Container();
++  const eyes = new Container();
++  eyes.label = "eyes placeholder layer";
++  head.addChild(eyes);
++
++  // The pre-fix lookup used the short name and silently returned null.
++  assert.equal(head.getChildByLabel("eyes"), null);
++  assert.equal(head.getChildByLabel("eyes placeholder layer"), eyes);
++});
++
++test("P0: a missing layer fails loudly instead of returning null", () => {
++  const head = new Container();
++  head.addChild(new Container({ label: "eyes placeholder layer" }));
++
++  assert.throws(
++    () => findRigLayer(head, "eyelids"),
++    /LayeredHeroineRig is missing the "eyelids placeholder layer" layer/,
++  );
++});
++
++// ---------------------------------------------------------------------------
++// P1 - passive income was lost because deltaMS is capped at 100 ms.
++// ---------------------------------------------------------------------------
++
++test("P1: pixel cap of deltaMS loses most of a slow frame, elapsedMS does not", () => {
++  const ticker = createTestTicker();
++  ticker.lastTime = 0;
++  ticker.update(260); // a 4 FPS frame, like the headless SwiftShader runs
++
++  assert.equal(ticker.deltaMS, 100);
++  assert.equal(frameElapsedMs(ticker), 260);
++});
++
++test("P1: accumulating deltaMS keeps the economy at full wall-clock speed", () => {
++  const ticker = createTestTicker();
++  ticker.lastTime = 0;
++  let clamped = 0;
++  let raw = 0;
++
++  for (let frame = 1; frame <= 4; frame += 1) {
++    ticker.update(frame * 260);
++    clamped += ticker.deltaMS;
++    raw += frameElapsedMs(ticker);
++  }
++
++  // Four 260 ms frames is 1040 ms of real time; the clamped clock only sees 400 ms.
++  assert.equal(raw, 1040);
++  assert.equal(clamped, 400);
++  assert.equal(advanceFrame(ticker, 0, false).elapsedMs, 260);
++});
++
++test("P1: a paused or non-advancing frame contributes no game time", () => {
++  const ticker = createTestTicker();
++  ticker.lastTime = 0;
++
++  // First frame: 260 ms of real time, but the scene is paused (backgrounded).
++  ticker.update(260);
++  const pausedFrame = advanceFrame(ticker, 1_000, true);
++  assert.equal(pausedFrame.elapsedMs, 0);
++  assert.equal(pausedFrame.skipped, true);
++
++  // Same timestamp twice -> Pixi reports elapsedMS 0; the clock must not move backwards.
++  ticker.update(260);
++  const stalledFrame = advanceFrame(ticker, 1_000, false);
++  assert.equal(stalledFrame.elapsedMs, 0);
++  assert.equal(stalledFrame.skipped, true);
++  assert.equal(stalledFrame.nowMs, 1_000);
++});
++
++test("P1: the frame clock advances by the real elapsed time", () => {
++  const ticker = createTestTicker();
++  ticker.lastTime = 0;
++  ticker.update(250);
++
++  const frame = advanceFrame(ticker, 5_000, false);
++  assert.equal(frame.nowMs, 5_250);
++  assert.equal(frame.skipped, false);
++});
++
++// ---------------------------------------------------------------------------
++// P1 - the canvas kept its old size, so the bottom UI slid under the home bar.
++// ---------------------------------------------------------------------------
++
++test("P1: ResizeObserver path resizes the renderer before laying out the scene", () => {
++  const calls: string[] = [];
++  const app = {
++    screen: { width: 390, height: 763 },
++    renderer: {
++      resize(width: number, height: number) {
++        calls.push(`renderer ${width}x${height}`);
++      },
++    },
++  };
++  const scene = {
++    resize(width: number, height: number) {
++      calls.push(`scene ${width}x${height}`);
++    },
++  };
++
++  resizeRendererAndScene(app, scene);
++
++  assert.deepEqual(calls, ["renderer 390x763", "scene 390x763"]);
++});
++
++test("P1: scene layout reads the post-resize screen, not the stale one", () => {
++  const app = {
++    screen: { width: 390, height: 844 },
++    renderer: {
++      resize(width: number, height: number) {
++        // The renderer applies the new size to app.screen, exactly like Pixi does.
++        app.screen = { width, height };
++      },
++    },
++  };
++  let seen = "";
++  const scene = {
++    resize() {
++      seen = `${app.screen.width}x${app.screen.height}`;
++    },
++  };
++
++  resizeRendererAndScene(app, scene);
++  assert.equal(seen, "390x844");
++});
++
++// ---------------------------------------------------------------------------
++// P2 - the bottom navigation was wider than a 280 px viewport.
++// ---------------------------------------------------------------------------
++
++test("P2: bottom navigation fits inside a 280 px viewport", () => {
++  const nav = new BottomNavigation(() => {});
++
++  nav.resize(280, 568);
++  assert.equal(nav.contentWidth, 264);
++  assert.ok(nav.contentWidth <= 280);
++
++  nav.resize(320, 568);
++  assert.equal(nav.contentWidth, 304);
++
++  nav.resize(844, 390);
++  assert.equal(nav.contentWidth, 828);
++});
++
++test("P2: six sections still fit at the 280 px minimum", () => {
++  const nav = new BottomNavigation(() => {});
++  nav.resize(280, 568);
++
++  const row = nav.children[1];
++  assert.ok(row, "navigation row must exist");
++  assert.equal(row.children.length, 6);
++
++  // Six 36 px items plus five 4 px gaps must fit in the 248 px inner width.
++  const innerWidth = nav.contentWidth - 16;
++  assert.ok(
++    6 * 36 + 5 * 4 <= innerWidth,
++    `six sections must fit in ${innerWidth} px`,
++  );
++});
++
++// ---------------------------------------------------------------------------
++// P2 - every toast created a fresh Text and leaked a GPU texture.
++// ---------------------------------------------------------------------------
++
++test("P2: toasts are pooled and stay bounded", () => {
++  const stage = new Container();
++  const feedback = new RewardFeedback(stage);
++
++  for (let index = 0; index < 20; index += 1) {
++    feedback.show(`+5 credits`, 10, 10);
++    tickActions(50); // let the full ~0.8 s sequence finish so it is released
++  }
++
++  assert.ok(
++    stage.children.length <= 1,
++    `expected at most one live toast, saw ${stage.children.length}`,
++  );
++  assert.ok(feedback.pooledCount <= 8, `pool grew to ${feedback.pooledCount}`);
++
++  feedback.destroy();
++  assert.equal(feedback.pooledCount, 0);
++});
++
++test("P2: a released toast is reused instead of adding a new node", () => {
++  const stage = new Container();
++  const feedback = new RewardFeedback(stage);
++
++  feedback.show("+5 credits", 10, 10);
++  tickActions(50);
++  const afterFirst = stage.children.length;
++  assert.equal(afterFirst, 1);
++
++  feedback.show("+4 credits", 20, 20);
++  assert.equal(
++    stage.children.length,
++    afterFirst,
++    "second toast must reuse the pooled node",
++  );
++
++  feedback.destroy();
++});
++
++test("P2: a reused toast becomes visible again", () => {
++  const stage = new Container();
++  const feedback = new RewardFeedback(stage);
++
++  feedback.show("+5 credits", 10, 10);
++  tickActions(50);
++  const pooled = stage.children[0];
++  assert.ok(pooled);
++  assert.equal(pooled.visible, false, "released toast must be hidden");
++
++  feedback.show("+5 credits", 10, 10);
++  assert.equal(pooled.visible, true, "reused toast must be shown again");
++  assert.equal(pooled.alpha, 0, "reused toast fades in from zero");
++
++  feedback.destroy();
++});
++
++test("P2: toasts of different tones get their own pool entries", () => {
++  const stage = new Container();
++  const feedback = new RewardFeedback(stage);
++
++  feedback.show("+5 credits", 10, 10, "reward");
++  feedback.show("TIER 2", 10, 10, "milestone");
++  assert.equal(stage.children.length, 2);
++
++  feedback.destroy();
++});
++
++// ---------------------------------------------------------------------------
++// P3 - setLabel left the container label stale.
++// ---------------------------------------------------------------------------
++
++test("P3: setLabel keeps the rendered text and the container label in sync", () => {
++  const button = createStyledButton("КУПИТЬ", {
++    width: 100,
++    height: 40,
++    onPress: () => {},
++  });
++
++  button.setLabel("КУПИТЬ · 20");
++  assert.equal(button.label.text, "КУПИТЬ · 20");
++  assert.equal(button.node.label, "КУПИТЬ · 20");
++
++  button.setLabel("ЗАКРЫТО · УР 1");
++  assert.equal(button.node.label, "ЗАКРЫТО · УР 1");
++});
