@@ -12,7 +12,7 @@ npm install
 npm run dev
 ```
 
-The Vite server binds to `0.0.0.0` for preview hosting. The `.ink` source is compiled before the dev server starts.
+The Vite server binds to `0.0.0.0` for preview hosting and allows only `*.e2b.app` hosts beyond Vite's built-in localhost/IP entries. The `.ink` source is compiled before the dev server starts.
 
 ## Validation commands
 
