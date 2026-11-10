@@ -72,10 +72,10 @@
   ],
   "stages": {
     "00-intake": "COMPLETE — three references received, committed, [С-8] resolved, full visual set confirmed",
-    "01-campus": "SUPERSEDED — no regeneration needed; evaluation/agreement of IMG_4037 pending",
-    "02-style": "SUPERSEDED — no regeneration needed; evaluation/agreement of IMG_4036 pending",
-    "03-rigpose": "SUPERSEDED — no regeneration needed; frontal-pose review of IMG_4038 pending",
-    "04-slicing-prep": "NOT STARTED — requires separate explicit permission before any slicing work"
+    "01-campus": "REVIEW COMPLETE — campus canon matches (see reference review)",
+    "02-style": "REVIEW COMPLETE — style reference confirmed, C-8 resolved",
+    "03-rigpose": "REVIEW COMPLETE — frontal pose accepted with notes",
+    "04-slicing-prep": "SPEC DRAFTED — animation spec ready; slicing NOT started, requires explicit approval"
   },
   "updatedAt": "2026-11-10",
   "decisions": {
@@ -98,5 +98,28 @@
     "consequence": "Stages 01-03 of the restoration plan NO LONGER require generating replacement masters. Their purpose changes from reconstruction to evaluation/agreement of the supplied references. No image generation is performed.",
     "stillOpen": "Byte identity with the PNG binaries named in the PAT is NOT claimed (WebP vs PNG, only 7-char prefixes). Separate files heroine-01-approved.png, identity-anchor.png, rigpose-01.png and the 5 test cutouts were not supplied. §8 contradictions remain unresolved except [С-8]. Slicing, atlas, code, Merge and Deployment each require a separate explicit permission."
   },
-  "planRevision": "v2 (2026-11-10): stages 01-03 changed from reconstruction to review; generation removed."
+  "planRevision": "v2 (2026-11-10): stages 01-03 changed from reconstruction to review; generation removed.",
+  "review": {
+    "file": "art-studio/stages/REFERENCE-REVIEW.md",
+    "verdict": "ACCEPTED WITH NOTES — frontal rig-pose geometry passes; final render must follow the style reference",
+    "axisDeviationPx": "<=0.6 of 106 (5 control points)",
+    "mirrorRMSE": 0.0893856,
+    "uniqueColors": {
+      "style": 124223,
+      "campus": 116952,
+      "rigpose": 55454
+    },
+    "notes": [
+      "rig-pose render is flatter than the style reference (fewer gradients)",
+      "background/lighting [C-7]",
+      "hair masses overlap shoulders [slicing note]",
+      "ribbon/stockings/shoes [C-3]"
+    ]
+  },
+  "animationSpec": {
+    "file": "art-studio/ANIMATION-SPEC.md",
+    "status": "DRAFT — for agreement",
+    "basis": "public GitHub animation projects as TECHNIQUE references only; NOT user repositories, NOT canon",
+    "target": "20 graphic slots / 24 visual states, never 7-9"
+  }
 }
