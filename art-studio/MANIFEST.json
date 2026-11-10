@@ -1,6 +1,6 @@
 {
   "schema": "heroine-01/visual-asset-manifest/v1",
-  "stage": "00-intake",
+  "stage": "04-slicing-prep",
   "date": "2026-11-10",
   "branch": "arena/02869c32-actual-new-clicker",
   "source": "User attachments in chat (IMG_4036.webp, IMG_4037.webp, IMG_4038.webp)",
@@ -64,7 +64,7 @@
       "gitBlobSha": "6960f95798f53859857c14fc9eaf2e982f7017f6",
       "patEquivalent": "rigpose-01.png / rigpose-02.png (в PAT 0 упоминаний)",
       "recoveryDocRefs": "§4, §5, §6, §9 п.4, [С-7]",
-      "status": "RESTORED — frontal rig-pose supplied by user; NOT approved for slicing",
+      "status": "APPROVED for technical slicing by user 2026-11-10 («Одобряю»); geometry source only, NOT render canon",
       "modified": false,
       "userConfirmedRestored": true,
       "note": "848x1264 equals APPROVED.json sourceSizePx (foundation), but the user labels this file as the rig-pose. Frontal A-pose, separated fingers, leg gap, collar clear of shoulder joints. Rendering is visibly simpler/flatter than the style reference — observation for stage 03, not a decision."
@@ -75,7 +75,7 @@
     "01-campus": "REVIEW COMPLETE — campus canon matches (see reference review)",
     "02-style": "REVIEW COMPLETE — style reference confirmed, C-8 resolved",
     "03-rigpose": "REVIEW COMPLETE — frontal pose accepted with notes",
-    "04-slicing-prep": "SPEC DRAFTED — animation spec ready; slicing NOT started, requires explicit approval"
+    "04-slicing-prep": "PARTIAL COMPLETE — user «Одобряю» (2026-11-10) granted slicing; technical alpha cutout + 20-slot geometric crop map committed. 20 of 24 states present; 4 states NOT present (require separate art pass, no-generation gate). Independent final layers, occlusion repair, atlas and code NOT done."
   },
   "updatedAt": "2026-11-10",
   "decisions": {
@@ -118,8 +118,34 @@
   },
   "animationSpec": {
     "file": "art-studio/ANIMATION-SPEC.md",
-    "status": "DRAFT — for agreement",
+    "status": "USED AS BASIS for stage 04 — slicing approved by user 2026-11-10 («Одобряю»); 20 slots / 24 states retained",
     "basis": "public GitHub animation projects as TECHNIQUE references only; NOT user repositories, NOT canon",
     "target": "20 graphic slots / 24 visual states, never 7-9"
+  },
+  "slicing": {
+    "permission": "user «Одобряю», 2026-11-10",
+    "report": "art-studio/stages/04-slicing-prep/SLICE-MAP.md",
+    "cropMap": "art-studio/stages/04-slicing-prep/crop-map.json",
+    "cutout": "art-studio/stages/04-slicing-prep/cutouts/work-cutout.png",
+    "alphaMask": "art-studio/stages/04-slicing-prep/cutouts/alpha-mask.png",
+    "builder": "art-studio/stages/04-slicing-prep/build_crops.py",
+    "slotsDir": "art-studio/stages/04-slicing-prep/cutouts/slots/",
+    "graphicSlots": 20,
+    "visualStatesPresent": 20,
+    "visualStatesMissing": 4,
+    "missingStates": [
+      "eye_l_closed",
+      "eye_r_closed",
+      "mouth_open",
+      "mouth_smile"
+    ],
+    "type": "geometric crop windows over a single composited frame, NOT independent layers",
+    "alphaMethod": "bilinear 4-corner background model + flood-fill from canvas border + connected-component cleanup",
+    "alphaMean": 0.269604,
+    "originalsUnchanged": true,
+    "generation": false,
+    "atlas": false,
+    "codeModified": false,
+    "blockedNext": "occlusion repair / hidden-zone repaint and the 4 missing states require a separate art pass with explicit permission"
   }
 }
