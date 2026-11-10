@@ -1,0 +1,73 @@
+{
+  "schema": "heroine-01/visual-asset-manifest/v1",
+  "stage": "00-intake",
+  "date": "2026-11-10",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "source": "User attachments in chat (IMG_4036.webp, IMG_4037.webp, IMG_4038.webp)",
+  "policy": {
+    "generated": false,
+    "note": "Files are byte-identical copies of the user attachments. No generation, retouch, crop, resize or conversion performed. Original approved art, code, atlas, PR and docs are untouched.",
+    "notVerified": "PAT in main contains only 7-character git prefixes for PNG binaries; these WebP files CANNOT be hash-matched against them. Byte identity with the lost PNG originals is NOT claimed.",
+    "readOnly": true
+  },
+  "files": [
+    {
+      "path": "art-studio/references/originals/IMG_4036_style-reference.webp",
+      "role": "style-reference",
+      "userLabel": "Style reference — исходная художественная манера",
+      "sourceUpload": "/tmp/arena-coding-uploads/IMG_4036.webp",
+      "format": "WebP / VP8 (lossy)",
+      "hasAlpha": false,
+      "widthPx": 864,
+      "heightPx": 1821,
+      "bytes": 99902,
+      "sha256": "33c266763e5a055ba3da9278015435f929cf8e05d9ded081f34baf9a36dabd28",
+      "gitBlobSha": "cb09b41c4cdad1f73676019258fa5bdc45c38d5a",
+      "patEquivalent": "art-studio/style/style-anchor-anime.png (3f3d0d6)",
+      "recoveryDocRefs": "§2.1–§2.4, §9 п.2, [С-2], [С-8]",
+      "status": "INTAKE — reference received, NOT approved as a master",
+      "modified": false
+    },
+    {
+      "path": "art-studio/references/originals/IMG_4037_campus-outfit.webp",
+      "role": "campus-outfit",
+      "userLabel": "Campus outfit — одежда и внешний вид HEROINE-01",
+      "sourceUpload": "/tmp/arena-coding-uploads/IMG_4037.webp",
+      "format": "WebP / VP8 (lossy)",
+      "hasAlpha": false,
+      "widthPx": 704,
+      "heightPx": 1484,
+      "bytes": 68726,
+      "sha256": "8c04c2dc8d796fae199c3ea30d440a511e0c1b9ca277e9f4c43f4d999bb8db05",
+      "gitBlobSha": "60e8d8fac52f5e8e75da0ee7310bdec7192c492c",
+      "patEquivalent": "art-studio/approved/heroine-01-campus-approved.png (8e0bbdc)",
+      "recoveryDocRefs": "§1.1, §3.1, §9 п.1, [С-3], [С-6]",
+      "status": "INTAKE — reference received, NOT approved as a master",
+      "modified": false
+    },
+    {
+      "path": "art-studio/references/originals/IMG_4038_rig-pose.webp",
+      "role": "rig-pose",
+      "userLabel": "Rig-pose — поза и подготовка к нарезке на слои",
+      "sourceUpload": "/tmp/arena-coding-uploads/IMG_4038.webp",
+      "format": "WebP / VP8 (lossy)",
+      "hasAlpha": false,
+      "widthPx": 848,
+      "heightPx": 1264,
+      "bytes": 53196,
+      "sha256": "477c64490b1e966109d8f68b815c4983a655373473fa2856d1a9ff57fd52dbf9",
+      "gitBlobSha": "6960f95798f53859857c14fc9eaf2e982f7017f6",
+      "patEquivalent": "rigpose-01.png / rigpose-02.png (в PAT 0 упоминаний)",
+      "recoveryDocRefs": "§4, §5, §6, §9 п.4, [С-7]",
+      "status": "INTAKE — reference received, NOT approved as a master",
+      "modified": false
+    }
+  ],
+  "stages": {
+    "00-intake": "COMPLETE — references received and committed",
+    "01-campus": "NOT STARTED — awaiting plan approval",
+    "02-style": "NOT STARTED",
+    "03-rigpose": "NOT STARTED",
+    "04-slicing-prep": "NOT STARTED"
+  }
+}
