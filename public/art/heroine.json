@@ -1,0 +1,92 @@
+{
+  "version": 3,
+  "page": {
+    "src": "art/heroine@2x.png",
+    "width": 512,
+    "height": 512,
+    "density": 2
+  },
+  "frames": [
+    {
+      "name": "back_hair",
+      "x": 6,
+      "y": 6,
+      "width": 114,
+      "height": 137,
+      "pivotX": 57,
+      "pivotY": 53
+    },
+    {
+      "name": "torso",
+      "x": 126,
+      "y": 6,
+      "width": 76,
+      "height": 124,
+      "pivotX": 38,
+      "pivotY": 5
+    },
+    {
+      "name": "arm_left",
+      "x": 208,
+      "y": 6,
+      "width": 18,
+      "height": 77,
+      "pivotX": 9,
+      "pivotY": 1
+    },
+    {
+      "name": "arm_right",
+      "x": 232,
+      "y": 6,
+      "width": 18,
+      "height": 77,
+      "pivotX": 9,
+      "pivotY": 1
+    },
+    {
+      "name": "head",
+      "x": 256,
+      "y": 6,
+      "width": 80,
+      "height": 94,
+      "pivotX": 40,
+      "pivotY": 47
+    },
+    {
+      "name": "eyes",
+      "x": 342,
+      "y": 6,
+      "width": 38,
+      "height": 6,
+      "pivotX": 19,
+      "pivotY": 1
+    },
+    {
+      "name": "eyelids",
+      "x": 386,
+      "y": 6,
+      "width": 42,
+      "height": 2,
+      "pivotX": 21,
+      "pivotY": 0
+    },
+    {
+      "name": "mouth",
+      "x": 434,
+      "y": 6,
+      "width": 12,
+      "height": 6,
+      "pivotX": 5.75,
+      "pivotY": 2.75
+    },
+    {
+      "name": "hair_front",
+      "x": 6,
+      "y": 149,
+      "width": 83,
+      "height": 59,
+      "pivotX": 41.23,
+      "pivotY": 47.23
+    }
+  ]
+}

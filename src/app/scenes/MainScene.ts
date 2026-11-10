@@ -88,6 +88,11 @@ export class MainScene extends Container {
     this.renderState();
   }
 
+  /** Exposes the HEROINE-01 rig so artwork can be swapped in once the atlas is ready. */
+  get heroineRig(): LayeredHeroineRig {
+    return this.heroine;
+  }
+
   update(elapsedMs: number): void {
     if (this.paused || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
     this.session.tick(elapsedMs);

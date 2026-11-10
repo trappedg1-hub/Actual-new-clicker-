@@ -1,5 +1,7 @@
-import { Circle, Container, Graphics, Rectangle, Text } from "pixi.js";
+import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
 import { findRigLayer } from "../../app/frameLoop.ts";
+import { createAnimationLayer, type AnimationLayer } from "./animationLayer.ts";
+import type { HeroineArtSource } from "../art/heroineArt.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { startIdlePose } from "../poses/idlePose.ts";
 import { playZoneReaction } from "../reactions/zoneReactions.ts";
@@ -16,6 +18,38 @@ export interface HeroineRigLayers {
   rightArm: Container;
 }
 
+/**
+ * Animatable rig parts and the node each kind of animation must target.
+ *
+ * `pose` is driven by tap reactions (always from identity), `idle` by the breathing /
+ * sway / blink loops. The art container is never animated, so artwork can be swapped
+ * for Sprites later without touching the animation code.
+ */
+export interface HeroineRigStacks {
+  torso: AnimationLayer;
+  head: AnimationLayer;
+  frontHair: AnimationLayer;
+  backHair: AnimationLayer;
+  leftArm: AnimationLayer;
+  rightArm: AnimationLayer;
+  eyes: AnimationLayer;
+  eyelids: AnimationLayer;
+  mouth: AnimationLayer;
+}
+
+/** Stack key -> frame name in the atlas. */
+const ART_FRAME_NAMES: Record<string, string> = {
+  backHair: "back_hair",
+  torso: "torso",
+  leftArm: "arm_left",
+  rightArm: "arm_right",
+  head: "head",
+  eyes: "eyes",
+  eyelids: "eyelids",
+  mouth: "mouth",
+  frontHair: "hair_front",
+};
+
 const LINE = 0xf2c7ff;
 const ACCENT = 0x8fe7ff;
 const FILL = 0x5f3b86;
@@ -23,7 +57,11 @@ const FILL = 0x5f3b86;
 /** A technical wireframe placeholder, not approved or generated character artwork. */
 export class LayeredHeroineRig extends Container {
   readonly layers: HeroineRigLayers;
+  /** Animation targets, kept separate so idle and reactions cannot overwrite each other. */
+  readonly stacks: HeroineRigStacks;
   private readonly glow: Graphics;
+  /** Pose nodes for eyes/eyelids/mouth, kept outside the head artwork. */
+  private headFeatures: Container[] = [];
   private placeholderTag: Text | null = null;
 
   constructor(
@@ -34,18 +72,56 @@ export class LayeredHeroineRig extends Container {
     this.glow = new Graphics();
     this.addChild(this.glow);
 
-    const backHair = this.createBackHair();
-    const torso = this.createTorso();
-    const leftArm = this.createArm(-1);
-    const rightArm = this.createArm(1);
-    const head = this.createHead();
-    const frontHair = this.createFrontHair();
+    // Art is built first, then wrapped: pose -> idle -> art.
+    // Tap reactions animate `pose`, idle loops animate `idle`, artwork stays static.
+    // Carries the facial features so they survive a head artwork swap.
+    const headFeaturesHost = createAnimationLayer("head features");
+
+    const backHairStack = createAnimationLayer("back hair");
+    const torsoStack = createAnimationLayer("torso");
+    const leftArmStack = createAnimationLayer("left arm");
+    const rightArmStack = createAnimationLayer("right arm");
+    const headStack = createAnimationLayer("head");
+    const frontHairStack = createAnimationLayer("front hair");
+
+    const backHair = this.createBackHair(backHairStack.art);
+    const torso = this.createTorso(torsoStack.art);
+    const leftArm = this.createArm(-1, leftArmStack.art);
+    const rightArm = this.createArm(1, rightArmStack.art);
+    const head = this.createHead(headStack.art);
+    const frontHair = this.createFrontHair(frontHairStack.art);
+
+    // The head internals keep their own stacking so blinking cannot reset a head reaction.
+    const eyesStack = createAnimationLayer("eyes");
+    const eyelidsStack = createAnimationLayer("eyelids");
+    const mouthStack = createAnimationLayer("mouth");
 
     // The placeholder layers are labelled "eyes placeholder layer" etc. Looking them up
     // by the short name returned null and the whole rig constructor threw (blank screen).
     const eyes = findRigLayer(head, "eyes");
     const eyelids = findRigLayer(head, "eyelids");
     const mouth = findRigLayer(head, "mouth");
+
+    // Re-parent the eye/lid graphics into their stacks, preserving local coordinates.
+    eyesStack.art.addChild(eyes);
+    eyelidsStack.art.addChild(eyelids);
+    mouthStack.art.addChild(mouth);
+    // Facial features are siblings of the head artwork, not children of it: `applyArt`
+    // clears an art container, which used to delete the eyes along with the head.
+    this.headFeatures = [eyesStack.pose, eyelidsStack.pose, mouthStack.pose];
+    headFeaturesHost.art.addChild(...this.headFeatures);
+
+    this.stacks = {
+      torso: torsoStack,
+      head: headStack,
+      frontHair: frontHairStack,
+      backHair: backHairStack,
+      leftArm: leftArmStack,
+      rightArm: rightArmStack,
+      eyes: eyesStack,
+      eyelids: eyelidsStack,
+      mouth: mouthStack,
+    };
 
     this.layers = {
       backHair,
@@ -58,7 +134,15 @@ export class LayeredHeroineRig extends Container {
       leftArm,
       rightArm,
     };
-    this.addChild(backHair, torso, leftArm, rightArm, head, frontHair);
+    this.addChild(
+      backHairStack.pose,
+      torsoStack.pose,
+      leftArmStack.pose,
+      rightArmStack.pose,
+      headStack.pose,
+      headFeaturesHost.pose,
+      frontHairStack.pose,
+    );
 
     this.makeInteractive(
       backHair,
@@ -104,7 +188,22 @@ export class LayeredHeroineRig extends Container {
     this.placeholderTag = tag;
     this.addChild(tag);
 
-    startIdlePose({ torso, frontHair, backHair, eyes, eyelids });
+    // The placeholder builders set the placement on the art node; move it onto `pose`
+    // so the artwork can be replaced without moving the layer.
+    for (const stack of Object.values(this.stacks))
+      this.liftRestTransform(stack);
+
+    // Facial features sit at the head's placement, so they must adopt it AFTER the
+    // head's own rest transform has been moved onto its pose node.
+    headFeaturesHost.pose.position.copyFrom(headStack.pose.position);
+
+    startIdlePose({
+      torso: torsoStack.idle,
+      frontHair: frontHairStack.idle,
+      backHair: backHairStack.idle,
+      eyes: eyesStack.idle,
+      eyelids: eyelidsStack.idle,
+    });
   }
 
   setScaleForViewport(scale: number): void {
@@ -118,7 +217,62 @@ export class LayeredHeroineRig extends Container {
   }
 
   reactToTap(zone: HeroineTouchZone): void {
-    playZoneReaction(this.layers, zone);
+    // Reactions target the `pose` containers so they compose with the idle loop
+    // instead of overwriting the same transform.
+    playZoneReaction(
+      {
+        head: this.stacks.head.pose,
+        frontHair: this.stacks.frontHair.pose,
+        backHair: this.stacks.backHair.pose,
+        torso: this.stacks.torso.pose,
+        leftArm: this.stacks.leftArm.pose,
+        rightArm: this.stacks.rightArm.pose,
+      },
+      zone,
+    );
+  }
+
+  /**
+   * Replaces the vector placeholder with atlas artwork, in place.
+   *
+   * The rig geometry, hit areas and animation stacks stay untouched: only the contents
+   * of each `art` container change. Frames whose name is missing from the atlas keep
+   * their placeholder, so a partial atlas degrades gracefully instead of blanking out.
+   *
+   * Returns the names of the frames that could not be applied.
+   */
+  /**
+   * Detaches the rest transform from the artwork node.
+   *
+   * Placeholder builders set `layer.position` on the art container; after wrapping, that
+   * position must live on `pose` so swapping the art cannot move the layer.
+   */
+  private liftRestTransform(stack: AnimationLayer): void {
+    stack.pose.position.copyFrom(stack.art.position);
+    stack.art.position.set(0, 0);
+  }
+
+  applyArt(source: HeroineArtSource): string[] {
+    const missing: string[] = [];
+    for (const [frameName, stack] of Object.entries(this.stacks)) {
+      const texture = source.texture(
+        ART_FRAME_NAMES[frameName as keyof HeroineRigStacks] ?? frameName,
+      );
+      const pivot = source.pivot(
+        ART_FRAME_NAMES[frameName as keyof HeroineRigStacks] ?? frameName,
+      );
+      if (!texture || !pivot) {
+        missing.push(frameName);
+        continue;
+      }
+      const sprite = new Sprite(texture);
+      // Anchor places the rig origin exactly where the bake recorded it.
+      sprite.anchor.set(pivot.x / texture.width, pivot.y / texture.height);
+      sprite.label = `${frameName} art sprite`;
+      stack.art.removeChildren();
+      stack.art.addChild(sprite);
+    }
+    return missing;
   }
 
   /**
@@ -138,8 +292,8 @@ export class LayeredHeroineRig extends Container {
     this.placeholderTag.position.set(0, Math.min(188, tagOffset));
   }
 
-  private createBackHair(): Container {
-    const layer = new Container();
+  private createBackHair(target: Container): Container {
+    const layer = target;
     layer.label = "back hair placeholder";
     layer.position.set(0, -91);
     const shape = new Graphics();
@@ -169,8 +323,8 @@ export class LayeredHeroineRig extends Container {
     return layer;
   }
 
-  private createTorso(): Container {
-    const layer = new Container();
+  private createTorso(target: Container): Container {
+    const layer = target;
     layer.label = "torso placeholder";
     layer.position.set(0, 0);
     const shape = new Graphics();
@@ -196,8 +350,8 @@ export class LayeredHeroineRig extends Container {
     return layer;
   }
 
-  private createArm(side: -1 | 1): Container {
-    const layer = new Container();
+  private createArm(side: -1 | 1, target: Container): Container {
+    const layer = target;
     layer.label = side < 0 ? "left arm placeholder" : "right arm placeholder";
     layer.position.set(side * 45, 19);
     layer.rotation = side * 0.12;
@@ -212,8 +366,8 @@ export class LayeredHeroineRig extends Container {
     return layer;
   }
 
-  private createHead(): Container {
-    const head = new Container();
+  private createHead(target: Container): Container {
+    const head = target;
     head.label = "head placeholder";
     head.position.set(0, -91);
     const outline = new Graphics();
@@ -266,8 +420,8 @@ export class LayeredHeroineRig extends Container {
     return head;
   }
 
-  private createFrontHair(): Container {
-    const layer = new Container();
+  private createFrontHair(target: Container): Container {
+    const layer = target;
     layer.label = "front hair placeholder";
     layer.position.set(0, -91);
     const shape = new Graphics();
