@@ -6,6 +6,7 @@ import { GameRepository } from "../../persistence/indexeddb/GameRepository.ts";
 import { SaveCoordinator } from "../../persistence/SaveCoordinator.ts";
 import { GameSession } from "../GameSession.ts";
 import { advanceFrame, resizeRendererAndScene } from "../frameLoop.ts";
+import { loadHeroineArt } from "../../heroine/art/heroineArt.ts";
 import { MainScene } from "../scenes/MainScene.ts";
 
 function announceBootError(message: string): void {
@@ -84,6 +85,30 @@ export async function bootstrapGame(): Promise<void> {
     frameNowMs = frame.nowMs;
     if (!frame.skipped) scene.update(frame.elapsedMs);
   });
+
+  // Artwork loads after the first frame: a missing or broken atlas must never delay the
+  // game or blank the scene. While it loads (or if it fails) the vector placeholder stays.
+  void loadHeroineArt(
+    `${import.meta.env.BASE_URL}art/heroine.json`,
+    import.meta.env.BASE_URL,
+  )
+    .then((art) => {
+      if (!art.ok || !art.source) {
+        console.warn(
+          `HEROINE-01 artwork not applied (${art.failure}): ${art.detail}`,
+        );
+        return;
+      }
+      const missing = scene.heroineRig.applyArt(art.source);
+      if (missing.length > 0) {
+        console.warn(
+          `HEROINE-01 artwork is missing frames: ${missing.join(", ")}`,
+        );
+      }
+    })
+    .catch((error: unknown) => {
+      console.warn("HEROINE-01 artwork failed to load", error);
+    });
 
   if (loadIssue) {
     scene.applyOfflineProgress(0, 0, false);

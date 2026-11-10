@@ -2,6 +2,12 @@ import { Action } from "pixijs-actions";
 import type { Container } from "pixi.js";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 
+/**
+ * Nodes a tap reaction animates.
+ *
+ * These are the `pose` containers of `AnimationLayer`, not the artwork: reactions
+ * always start from identity while the idle loop keeps running on the inner node.
+ */
 export interface HeroineReactionLayers {
   head: Container;
   frontHair: Container;
@@ -11,7 +17,12 @@ export interface HeroineReactionLayers {
   rightArm: Container;
 }
 
-/** Reactions animate the tapped rig part(s), not a scale/rotation of the whole heroine. */
+/**
+ * Reactions animate the tapped rig part(s), not the whole heroine.
+ *
+ * Every sequence starts and ends at identity: the final action is a no-op reset, so a
+ * rapid series of taps (which restarts the sequence) can never accumulate drift.
+ */
 export function playZoneReaction(
   layers: HeroineReactionLayers,
   zone: HeroineTouchZone,
