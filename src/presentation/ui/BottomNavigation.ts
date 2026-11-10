@@ -45,7 +45,9 @@ export class BottomNavigation extends Container {
   }
 
   resize(width: number, height: number): void {
-    this.currentWidth = Math.max(288, width - 16);
+    // `max(288, ...)` made the bar wider than a 280 px viewport and pushed the last
+    // section off screen. 264 px still fits all six items at their 36 px minimum.
+    this.currentWidth = Math.max(264, width - 16);
     const x = Math.max(8, (width - this.currentWidth) / 2);
     const panelHeight = 60;
     this.position.set(x, height - panelHeight - 6);
@@ -68,7 +70,7 @@ export class BottomNavigation extends Container {
     };
     const gapTotal = 4 * (this.buttons.length - 1);
     const itemWidth = Math.max(
-      40,
+      36,
       (innerWidth - gapTotal) / this.buttons.length,
     );
     for (const button of this.buttons) {

@@ -120,5 +120,18 @@ export class UpgradePanel extends Container {
       : this.portrait
         ? "Пассивный доход станет выше"
         : "Доход за каждый уровень";
+    // The description used to run under the buy button on narrow panels. In portrait the
+    // buy button occupies the right ~116 px; in landscape it sits below the text, so the
+    // description may use the full panel width.
+    this.detail.style.wordWrap = true;
+    this.detail.style.wordWrapWidth = this.portrait
+      ? Math.max(90, this.panelWidth - 130)
+      : Math.max(90, this.panelWidth - 28);
+    // `+0.25 / сек` collided with the buy button in the compact landscape panel.
+    // The description can wrap to two lines on a 280 px screen, so the level row follows
+    // its measured height instead of sitting at a fixed y that the wrapped text runs into.
+    const levelY = this.detail.position.y + this.detail.height + 6;
+    this.levelText.position.set(14, levelY);
+    this.rateText.position.set(this.portrait ? 104 : 14, levelY);
   }
 }

@@ -90,6 +90,8 @@ export function createStyledButton(
     label,
     setLabel(nextText) {
       label.text = nextText;
+      // The container label is what accessibility tooling and hit-test debugging read.
+      button.label = nextText;
     },
     setSize(nextWidth, nextHeight) {
       width = nextWidth;
