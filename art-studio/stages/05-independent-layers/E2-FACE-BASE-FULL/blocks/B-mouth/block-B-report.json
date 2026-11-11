@@ -1,0 +1,467 @@
+{
+  "block": "B - mouth",
+  "expressions": [
+    "mouth_open-A",
+    "mouth_smile-A"
+  ],
+  "visualReferenceOnly": "mouth_closed-A (no separate slot / no mask)",
+  "method": "one shared manual clean base + two independent fitted soft hybrid mattes",
+  "generativeAI": false,
+  "inpainting": false,
+  "generativeFill": false,
+  "cleanPolygon": [
+    [
+      404,
+      201
+    ],
+    [
+      408,
+      197
+    ],
+    [
+      415,
+      195
+    ],
+    [
+      423,
+      194
+    ],
+    [
+      431,
+      195
+    ],
+    [
+      438,
+      197
+    ],
+    [
+      441,
+      201
+    ],
+    [
+      441,
+      206
+    ],
+    [
+      437,
+      210
+    ],
+    [
+      430,
+      213
+    ],
+    [
+      423,
+      214
+    ],
+    [
+      416,
+      212
+    ],
+    [
+      409,
+      209
+    ],
+    [
+      404,
+      205
+    ]
+  ],
+  "lensPolygon": [
+    [
+      405,
+      201
+    ],
+    [
+      409,
+      197
+    ],
+    [
+      416,
+      195
+    ],
+    [
+      423,
+      194
+    ],
+    [
+      431,
+      195
+    ],
+    [
+      438,
+      198
+    ],
+    [
+      442,
+      202
+    ],
+    [
+      441,
+      207
+    ],
+    [
+      436,
+      211
+    ],
+    [
+      429,
+      214
+    ],
+    [
+      422,
+      214
+    ],
+    [
+      415,
+      211
+    ],
+    [
+      409,
+      208
+    ],
+    [
+      405,
+      205
+    ]
+  ],
+  "skinAnchors": {
+    "count": 48,
+    "handCandidatesSkipped": [
+      [
+        420,
+        220
+      ],
+      [
+        428,
+        220
+      ]
+    ],
+    "coords": [
+      [
+        404,
+        199
+      ],
+      [
+        407,
+        196
+      ],
+      [
+        412,
+        195
+      ],
+      [
+        418,
+        195
+      ],
+      [
+        425,
+        195
+      ],
+      [
+        432,
+        196
+      ],
+      [
+        438,
+        198
+      ],
+      [
+        441,
+        201
+      ],
+      [
+        441,
+        206
+      ],
+      [
+        438,
+        211
+      ],
+      [
+        432,
+        215
+      ],
+      [
+        425,
+        217
+      ],
+      [
+        418,
+        216
+      ],
+      [
+        412,
+        214
+      ],
+      [
+        407,
+        210
+      ],
+      [
+        404,
+        205
+      ],
+      [
+        407,
+        193
+      ],
+      [
+        406,
+        190
+      ],
+      [
+        410,
+        192
+      ],
+      [
+        409,
+        189
+      ],
+      [
+        413,
+        192
+      ],
+      [
+        412,
+        189
+      ],
+      [
+        415,
+        191
+      ],
+      [
+        414,
+        188
+      ],
+      [
+        417,
+        191
+      ],
+      [
+        417,
+        188
+      ],
+      [
+        429,
+        191
+      ],
+      [
+        430,
+        188
+      ],
+      [
+        432,
+        191
+      ],
+      [
+        433,
+        188
+      ],
+      [
+        435,
+        192
+      ],
+      [
+        436,
+        189
+      ],
+      [
+        438,
+        193
+      ],
+      [
+        439,
+        190
+      ],
+      [
+        441,
+        195
+      ],
+      [
+        443,
+        197
+      ],
+      [
+        445,
+        201
+      ],
+      [
+        448,
+        201
+      ],
+      [
+        445,
+        204
+      ],
+      [
+        448,
+        204
+      ],
+      [
+        444,
+        209
+      ],
+      [
+        446,
+        211
+      ],
+      [
+        442,
+        211
+      ],
+      [
+        444,
+        213
+      ],
+      [
+        439,
+        214
+      ],
+      [
+        440,
+        216
+      ],
+      [
+        436,
+        215
+      ],
+      [
+        433,
+        216
+      ]
+    ]
+  },
+  "cleanBasePixelsRepainted": 829,
+  "expressions_detail": {
+    "mouth_open-A": {
+      "mask": {
+        "maskNonZeroPixels": 790,
+        "maskFullyOpaquePixels": 126,
+        "maskPartialPixels": 664
+      },
+      "maskBBox": [
+        403,
+        192,
+        444,
+        216
+      ],
+      "overlayPixelsTouched": 790,
+      "seamRMSE": {
+        "newOverlay_vs_original": 3.5687,
+        "cleanBase_vs_original": 1.7135,
+        "publishedE2_vs_original": 8.6685
+      },
+      "protectedZones": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      },
+      "maskPixelsInProtectedZones": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      }
+    },
+    "mouth_smile-A": {
+      "mask": {
+        "maskNonZeroPixels": 790,
+        "maskFullyOpaquePixels": 66,
+        "maskPartialPixels": 724
+      },
+      "maskBBox": [
+        403,
+        192,
+        444,
+        216
+      ],
+      "overlayPixelsTouched": 790,
+      "seamRMSE": {
+        "newOverlay_vs_original": 2.1048,
+        "cleanBase_vs_original": 1.7135,
+        "publishedE2_vs_original": 3.0295
+      },
+      "protectedZones": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      },
+      "maskPixelsInProtectedZones": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      }
+    }
+  },
+  "neutralReturnPixelIdenticalToOriginal": true,
+  "protectedZonesCleanBase": {
+    "brow_left": 0,
+    "brow_right": 0,
+    "hair_fringe_left": 0,
+    "hair_tip_left": 0,
+    "hair_strand_center": 0,
+    "hair_strand_right": 0,
+    "ear_right": 0,
+    "nose_highlight": 0,
+    "nose_line": 0,
+    "jaw_left": 0,
+    "jaw_right_upper": 0,
+    "chin": 0,
+    "blush_left": 0,
+    "blush_right": 0,
+    "hair_lower_left": 0,
+    "hair_lower_right": 0
+  }
+}

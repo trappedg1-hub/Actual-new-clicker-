@@ -212,8 +212,8 @@ def build_masks(g):
     for name in ("mouth_open-A", "mouth_smile-A"):
         em = T.read_rgb(SRC_DIR / f"element-{name}.png")
         mm = T.build_hybrid_mask(em, base_m, MOUTH_LENS, PROTECTED_LIST,
-                                 feather=2.8, skin_mix=0.38,
-                                 ink_low=10.0, ink_span=38.0)
+                                 feather=2.8, skin_mix=0.34,
+                                 ink_low=4.0, ink_span=20.0)
         masks[name] = mm
         elems[name] = em
         lm = bytearray(T.W * T.H * 4)
