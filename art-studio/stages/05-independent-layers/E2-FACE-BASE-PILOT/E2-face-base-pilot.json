@@ -1,0 +1,557 @@
+{
+  "stage": "E2-FACE-BASE-PILOT",
+  "pilotArea": "eye_l_closed-B",
+  "method": "manual skin reconstruction + fitted soft hybrid lid-lens alpha matte",
+  "generativeAI": false,
+  "inpainting": false,
+  "generativeFill": false,
+  "sourcesAreReadOnlyCopies": true,
+  "handDrawnGeometry": {
+    "eyePolygon": [
+      [
+        395,
+        150
+      ],
+      [
+        399,
+        150
+      ],
+      [
+        404,
+        151
+      ],
+      [
+        408,
+        155
+      ],
+      [
+        408,
+        162
+      ],
+      [
+        408,
+        168
+      ],
+      [
+        405,
+        173
+      ],
+      [
+        400,
+        176
+      ],
+      [
+        393,
+        177
+      ],
+      [
+        386,
+        176
+      ],
+      [
+        380,
+        173
+      ],
+      [
+        377,
+        169
+      ],
+      [
+        380,
+        166
+      ],
+      [
+        385,
+        162
+      ],
+      [
+        390,
+        157
+      ],
+      [
+        393,
+        153
+      ]
+    ],
+    "lidLensPolygon": [
+      [
+        378,
+        168
+      ],
+      [
+        382,
+        161
+      ],
+      [
+        388,
+        155
+      ],
+      [
+        394,
+        151
+      ],
+      [
+        400,
+        150
+      ],
+      [
+        405,
+        152
+      ],
+      [
+        409,
+        157
+      ],
+      [
+        410,
+        164
+      ],
+      [
+        408,
+        170
+      ],
+      [
+        403,
+        175
+      ],
+      [
+        396,
+        177
+      ],
+      [
+        388,
+        176
+      ],
+      [
+        381,
+        173
+      ]
+    ],
+    "rejectedStrokeBandPolygon": [
+      [
+        374,
+        164
+      ],
+      [
+        378,
+        158
+      ],
+      [
+        386,
+        155
+      ],
+      [
+        396,
+        154
+      ],
+      [
+        404,
+        156
+      ],
+      [
+        410,
+        160
+      ],
+      [
+        411,
+        168
+      ],
+      [
+        407,
+        174
+      ],
+      [
+        398,
+        177
+      ],
+      [
+        388,
+        177
+      ],
+      [
+        380,
+        174
+      ],
+      [
+        375,
+        170
+      ]
+    ],
+    "cleanBaseFeatherPx": 3.0,
+    "lensFeatherPx": 3.5,
+    "lensPlainSkinMix": 0.55
+  },
+  "protectedZones": {
+    "brow": [
+      392,
+      136,
+      416,
+      149
+    ],
+    "hair_fringe": [
+      352,
+      130,
+      376,
+      200
+    ],
+    "hair_tip": [
+      374,
+      143,
+      385,
+      157
+    ],
+    "hair_strand": [
+      412,
+      130,
+      417,
+      172
+    ],
+    "cheek_skin": [
+      382,
+      182,
+      432,
+      210
+    ],
+    "nose_line": [
+      412,
+      178,
+      418,
+      200
+    ],
+    "nose_highlight": [
+      419,
+      178,
+      426,
+      192
+    ]
+  },
+  "cleanBase": {
+    "skinAnchorCount": 13,
+    "skinAnchorCoords": [
+      [
+        380,
+        178
+      ],
+      [
+        384,
+        181
+      ],
+      [
+        386,
+        178
+      ],
+      [
+        390,
+        182
+      ],
+      [
+        390,
+        186
+      ],
+      [
+        397,
+        182
+      ],
+      [
+        404,
+        181
+      ],
+      [
+        408,
+        186
+      ],
+      [
+        410,
+        178
+      ],
+      [
+        414,
+        176
+      ],
+      [
+        418,
+        172
+      ],
+      [
+        418,
+        162
+      ],
+      [
+        418,
+        155
+      ]
+    ],
+    "skinField": "inverse-distance interpolation, soften=9px",
+    "cleanBaseFeatherPx": 3.0,
+    "cleanBasePixelsRepainted": 758
+  },
+  "mask": {
+    "maskNonZeroPixels": 892,
+    "maskFullyOpaquePixels": 64,
+    "maskPartialPixels": 828
+  },
+  "overlay": {
+    "overlayPixelsTouched": 892
+  },
+  "rejectedVariant": {
+    "reason": "stroke-only matte leaves a visibly flat skin patch",
+    "mask": {
+      "maskNonZeroPixels": 163,
+      "maskFullyOpaquePixels": 67,
+      "maskPartialPixels": 96
+    },
+    "overlay": {
+      "overlayPixelsTouched": 163
+    }
+  },
+  "verification": {
+    "brow": {
+      "rect": [
+        392,
+        136,
+        416,
+        149
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 350,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 350,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 350,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 350,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 350,
+        "meanMaxChannelDiff": 27.682857,
+        "maxDiff": 118
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "hair_fringe": {
+      "rect": [
+        352,
+        130,
+        376,
+        200
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 1775,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 1775,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 1775,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 1775,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 1775,
+        "meanMaxChannelDiff": 3.398873,
+        "maxDiff": 96
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "hair_tip": {
+      "rect": [
+        374,
+        143,
+        385,
+        157
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 180,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 180,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 180,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 180,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 180,
+        "meanMaxChannelDiff": 29.488889,
+        "maxDiff": 132
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "hair_strand": {
+      "rect": [
+        412,
+        130,
+        417,
+        172
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 258,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 258,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 258,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 258,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 258,
+        "meanMaxChannelDiff": 30.996124,
+        "maxDiff": 118
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "cheek_skin": {
+      "rect": [
+        382,
+        182,
+        432,
+        210
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 1479,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 1479,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 1479,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 1479,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 1479,
+        "meanMaxChannelDiff": 0.813387,
+        "maxDiff": 42
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "nose_line": {
+      "rect": [
+        412,
+        178,
+        418,
+        200
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 161,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 161,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 161,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 161,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 161,
+        "meanMaxChannelDiff": 0.559006,
+        "maxDiff": 6
+      },
+      "pilotMaskNonZeroPixels": 0
+    },
+    "nose_highlight": {
+      "rect": [
+        419,
+        178,
+        426,
+        192
+      ],
+      "cleanBase_vs_original": {
+        "pixels": 120,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_original": {
+        "pixels": 120,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "pilotOverlay_vs_cleanBase": {
+        "pixels": 120,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "strokeVariant_vs_original": {
+        "pixels": 120,
+        "meanMaxChannelDiff": 0.0,
+        "maxDiff": 0
+      },
+      "publishedE2Overlay_vs_original": {
+        "pixels": 120,
+        "meanMaxChannelDiff": 0.125,
+        "maxDiff": 4
+      },
+      "pilotMaskNonZeroPixels": 0
+    }
+  },
+  "seamRMSE": {
+    "pilotOverlay_vs_original_aroundEye": 31.0025,
+    "strokeVariant_vs_original_aroundEye": 30.2109,
+    "publishedE2SolidEllipse_vs_original_aroundEye": 38.989
+  },
+  "sourceSHA256": {
+    "source-frame.webp": "477c64490b1e966109d8f68b815c4983a655373473fa2856d1a9ff57fd52dbf9",
+    "element-eye_l_closed-B.png": "cb1f664fef87dc78efdee3e0652734c7a36f345e27d15a9a173cc6c65472220c",
+    "e1-layer-14_eye_l_open.png": "4db66d666cbdf13dcd403f0911779c1558488b82289539b755c6c11796eb38f7"
+  }
+}
