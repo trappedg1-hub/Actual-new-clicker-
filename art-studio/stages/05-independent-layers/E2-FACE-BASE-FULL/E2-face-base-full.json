@@ -1,0 +1,1071 @@
+{
+  "stage": "E2-FACE-BASE-FULL",
+  "parentPilot": "504d1f71f8969c5ea0a2ee235a7c7cab28a5d96d",
+  "method": "manual IDW skin reconstruction from real samples + fitted soft hybrid lid/lip lenses",
+  "generativeAI": false,
+  "inpainting": false,
+  "generativeFill": false,
+  "sourcesAreReadOnlyCopies": true,
+  "geometry": {
+    "eye_r_clean": [
+      [
+        436,
+        160
+      ],
+      [
+        439,
+        153
+      ],
+      [
+        445,
+        149
+      ],
+      [
+        453,
+        148
+      ],
+      [
+        461,
+        148
+      ],
+      [
+        467,
+        150
+      ],
+      [
+        470,
+        154
+      ],
+      [
+        470,
+        160
+      ],
+      [
+        470,
+        165
+      ],
+      [
+        467,
+        170
+      ],
+      [
+        461,
+        174
+      ],
+      [
+        454,
+        176
+      ],
+      [
+        447,
+        175
+      ],
+      [
+        441,
+        172
+      ],
+      [
+        437,
+        167
+      ]
+    ],
+    "eye_r_lens": [
+      [
+        431,
+        161
+      ],
+      [
+        434,
+        155
+      ],
+      [
+        441,
+        151
+      ],
+      [
+        449,
+        149
+      ],
+      [
+        457,
+        149
+      ],
+      [
+        464,
+        151
+      ],
+      [
+        468,
+        155
+      ],
+      [
+        470,
+        160
+      ],
+      [
+        469,
+        166
+      ],
+      [
+        465,
+        171
+      ],
+      [
+        458,
+        174
+      ],
+      [
+        450,
+        175
+      ],
+      [
+        442,
+        173
+      ],
+      [
+        436,
+        169
+      ]
+    ],
+    "mouth_clean": [
+      [
+        404,
+        201
+      ],
+      [
+        408,
+        197
+      ],
+      [
+        415,
+        195
+      ],
+      [
+        423,
+        194
+      ],
+      [
+        431,
+        195
+      ],
+      [
+        438,
+        197
+      ],
+      [
+        441,
+        201
+      ],
+      [
+        441,
+        206
+      ],
+      [
+        437,
+        210
+      ],
+      [
+        430,
+        213
+      ],
+      [
+        423,
+        214
+      ],
+      [
+        416,
+        212
+      ],
+      [
+        409,
+        209
+      ],
+      [
+        404,
+        205
+      ]
+    ],
+    "mouth_lens": [
+      [
+        405,
+        201
+      ],
+      [
+        409,
+        197
+      ],
+      [
+        416,
+        195
+      ],
+      [
+        423,
+        194
+      ],
+      [
+        431,
+        195
+      ],
+      [
+        438,
+        198
+      ],
+      [
+        442,
+        202
+      ],
+      [
+        441,
+        207
+      ],
+      [
+        436,
+        211
+      ],
+      [
+        429,
+        214
+      ],
+      [
+        422,
+        214
+      ],
+      [
+        415,
+        211
+      ],
+      [
+        409,
+        208
+      ],
+      [
+        405,
+        205
+      ]
+    ],
+    "eye_l_pilot": "reused byte-for-byte from 504d1f7"
+  },
+  "protectedZones": {
+    "brow_left": [
+      392,
+      136,
+      416,
+      149
+    ],
+    "brow_right": [
+      432,
+      136,
+      470,
+      148
+    ],
+    "hair_fringe_left": [
+      352,
+      130,
+      376,
+      200
+    ],
+    "hair_tip_left": [
+      374,
+      143,
+      385,
+      157
+    ],
+    "hair_strand_center": [
+      412,
+      130,
+      417,
+      172
+    ],
+    "hair_strand_right": [
+      471,
+      130,
+      477,
+      196
+    ],
+    "ear_right": [
+      478,
+      148,
+      498,
+      192
+    ],
+    "nose_highlight": [
+      418,
+      176,
+      428,
+      193
+    ],
+    "nose_line": [
+      421,
+      183,
+      427,
+      192
+    ],
+    "jaw_left": [
+      376,
+      186,
+      398,
+      216
+    ],
+    "jaw_right_upper": [
+      468,
+      178,
+      480,
+      206
+    ],
+    "chin": [
+      405,
+      218,
+      443,
+      232
+    ],
+    "blush_left": [
+      380,
+      182,
+      403,
+      200
+    ],
+    "blush_right": [
+      444,
+      180,
+      468,
+      200
+    ],
+    "hair_lower_left": [
+      348,
+      202,
+      376,
+      244
+    ],
+    "hair_lower_right": [
+      470,
+      202,
+      502,
+      244
+    ]
+  },
+  "zoneRects": {
+    "eye_l": [
+      365,
+      138,
+      420,
+      186
+    ],
+    "eye_r": [
+      428,
+      140,
+      474,
+      186
+    ],
+    "mouth": [
+      400,
+      190,
+      446,
+      218
+    ]
+  },
+  "cleanBase": {
+    "eye_l_repainted": 750,
+    "eye_l_diffBBox": [
+      377,
+      150,
+      407,
+      179
+    ],
+    "eye_r_repainted": 1002,
+    "mouth_repainted": 829,
+    "fullBasePixelsChanged": 2523
+  },
+  "skinAnchors": {
+    "eye_r": [
+      [
+        430,
+        178
+      ],
+      [
+        435,
+        184
+      ],
+      [
+        440,
+        184
+      ],
+      [
+        430,
+        170
+      ],
+      [
+        429,
+        163
+      ],
+      [
+        431,
+        156
+      ],
+      [
+        437,
+        150
+      ],
+      [
+        466,
+        168
+      ],
+      [
+        464,
+        174
+      ],
+      [
+        458,
+        179
+      ],
+      [
+        442,
+        178
+      ],
+      [
+        436,
+        174
+      ],
+      [
+        432,
+        182
+      ],
+      [
+        432,
+        158
+      ],
+      [
+        430,
+        157
+      ],
+      [
+        434,
+        156
+      ],
+      [
+        431,
+        154
+      ],
+      [
+        435,
+        153
+      ],
+      [
+        432,
+        152
+      ],
+      [
+        469,
+        173
+      ],
+      [
+        467,
+        175
+      ],
+      [
+        468,
+        177
+      ],
+      [
+        464,
+        177
+      ],
+      [
+        466,
+        179
+      ],
+      [
+        462,
+        178
+      ],
+      [
+        459,
+        179
+      ],
+      [
+        456,
+        179
+      ],
+      [
+        447,
+        179
+      ],
+      [
+        445,
+        179
+      ],
+      [
+        443,
+        177
+      ],
+      [
+        441,
+        180
+      ],
+      [
+        440,
+        176
+      ],
+      [
+        439,
+        179
+      ],
+      [
+        438,
+        174
+      ],
+      [
+        436,
+        176
+      ],
+      [
+        436,
+        172
+      ],
+      [
+        434,
+        174
+      ],
+      [
+        434,
+        170
+      ],
+      [
+        432,
+        172
+      ],
+      [
+        433,
+        168
+      ],
+      [
+        430,
+        168
+      ],
+      [
+        433,
+        165
+      ],
+      [
+        430,
+        165
+      ],
+      [
+        432,
+        162
+      ],
+      [
+        429,
+        162
+      ]
+    ],
+    "mouth": [
+      [
+        404,
+        199
+      ],
+      [
+        407,
+        196
+      ],
+      [
+        412,
+        195
+      ],
+      [
+        418,
+        195
+      ],
+      [
+        425,
+        195
+      ],
+      [
+        432,
+        196
+      ],
+      [
+        438,
+        198
+      ],
+      [
+        441,
+        201
+      ],
+      [
+        441,
+        206
+      ],
+      [
+        438,
+        211
+      ],
+      [
+        432,
+        215
+      ],
+      [
+        425,
+        217
+      ],
+      [
+        418,
+        216
+      ],
+      [
+        412,
+        214
+      ],
+      [
+        407,
+        210
+      ],
+      [
+        404,
+        205
+      ],
+      [
+        407,
+        193
+      ],
+      [
+        406,
+        190
+      ],
+      [
+        410,
+        192
+      ],
+      [
+        409,
+        189
+      ],
+      [
+        413,
+        192
+      ],
+      [
+        412,
+        189
+      ],
+      [
+        415,
+        191
+      ],
+      [
+        414,
+        188
+      ],
+      [
+        417,
+        191
+      ],
+      [
+        417,
+        188
+      ],
+      [
+        429,
+        191
+      ],
+      [
+        430,
+        188
+      ],
+      [
+        432,
+        191
+      ],
+      [
+        433,
+        188
+      ],
+      [
+        435,
+        192
+      ],
+      [
+        436,
+        189
+      ],
+      [
+        438,
+        193
+      ],
+      [
+        439,
+        190
+      ],
+      [
+        441,
+        195
+      ],
+      [
+        443,
+        197
+      ],
+      [
+        445,
+        201
+      ],
+      [
+        448,
+        201
+      ],
+      [
+        445,
+        204
+      ],
+      [
+        448,
+        204
+      ],
+      [
+        444,
+        209
+      ],
+      [
+        446,
+        211
+      ],
+      [
+        442,
+        211
+      ],
+      [
+        444,
+        213
+      ],
+      [
+        439,
+        214
+      ],
+      [
+        440,
+        216
+      ],
+      [
+        436,
+        215
+      ],
+      [
+        433,
+        216
+      ]
+    ]
+  },
+  "masks": {
+    "eye_l_closed-B": {
+      "maskNonZeroPixels": 892,
+      "maskFullyOpaquePixels": 64,
+      "maskPartialPixels": 828,
+      "bbox": [
+        377,
+        149,
+        411,
+        180
+      ]
+    },
+    "eye_r_closed-B": {
+      "maskNonZeroPixels": 1055,
+      "maskFullyOpaquePixels": 126,
+      "maskPartialPixels": 929,
+      "bbox": [
+        428,
+        149,
+        470,
+        178
+      ]
+    },
+    "mouth_open-A": {
+      "maskNonZeroPixels": 790,
+      "maskFullyOpaquePixels": 126,
+      "maskPartialPixels": 664,
+      "bbox": [
+        403,
+        192,
+        444,
+        216
+      ]
+    },
+    "mouth_smile-A": {
+      "maskNonZeroPixels": 790,
+      "maskFullyOpaquePixels": 66,
+      "maskPartialPixels": 724,
+      "bbox": [
+        403,
+        192,
+        444,
+        216
+      ]
+    }
+  },
+  "states": {
+    "00-neutral": {
+      "expressions": [],
+      "cleanZones": [],
+      "diffFromOriginal": {
+        "changedPixels": 0,
+        "bbox": null
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "01-eye_l_closed-B": {
+      "expressions": [
+        "eye_l_closed-B"
+      ],
+      "cleanZones": [
+        "eye_l"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 881,
+        "bbox": [
+          377,
+          150,
+          411,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 869,
+        "bbox": [
+          377,
+          150,
+          411,
+          179
+        ]
+      }
+    },
+    "02-eye_r_closed-B": {
+      "expressions": [
+        "eye_r_closed-B"
+      ],
+      "cleanZones": [
+        "eye_r"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1057,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 991,
+        "bbox": [
+          429,
+          149,
+          470,
+          177
+        ]
+      }
+    },
+    "03-mouth_open-A": {
+      "expressions": [
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 802,
+        "bbox": [
+          402,
+          192,
+          444,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 774,
+        "bbox": [
+          403,
+          193,
+          444,
+          216
+        ]
+      }
+    },
+    "04-mouth_smile-A": {
+      "expressions": [
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 788,
+        "bbox": [
+          402,
+          192,
+          443,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 664,
+        "bbox": [
+          404,
+          193,
+          443,
+          216
+        ]
+      }
+    },
+    "05-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1938,
+        "bbox": [
+          377,
+          149,
+          470,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1860,
+        "bbox": [
+          377,
+          149,
+          470,
+          179
+        ]
+      }
+    },
+    "06-both-eyes-closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 2726,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 2524,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      }
+    },
+    "07-mouth_open-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 2740,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 2634,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      }
+    },
+    "08-eye_l_closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1669,
+        "bbox": [
+          377,
+          150,
+          443,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1533,
+        "bbox": [
+          377,
+          150,
+          443,
+          216
+        ]
+      }
+    },
+    "09-eye_r_closed-mouth_open": {
+      "expressions": [
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1859,
+        "bbox": [
+          402,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1765,
+        "bbox": [
+          403,
+          149,
+          470,
+          216
+        ]
+      }
+    }
+  },
+  "sourceSHA256": {
+    "source-frame.webp": "477c64490b1e966109d8f68b815c4983a655373473fa2856d1a9ff57fd52dbf9",
+    "pilot-clean-base.png": "10bfbdc2b0372a19dd755ea74004a62c38962e35adf459c0252235b358d1cc83",
+    "pilot-mask-eye_l_closed-B.png": "8f7a5893019c06c65f94d06eda50639920dfbfb7157ab9cf566d7f0b69c3dd7a",
+    "pilot-masked-element-eye_l_closed-B.png": "5612028bc71b80f0d433ab796d07d923953d0e64fa44ff0ef574165cc6a771a2",
+    "pilot-overlay-full.png": "8906f3685ed78f246ae9d8ab6d4be68bebe99e3dcbb93ff3938f19c9ccedf957"
+  }
+}

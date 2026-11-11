@@ -78,7 +78,7 @@ PROTECTED = {
     "jaw_left":           (376, 186, 398, 216),
     "jaw_right_upper":    (468, 178, 480, 206),
     "chin":               (405, 218, 443, 232),
-    "blush_left":         (380, 180, 403, 200),
+    "blush_left":         (380, 182, 403, 200),
     "blush_right":        (444, 180, 468, 200),
     "hair_lower_left":    (348, 202, 376, 244),
     "hair_lower_right":   (470, 202, 502, 244),

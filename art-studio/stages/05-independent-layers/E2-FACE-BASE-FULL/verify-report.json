@@ -1,0 +1,974 @@
+{
+  "stage": "E2-FACE-BASE-FULL",
+  "checks": {
+    "protected_zones_all_outputs": {
+      "pass": true,
+      "detail": {
+        "outputsChecked": 24,
+        "zonesChecked": 16,
+        "worstMaxDiff": 0,
+        "perOutput": {
+          "full_clean_base": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "clean_base_eye_l": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "clean_base_eye_r": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "clean_base_mouth": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_00-neutral": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_01-eye_l_closed-B": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_02-eye_r_closed-B": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_03-mouth_open-A": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_04-mouth_smile-A": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_05-both-eyes-closed": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_06-both-eyes-closed-smile": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_07-mouth_open-both-eyes-closed": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_08-eye_l_closed-smile": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "state_09-eye_r_closed-mouth_open": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_00-neutral": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_01-eye_l_closed-B": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_02-eye_r_closed-B": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_03-mouth_open-A": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_04-mouth_smile-A": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_05-both-eyes-closed": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_06-both-eyes-closed-smile": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_07-mouth_open-both-eyes-closed": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_08-eye_l_closed-smile": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          },
+          "statebase_09-eye_r_closed-mouth_open": {
+            "brow_left": 0,
+            "brow_right": 0,
+            "hair_fringe_left": 0,
+            "hair_tip_left": 0,
+            "hair_strand_center": 0,
+            "hair_strand_right": 0,
+            "ear_right": 0,
+            "nose_highlight": 0,
+            "nose_line": 0,
+            "jaw_left": 0,
+            "jaw_right_upper": 0,
+            "chin": 0,
+            "blush_left": 0,
+            "blush_right": 0,
+            "hair_lower_left": 0,
+            "hair_lower_right": 0
+          }
+        }
+      }
+    },
+    "masks_do_not_touch_protected_zones": {
+      "pass": true,
+      "detail": {
+        "eye_l_closed-B": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "eye_r_closed-B": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "mouth_open-A": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "mouth_smile-A": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        }
+      }
+    },
+    "no_changes_outside_active_zones": {
+      "pass": true,
+      "detail": {
+        "00-neutral": {
+          "activeZones": [],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 0,
+            "bbox": null
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 0,
+            "bbox": null
+          }
+        },
+        "01-eye_l_closed-B": {
+          "activeZones": [
+            "eye_l"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 881,
+            "bbox": [
+              377,
+              150,
+              411,
+              179
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 869,
+            "bbox": [
+              377,
+              150,
+              411,
+              179
+            ]
+          }
+        },
+        "02-eye_r_closed-B": {
+          "activeZones": [
+            "eye_r"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 1057,
+            "bbox": [
+              429,
+              149,
+              470,
+              179
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 991,
+            "bbox": [
+              429,
+              149,
+              470,
+              177
+            ]
+          }
+        },
+        "03-mouth_open-A": {
+          "activeZones": [
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 802,
+            "bbox": [
+              402,
+              192,
+              444,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 774,
+            "bbox": [
+              403,
+              193,
+              444,
+              216
+            ]
+          }
+        },
+        "04-mouth_smile-A": {
+          "activeZones": [
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 788,
+            "bbox": [
+              402,
+              192,
+              443,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 664,
+            "bbox": [
+              404,
+              193,
+              443,
+              216
+            ]
+          }
+        },
+        "05-both-eyes-closed": {
+          "activeZones": [
+            "eye_l",
+            "eye_r"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 1938,
+            "bbox": [
+              377,
+              149,
+              470,
+              179
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 1860,
+            "bbox": [
+              377,
+              149,
+              470,
+              179
+            ]
+          }
+        },
+        "06-both-eyes-closed-smile": {
+          "activeZones": [
+            "eye_l",
+            "eye_r",
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 2726,
+            "bbox": [
+              377,
+              149,
+              470,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 2524,
+            "bbox": [
+              377,
+              149,
+              470,
+              216
+            ]
+          }
+        },
+        "07-mouth_open-both-eyes-closed": {
+          "activeZones": [
+            "eye_l",
+            "eye_r",
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 2740,
+            "bbox": [
+              377,
+              149,
+              470,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 2634,
+            "bbox": [
+              377,
+              149,
+              470,
+              216
+            ]
+          }
+        },
+        "08-eye_l_closed-smile": {
+          "activeZones": [
+            "eye_l",
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 1669,
+            "bbox": [
+              377,
+              150,
+              443,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 1533,
+            "bbox": [
+              377,
+              150,
+              443,
+              216
+            ]
+          }
+        },
+        "09-eye_r_closed-mouth_open": {
+          "activeZones": [
+            "eye_r",
+            "mouth"
+          ],
+          "changedPixelsOutsideZones": 0,
+          "diffFromOriginal": {
+            "changedPixels": 1859,
+            "bbox": [
+              402,
+              149,
+              470,
+              216
+            ]
+          },
+          "diffFromOwnStateBase": {
+            "changedPixels": 1765,
+            "bbox": [
+              403,
+              149,
+              470,
+              216
+            ]
+          }
+        }
+      }
+    },
+    "overlay_changes_only_inside_mattes": {
+      "pass": true,
+      "detail": {
+        "00-neutral": true,
+        "01-eye_l_closed-B": true,
+        "02-eye_r_closed-B": true,
+        "03-mouth_open-A": true,
+        "04-mouth_smile-A": true,
+        "05-both-eyes-closed": true,
+        "06-both-eyes-closed-smile": true,
+        "07-mouth_open-both-eyes-closed": true,
+        "08-eye_l_closed-smile": true,
+        "09-eye_r_closed-mouth_open": true
+      }
+    },
+    "alpha_layer_integrity": {
+      "pass": true,
+      "detail": {
+        "eye_l_closed-B": {
+          "maskEqualsLayerAlpha": true,
+          "layerRgbEqualsElement": true,
+          "maskStats": {
+            "maskNonZeroPixels": 892,
+            "maskFullyOpaquePixels": 64,
+            "maskPartialPixels": 828
+          },
+          "maskBBox": [
+            377,
+            149,
+            411,
+            180
+          ],
+          "bboxInsideZoneRect": true
+        },
+        "eye_r_closed-B": {
+          "maskEqualsLayerAlpha": true,
+          "layerRgbEqualsElement": true,
+          "maskStats": {
+            "maskNonZeroPixels": 1055,
+            "maskFullyOpaquePixels": 126,
+            "maskPartialPixels": 929
+          },
+          "maskBBox": [
+            428,
+            149,
+            470,
+            178
+          ],
+          "bboxInsideZoneRect": true
+        },
+        "mouth_open-A": {
+          "maskEqualsLayerAlpha": true,
+          "layerRgbEqualsElement": true,
+          "maskStats": {
+            "maskNonZeroPixels": 790,
+            "maskFullyOpaquePixels": 126,
+            "maskPartialPixels": 664
+          },
+          "maskBBox": [
+            403,
+            192,
+            444,
+            216
+          ],
+          "bboxInsideZoneRect": true
+        },
+        "mouth_smile-A": {
+          "maskEqualsLayerAlpha": true,
+          "layerRgbEqualsElement": true,
+          "maskStats": {
+            "maskNonZeroPixels": 790,
+            "maskFullyOpaquePixels": 66,
+            "maskPartialPixels": 724
+          },
+          "maskBBox": [
+            403,
+            192,
+            444,
+            216
+          ],
+          "bboxInsideZoneRect": true
+        }
+      }
+    },
+    "mouth_mattes_are_distinct_but_mutually_exclusive": {
+      "pass": true,
+      "detail": {
+        "note": "same fitted lens support, different ink-aware alpha; only one mouth expression may be active at a time"
+      }
+    },
+    "mattes_of_combinable_expressions_are_disjoint": {
+      "pass": true,
+      "detail": {
+        "eye_l_closed-B__eye_r_closed-B": 0,
+        "eye_l_closed-B__mouth_open-A": 0,
+        "eye_l_closed-B__mouth_smile-A": 0,
+        "eye_r_closed-B__mouth_open-A": 0,
+        "eye_r_closed-B__mouth_smile-A": 0
+      }
+    },
+    "png_decode_and_dimensions": {
+      "pass": true,
+      "detail": {
+        "pngFilesChecked": 131,
+        "decodeErrors": [],
+        "fullFrameAssets": 49,
+        "wrongDimensions": {}
+      }
+    },
+    "no_empty_or_all_zero_mattes": {
+      "pass": true,
+      "detail": {
+        "eye_l_closed-B": {
+          "maskNonZeroPixels": 892,
+          "maskFullyOpaquePixels": 64,
+          "maskPartialPixels": 828
+        },
+        "eye_r_closed-B": {
+          "maskNonZeroPixels": 1055,
+          "maskFullyOpaquePixels": 126,
+          "maskPartialPixels": 929
+        },
+        "mouth_open-A": {
+          "maskNonZeroPixels": 790,
+          "maskFullyOpaquePixels": 126,
+          "maskPartialPixels": 664
+        },
+        "mouth_smile-A": {
+          "maskNonZeroPixels": 790,
+          "maskFullyOpaquePixels": 66,
+          "maskPartialPixels": 724
+        }
+      }
+    },
+    "expression_switching_round_trips": {
+      "pass": true,
+      "detail": {
+        "neutral_is_original": true,
+        "neutral_apply_eye_l_equals_state_01": true,
+        "state01_apply_eye_r_equals_state05": true,
+        "state05_remove_eye_r_equals_state01": true,
+        "state05_remove_eye_l_equals_state02": true,
+        "neutral_apply_mouth_open_equals_state03": true,
+        "state03_replace_with_smile_equals_state04": true,
+        "state03_remove_mouth_equals_neutral": true,
+        "state05_apply_smile_equals_state06": true,
+        "state02_apply_mouth_open_equals_state09": true,
+        "state06_remove_all_equals_neutral": true,
+        "left_eye_state_equals_published_pilot_504d1f7": true
+      }
+    },
+    "source_copies_byte_identical": {
+      "pass": true,
+      "detail": {
+        "source/source-frame.webp": true,
+        "source/element-eye_l_closed-B.png": true,
+        "source/element-eye_r_closed-B.png": true,
+        "source/element-mouth_open-A.png": true,
+        "source/element-mouth_smile-A.png": true,
+        "source/element-mouth_closed-A.png": true,
+        "source/e1-13_head.png": true,
+        "source/e1-14_eye_l_open.png": true,
+        "source/e1-15_eye_r_open.png": true,
+        "source/e1-16_mouth_neutral.png": true,
+        "source/layer-map-reference.json": true
+      }
+    },
+    "protected_published_files_unchanged_vs_504d1f7": {
+      "pass": true,
+      "detail": {
+        "art-studio/stages/05-independent-layers/PLAN.md": true,
+        "art-studio/MANIFEST.json": true,
+        "art-studio/ANIMATION-SPEC.md": true,
+        "art-studio/references/originals/IMG_4038_rig-pose.webp": true,
+        "art-studio/stages/05-independent-layers/layer-map.json": true,
+        "art-studio/stages/05-independent-layers/E2-facial-states/E2-DECISION.md": true,
+        "art-studio/stages/05-independent-layers/E2-facial-states/E2-decision.json": true,
+        "art-studio/stages/05-independent-layers/E2-FINAL-DECISION/E2-FINAL-DECISION.md": true,
+        "art-studio/stages/05-independent-layers/E2-FINAL-DECISION/E2-final-decision.json": true,
+        "art-studio/stages/05-independent-layers/E2-facial-states/elements/eye_l_closed-B.png": true,
+        "art-studio/stages/05-independent-layers/layers/14_eye_l_open.png": true,
+        "docs/HEROINE-01-recovery.md": true,
+        "package.json": true
+      }
+    },
+    "no_changes_anywhere_outside_this_stage_folder": {
+      "pass": true,
+      "detail": {
+        "changedPaths": []
+      }
+    },
+    "sha256_manifest": {
+      "pass": true,
+      "detail": {
+        "fileCount": 144,
+        "totalBytes": 25694630
+      }
+    }
+  },
+  "errors": [],
+  "summary": {
+    "checksTotal": 14,
+    "checksPassed": 14,
+    "checksFailed": 0,
+    "protectedZones": 16,
+    "outputsChecked": 24,
+    "pngFilesChecked": 131,
+    "states": 10,
+    "mattes": 4,
+    "manifestFiles": 144
+  }
+}
