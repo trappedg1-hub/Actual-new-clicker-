@@ -1,0 +1,1262 @@
+{
+  "stage": "B1.1 / baked-background classification",
+  "status": "AUDIT_AND_CLASSIFICATION_ONLY; no pixel or alpha changed; no B1.2 permission",
+  "headBefore": "580ea91b68aecf0388331e51b4d1ddeddffe698a",
+  "originHeadBefore": "580ea91b68aecf0388331e51b4d1ddeddffe698a",
+  "githubApiHeadBefore": "580ea91b68aecf0388331e51b4d1ddeddffe698a",
+  "e35IssueMapHeadBefore": "ed4d3730442f56f2f8211a0bf2d021dda29a7f9e",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "candidatePixels": 6717,
+  "candidateComponents": 782,
+  "categoryCounts": {
+    "CONFIRMED_BACKGROUND": 4,
+    "LIKELY_BACKGROUND": 9,
+    "CHARACTER_PIXEL": 343,
+    "ANTIALIAS_EDGE": 41,
+    "AMBIGUOUS": 385
+  },
+  "categoryPixels": {
+    "CONFIRMED_BACKGROUND": 3366,
+    "LIKELY_BACKGROUND": 1349,
+    "CHARACTER_PIXEL": 468,
+    "ANTIALIAS_EDGE": 52,
+    "AMBIGUOUS": 1482
+  },
+  "categoryConfidenceMean": {
+    "CONFIRMED_BACKGROUND": 0.927,
+    "LIKELY_BACKGROUND": 0.644,
+    "CHARACTER_PIXEL": 0.776,
+    "ANTIALIAS_EDGE": 0.88,
+    "AMBIGUOUS": 0.39
+  },
+  "ownerGroupCategoryCounts": {
+    "clothing": {
+      "CONFIRMED_BACKGROUND": 4,
+      "AMBIGUOUS": 301,
+      "CHARACTER_PIXEL": 235,
+      "ANTIALIAS_EDGE": 7
+    },
+    "hair": {
+      "LIKELY_BACKGROUND": 4,
+      "AMBIGUOUS": 68,
+      "CHARACTER_PIXEL": 93,
+      "ANTIALIAS_EDGE": 29
+    },
+    "skin_face": {
+      "LIKELY_BACKGROUND": 5,
+      "AMBIGUOUS": 16,
+      "CHARACTER_PIXEL": 15,
+      "ANTIALIAS_EDGE": 3
+    },
+    "legs_shoes": {
+      "ANTIALIAS_EDGE": 2
+    }
+  },
+  "hiddenZoneComponentCounts": {
+    "HZ-01": 430,
+    "HZ-02": 459,
+    "HZ-18": 283,
+    "HZ-25": 763,
+    "HZ-26": 750,
+    "HZ-10": 41,
+    "HZ-05": 10,
+    "HZ-07": 109,
+    "HZ-09": 97,
+    "HZ-04": 83,
+    "HZ-21": 15,
+    "HZ-03": 70,
+    "HZ-06": 148,
+    "HZ-23": 4,
+    "HZ-20": 117,
+    "HZ-08": 21,
+    "HZ-19": 279,
+    "HZ-24": 15,
+    "HZ-17": 37,
+    "HZ-11": 31,
+    "HZ-12": 24,
+    "HZ-13": 17,
+    "HZ-15": 1,
+    "HZ-16": 24,
+    "HZ-22": 2
+  },
+  "hiddenZonePixels": {
+    "HZ-01": 5417,
+    "HZ-02": 4941,
+    "HZ-18": 3362,
+    "HZ-25": 6696,
+    "HZ-26": 6081,
+    "HZ-10": 1408,
+    "HZ-05": 366,
+    "HZ-07": 632,
+    "HZ-09": 900,
+    "HZ-04": 958,
+    "HZ-21": 355,
+    "HZ-03": 771,
+    "HZ-06": 521,
+    "HZ-23": 185,
+    "HZ-20": 318,
+    "HZ-08": 142,
+    "HZ-19": 586,
+    "HZ-24": 136,
+    "HZ-17": 86,
+    "HZ-11": 88,
+    "HZ-12": 46,
+    "HZ-13": 42,
+    "HZ-15": 2,
+    "HZ-16": 24,
+    "HZ-22": 2
+  },
+  "componentsWithHiddenZoneIntersections": 781,
+  "disputedComponentCount": 394,
+  "disputedPixels": 2831,
+  "manualVisualOverrides": [
+    {
+      "id": "BG-0002",
+      "visualCategory": "CONFIRMED_BACKGROUND",
+      "confidence": 0.95,
+      "reason": "Manual visual review: mirrored homogeneous dark-purple wedge between back hair and sleeve/arm, symmetric to BG-0001; source and E3 red map agree."
+    },
+    {
+      "id": "BG-0003",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.7,
+      "reason": "Manual visual review: dark-purple locked wedge between front hair, ear and collar; background-like but adjacent to high-gradient hair contour."
+    },
+    {
+      "id": "BG-0006",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "reason": "Manual visual review: left-side hair/collar wedge resembling BG-0003; background-like but needs user confirmation."
+    },
+    {
+      "id": "BG-0007",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.64,
+      "reason": "Manual visual review: narrow dark wedge between right arm and hair strands; shape follows an occlusion gap, not a fabric fold."
+    },
+    {
+      "id": "BG-0008",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "reason": "Manual visual review: left arm/hair dark wedge; likely locked background, but thin and close to contour."
+    },
+    {
+      "id": "BG-0011",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "reason": "Manual visual review: right arm/hair dark wedge near BG-0001; likely background gap, visual confirmation required."
+    },
+    {
+      "id": "BG-0012",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.6,
+      "reason": "Manual visual review: narrow left arm/hair wedge; background-like but thin/edge-adjacent."
+    },
+    {
+      "id": "BG-0013",
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.58,
+      "reason": "Manual visual review: small left arm/hair wedge; background-like but insufficient area for high confidence."
+    }
+  ],
+  "topDisputed": [
+    {
+      "id": "BG-0003",
+      "pixels": 354,
+      "bbox": [
+        505,
+        172,
+        520,
+        233
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.7,
+      "ownerSlot": "hair_front_02",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-05",
+        "HZ-07",
+        "HZ-09",
+        "HZ-25"
+      ]
+    },
+    {
+      "id": "BG-0006",
+      "pixels": 246,
+      "bbox": [
+        326,
+        183,
+        339,
+        232
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "ownerSlot": "hair_side_l",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-06",
+        "HZ-09",
+        "HZ-25"
+      ]
+    },
+    {
+      "id": "BG-0007",
+      "pixels": 198,
+      "bbox": [
+        638,
+        462,
+        653,
+        489
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.64,
+      "ownerSlot": "arm_r",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0008",
+      "pixels": 192,
+      "bbox": [
+        195,
+        453,
+        211,
+        487
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0009",
+      "pixels": 179,
+      "bbox": [
+        445,
+        650,
+        462,
+        667
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-23",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0010",
+      "pixels": 147,
+      "bbox": [
+        406,
+        412,
+        419,
+        433
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_ribbon",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-18",
+        "HZ-20",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0011",
+      "pixels": 114,
+      "bbox": [
+        621,
+        433,
+        639,
+        457
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "ownerSlot": "arm_r",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0012",
+      "pixels": 96,
+      "bbox": [
+        191,
+        487,
+        198,
+        517
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.6,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0013",
+      "pixels": 69,
+      "bbox": [
+        212,
+        438,
+        223,
+        451
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.58,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0014",
+      "pixels": 68,
+      "bbox": [
+        482,
+        614,
+        492,
+        623
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0015",
+      "pixels": 60,
+      "bbox": [
+        513,
+        624,
+        524,
+        629
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0016",
+      "pixels": 59,
+      "bbox": [
+        465,
+        258,
+        476,
+        269
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_r",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-08",
+        "HZ-09",
+        "HZ-19",
+        "HZ-24",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0017",
+      "pixels": 54,
+      "bbox": [
+        630,
+        570,
+        637,
+        583
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "ownerSlot": "hair_back_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0018",
+      "pixels": 48,
+      "bbox": [
+        368,
+        253,
+        377,
+        263
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_l",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-06",
+        "HZ-09",
+        "HZ-19",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0019",
+      "pixels": 45,
+      "bbox": [
+        478,
+        260,
+        487,
+        267
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_r",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-08",
+        "HZ-09",
+        "HZ-19",
+        "HZ-24",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0020",
+      "pixels": 39,
+      "bbox": [
+        518,
+        648,
+        527,
+        654
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0021",
+      "pixels": 29,
+      "bbox": [
+        468,
+        488,
+        479,
+        492
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-17",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0022",
+      "pixels": 28,
+      "bbox": [
+        452,
+        624,
+        458,
+        627
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0023",
+      "pixels": 26,
+      "bbox": [
+        212,
+        572,
+        216,
+        579
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "ownerSlot": "hair_back_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0024",
+      "pixels": 25,
+      "bbox": [
+        654,
+        500,
+        656,
+        510
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "arm_r",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0025",
+      "pixels": 21,
+      "bbox": [
+        436,
+        414,
+        439,
+        423
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_ribbon",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-18",
+        "HZ-20",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0026",
+      "pixels": 17,
+      "bbox": [
+        515,
+        367,
+        518,
+        372
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_blouse",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-11",
+        "HZ-18",
+        "HZ-19",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0027",
+      "pixels": 16,
+      "bbox": [
+        511,
+        264,
+        516,
+        271
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_r",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-09",
+        "HZ-19",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0028",
+      "pixels": 16,
+      "bbox": [
+        516,
+        632,
+        521,
+        635
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0029",
+      "pixels": 14,
+      "bbox": [
+        279,
+        613,
+        282,
+        618
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0030",
+      "pixels": 14,
+      "bbox": [
+        400,
+        624,
+        403,
+        627
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0032",
+      "pixels": 13,
+      "bbox": [
+        525,
+        364,
+        532,
+        368
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_blouse",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-11",
+        "HZ-18",
+        "HZ-19",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0033",
+      "pixels": 12,
+      "bbox": [
+        378,
+        265,
+        381,
+        270
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_l",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-06",
+        "HZ-08",
+        "HZ-09",
+        "HZ-19",
+        "HZ-24",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0035",
+      "pixels": 12,
+      "bbox": [
+        432,
+        500,
+        434,
+        503
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-17",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0038",
+      "pixels": 9,
+      "bbox": [
+        421,
+        533,
+        423,
+        535
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-25",
+        "HZ-26"
+      ]
+    }
+  ],
+  "topComponents": [
+    {
+      "id": "BG-0001",
+      "pixels": 1402,
+      "bbox": [
+        579,
+        347,
+        635,
+        418
+      ],
+      "visualCategory": "CONFIRMED_BACKGROUND",
+      "confidence": 0.92,
+      "ownerSlot": "outfit_blouse",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-18",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0002",
+      "pixels": 1337,
+      "bbox": [
+        214,
+        348,
+        271,
+        415
+      ],
+      "visualCategory": "CONFIRMED_BACKGROUND",
+      "confidence": 0.95,
+      "ownerSlot": "outfit_blouse",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-10",
+        "HZ-18",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0003",
+      "pixels": 354,
+      "bbox": [
+        505,
+        172,
+        520,
+        233
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.7,
+      "ownerSlot": "hair_front_02",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-05",
+        "HZ-07",
+        "HZ-09",
+        "HZ-25"
+      ]
+    },
+    {
+      "id": "BG-0004",
+      "pixels": 339,
+      "bbox": [
+        568,
+        560,
+        586,
+        608
+      ],
+      "visualCategory": "CONFIRMED_BACKGROUND",
+      "confidence": 0.92,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-21",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0005",
+      "pixels": 288,
+      "bbox": [
+        307,
+        506,
+        318,
+        553
+      ],
+      "visualCategory": "CONFIRMED_BACKGROUND",
+      "confidence": 0.92,
+      "ownerSlot": "outfit_skirt_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0006",
+      "pixels": 246,
+      "bbox": [
+        326,
+        183,
+        339,
+        232
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "ownerSlot": "hair_side_l",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-06",
+        "HZ-09",
+        "HZ-25"
+      ]
+    },
+    {
+      "id": "BG-0007",
+      "pixels": 198,
+      "bbox": [
+        638,
+        462,
+        653,
+        489
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.64,
+      "ownerSlot": "arm_r",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0008",
+      "pixels": 192,
+      "bbox": [
+        195,
+        453,
+        211,
+        487
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0009",
+      "pixels": 179,
+      "bbox": [
+        445,
+        650,
+        462,
+        667
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-23",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0010",
+      "pixels": 147,
+      "bbox": [
+        406,
+        412,
+        419,
+        433
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_ribbon",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-18",
+        "HZ-20",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0011",
+      "pixels": 114,
+      "bbox": [
+        621,
+        433,
+        639,
+        457
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.62,
+      "ownerSlot": "arm_r",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0012",
+      "pixels": 96,
+      "bbox": [
+        191,
+        487,
+        198,
+        517
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.6,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0013",
+      "pixels": 69,
+      "bbox": [
+        212,
+        438,
+        223,
+        451
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.58,
+      "ownerSlot": "arm_l",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-02",
+        "HZ-03",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0014",
+      "pixels": 68,
+      "bbox": [
+        482,
+        614,
+        492,
+        623
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0015",
+      "pixels": 60,
+      "bbox": [
+        513,
+        624,
+        524,
+        629
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0016",
+      "pixels": 59,
+      "bbox": [
+        465,
+        258,
+        476,
+        269
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_r",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-08",
+        "HZ-09",
+        "HZ-19",
+        "HZ-24",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0017",
+      "pixels": 54,
+      "bbox": [
+        630,
+        570,
+        637,
+        583
+      ],
+      "visualCategory": "LIKELY_BACKGROUND",
+      "confidence": 0.68,
+      "ownerSlot": "hair_back_01",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0018",
+      "pixels": 48,
+      "bbox": [
+        368,
+        253,
+        377,
+        263
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_l",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-06",
+        "HZ-09",
+        "HZ-19",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0019",
+      "pixels": 45,
+      "bbox": [
+        478,
+        260,
+        487,
+        267
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "hair_side_r",
+      "hiddenZoneIds": [
+        "HZ-02",
+        "HZ-07",
+        "HZ-08",
+        "HZ-09",
+        "HZ-19",
+        "HZ-24",
+        "HZ-25",
+        "HZ-26"
+      ]
+    },
+    {
+      "id": "BG-0020",
+      "pixels": 39,
+      "bbox": [
+        518,
+        648,
+        527,
+        654
+      ],
+      "visualCategory": "AMBIGUOUS",
+      "confidence": 0.45,
+      "ownerSlot": "outfit_skirt_02",
+      "hiddenZoneIds": [
+        "HZ-01",
+        "HZ-04",
+        "HZ-25",
+        "HZ-26"
+      ]
+    }
+  ],
+  "stage04Discrepancy": {
+    "documentedRemovedPixels": 3841,
+    "remeasuredInternalHolePixels": 3842,
+    "remeasuredInternalHoleComponents": 4,
+    "remeasuredHoleComponents": [
+      {
+        "id": "ST04-HOLE-01",
+        "pixels": 1470,
+        "bbox": [
+          167,
+          454,
+          196,
+          553
+        ],
+        "meanL1Stage04": 17.78
+      },
+      {
+        "id": "ST04-HOLE-02",
+        "pixels": 1442,
+        "bbox": [
+          652,
+          453,
+          681,
+          552
+        ],
+        "meanL1Stage04": 18.32
+      },
+      {
+        "id": "ST04-HOLE-03",
+        "pixels": 488,
+        "bbox": [
+          261,
+          553,
+          283,
+          608
+        ],
+        "meanL1Stage04": 18.94
+      },
+      {
+        "id": "ST04-HOLE-04",
+        "pixels": 442,
+        "bbox": [
+          530,
+          498,
+          543,
+          557
+        ],
+        "meanL1Stage04": 18.45
+      }
+    ],
+    "note": "3842 vs 3841 remains unresolved: the original stage-04 generator script is absent; threshold sweep shows sensitivity but does not prove a cause; no stage-04 file changed.",
+    "stage04RetainedDarkBandOverlapPx": 4308,
+    "stage04BackgroundLikeBandOverlapPx": 2409,
+    "remeasuredRetainedDarkBandPx": 49228,
+    "remeasuredBackgroundLikeBandPx": 3424,
+    "candidateHighGradientPx": 381,
+    "candidateSemiTransparentPx": 62,
+    "candidateEdgeAdjacentPx": 44
+  },
+  "constraints": {
+    "pixelsChanged": 0,
+    "alphaChannelsChanged": 0,
+    "generatedImages": 0,
+    "newArtLayers": 0,
+    "inpaintingCloningGenerativeFill": 0,
+    "hiddenAnatomyRestored": 0,
+    "originalsE1E2E2V2E3E35Changed": false,
+    "codePixiJSAtlasPRPublicSrcDistChanged": false,
+    "vercelPreviewOrProduction": false,
+    "b12OrB2ToB6OrE4ToE8Started": false,
+    "selfApproval": false,
+    "residualDefectsWaived": false,
+    "technicalPassEqualsArtisticQuality": false
+  },
+  "diagnosticImages": [
+    "00-overview-map.png",
+    "01-classification-overlay-full.png",
+    "02-HZ-intersections-map.png",
+    "03-bbox-overlay-full.png",
+    "04-large-components-sheet.png",
+    "05-disputed-components-sheet.png",
+    "06-closeup-hair.png",
+    "07-closeup-shoulders.png",
+    "08-closeup-clothing.png",
+    "09-closeup-hands-left.png",
+    "10-closeup-hands-right.png",
+    "11-closeup-external-contours.png",
+    "12-legend.png",
+    "13-source-vs-overlay-full.png",
+    "source.png"
+  ],
+  "protectedSnapshot": {
+    "source": "E3.5-RESTORATION-PLAN/ISSUE-MAP.json → verification.protectedSnapshotSHA256",
+    "sha256": "998c2cbefb797eb31899ba33bf1722bc683071c739f6237d5b56591ba319969f",
+    "protectedFilesChecked": 811,
+    "protectedFilesChanged": []
+  },
+  "commitPolicy": "separate B1.1 commit only; no amend, no rebase, no force push",
+  "stop": "STOP after B1.1 publication; wait for user visual confirmation and separate B1.2 permission."
+}
