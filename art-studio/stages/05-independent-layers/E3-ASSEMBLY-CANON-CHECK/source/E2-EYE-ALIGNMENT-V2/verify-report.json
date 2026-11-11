@@ -1,0 +1,698 @@
+{
+  "stage": "E2-EYE-ALIGNMENT-V2",
+  "parent": "569f984974f3ec7ade15c90a7b8dfb4bc83cce1a",
+  "deltaPxDown": 9,
+  "measurementsBefore": {
+    "reference": "HEROINE-01 untouched source frame IMG_4038_rig-pose.webp",
+    "method": "green-iris centroid for anatomy; dark closed-lid ink centroid in a +-3 px band around the peak row",
+    "originalIris": {
+      "left": {
+        "centroidY": 163.01,
+        "greenPixels": 100,
+        "xRange": [
+          380,
+          412
+        ]
+      },
+      "right": {
+        "centroidY": 163.111,
+        "greenPixels": 99,
+        "xRange": [
+          435,
+          470
+        ]
+      },
+      "verticalDifferencePx": 0.101,
+      "conclusion": "both eyes are level in the original anatomy"
+    },
+    "approvedElements": {
+      "eye_l_closed-B": {
+        "peakRow": 168,
+        "peakDarkPixels": 31,
+        "centroidY": 168.244,
+        "darkPixelsInBand": 119,
+        "offsetFromOwnIris": 5.234
+      },
+      "eye_r_closed-B": {
+        "peakRow": 159,
+        "peakDarkPixels": 27,
+        "centroidY": 159.028,
+        "darkPixelsInBand": 107,
+        "offsetFromOwnIris": -4.083
+      }
+    },
+    "displacedEye": "eye_r_closed-B (right eye)",
+    "diagnosis": "left lid sits +5.23 px below its iris (natural); right lid sits -4.08 px ABOVE its iris, i.e. in the upper-lash/crease zone. The right element is registered too high; the left element is correctly registered.",
+    "v1BothClosedState": {
+      "left": {
+        "peakRow": 168,
+        "peakDarkPixels": 29,
+        "centroidY": 168.214,
+        "darkPixelsInBand": 112
+      },
+      "right": {
+        "peakRow": 159,
+        "peakDarkPixels": 27,
+        "centroidY": 159.047,
+        "darkPixelsInBand": 106
+      },
+      "asymmetryPx": 9.167
+    },
+    "correction": {
+      "deltaPxDown": 9,
+      "type": "pure integer vertical translation, no resampling",
+      "appliedTo": "only eye_r_closed-B expression ink + its fitted lens",
+      "notAppliedTo": [
+        "eye_l_closed-B",
+        "mouth_open-A",
+        "mouth_smile-A",
+        "neutral",
+        "clean bases",
+        "skin",
+        "hair",
+        "protected zones",
+        "AI brow/context above the lid"
+      ],
+      "expectedRightLidCentroidY": 168.028,
+      "expectedResidualAsymmetryPx": 0.216
+    },
+    "publishedE2AndV1Agree": true,
+    "note": "v1 (569f984) faithfully reproduced the approved element; the shift is inherent to the element registration, not introduced by the v1 pipeline."
+  },
+  "measurementsAfter": {
+    "bothClosedLeftLid": {
+      "peakRow": 168,
+      "peakDarkPixels": 29,
+      "centroidY": 168.214,
+      "darkPixelsInBand": 112
+    },
+    "bothClosedRightLid": {
+      "peakRow": 168,
+      "peakDarkPixels": 27,
+      "centroidY": 168.047,
+      "darkPixelsInBand": 106
+    },
+    "singleRightLid": {
+      "peakRow": 168,
+      "peakDarkPixels": 27,
+      "centroidY": 168.047,
+      "darkPixelsInBand": 106
+    },
+    "neutralLeftDarkPeak": {
+      "peakRow": 156,
+      "peakDarkPixels": 27,
+      "centroidY": 156.246,
+      "darkPixelsInBand": 142
+    },
+    "neutralRightDarkPeak": {
+      "peakRow": 155,
+      "peakDarkPixels": 27,
+      "centroidY": 155.119,
+      "darkPixelsInBand": 168
+    },
+    "residualAsymmetryPx": 0.167
+  },
+  "mask": {
+    "maskNonZeroPixels": 749,
+    "maskFullyOpaquePixels": 126,
+    "maskPartialPixels": 623,
+    "bbox": [
+      430,
+      155,
+      470,
+      179
+    ]
+  },
+  "states": {
+    "00-neutral": {
+      "expressions": [],
+      "status": "byte-identical to v1",
+      "diffFromV1": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "01-eye_l_closed-B": {
+      "expressions": [
+        "eye_l_closed-B"
+      ],
+      "status": "byte-identical to v1",
+      "diffFromV1": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "02-eye_r_closed-B": {
+      "expressions": [
+        "eye_r_closed-B"
+      ],
+      "status": "recomposed with corrected right-eye layer",
+      "diffFromV1": {
+        "changedPixels": 1052,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      }
+    },
+    "03-mouth_open-A": {
+      "expressions": [
+        "mouth_open-A"
+      ],
+      "status": "byte-identical to v1",
+      "diffFromV1": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "04-mouth_smile-A": {
+      "expressions": [
+        "mouth_smile-A"
+      ],
+      "status": "byte-identical to v1",
+      "diffFromV1": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "05-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B"
+      ],
+      "status": "recomposed with corrected right-eye layer",
+      "diffFromV1": {
+        "changedPixels": 1052,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      }
+    },
+    "06-both-eyes-closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_smile-A"
+      ],
+      "status": "recomposed with corrected right-eye layer",
+      "diffFromV1": {
+        "changedPixels": 1052,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      }
+    },
+    "07-mouth_open-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "status": "recomposed with corrected right-eye layer",
+      "diffFromV1": {
+        "changedPixels": 1052,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      }
+    },
+    "08-eye_l_closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "mouth_smile-A"
+      ],
+      "status": "byte-identical to v1",
+      "diffFromV1": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "09-eye_r_closed-mouth_open": {
+      "expressions": [
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "status": "recomposed with corrected right-eye layer",
+      "diffFromV1": {
+        "changedPixels": 1052,
+        "bbox": [
+          429,
+          149,
+          470,
+          179
+        ]
+      }
+    }
+  },
+  "switchMatrix": "states/switch-matrix.json",
+  "seam": {
+    "v1": 25.6289,
+    "v2": 65.1796
+  },
+  "carriedAssets": 22,
+  "v1FilesChecked": 147,
+  "v1FilesChanged": 0,
+  "checks": {
+    "only_right_eye_translated": {
+      "pass": true,
+      "detail": {
+        "leftBefore": 168.214,
+        "leftAfter": 168.214
+      }
+    },
+    "right_lid_lowered_by_integer_delta": {
+      "pass": true,
+      "detail": {
+        "before": 159.047,
+        "after": 168.047,
+        "delta": 9
+      }
+    },
+    "eyes_level_after_correction": {
+      "pass": true,
+      "detail": {
+        "left": 168.214,
+        "right": 168.047,
+        "residualPx": 0.167
+      }
+    },
+    "neutral_state_unchanged": {
+      "pass": true,
+      "detail": {
+        "neutralEqualsOriginal": true
+      }
+    },
+    "left_eye_region_byte_identical_in_both_closed": {
+      "pass": true,
+      "detail": null
+    },
+    "mouth_and_skin_untouched": {
+      "pass": true,
+      "detail": null
+    },
+    "all_16_protected_zones_pixel_identical": {
+      "pass": true,
+      "detail": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      }
+    },
+    "v2_mask_has_zero_pixels_in_protected_zones": {
+      "pass": true,
+      "detail": {
+        "brow_left": 0,
+        "brow_right": 0,
+        "hair_fringe_left": 0,
+        "hair_tip_left": 0,
+        "hair_strand_center": 0,
+        "hair_strand_right": 0,
+        "ear_right": 0,
+        "nose_highlight": 0,
+        "nose_line": 0,
+        "jaw_left": 0,
+        "jaw_right_upper": 0,
+        "chin": 0,
+        "blush_left": 0,
+        "blush_right": 0,
+        "hair_lower_left": 0,
+        "hair_lower_right": 0
+      }
+    },
+    "no_changes_outside_right_eye_owned_pixels": {
+      "pass": true,
+      "detail": {
+        "changedOutside": 0,
+        "ownedPixels": 1082
+      }
+    },
+    "v1_569f984_files_untouched": {
+      "pass": true,
+      "detail": {
+        "changed": [],
+        "checked": 147
+      }
+    },
+    "states_without_right_eye_byte_identical": {
+      "pass": true,
+      "detail": {
+        "00-neutral": true,
+        "01-eye_l_closed-B": true,
+        "03-mouth_open-A": true,
+        "04-mouth_smile-A": true,
+        "08-eye_l_closed-smile": true
+      }
+    },
+    "ink_shape_thickness_tilt_colour_preserved": {
+      "pass": true,
+      "detail": {
+        "darkInkPixelsChecked": 128,
+        "method": "every dark source pixel reappears at exactly (x, y+9)"
+      }
+    },
+    "all_carried_v1_assets_byte_identical": {
+      "pass": true,
+      "detail": {
+        "checked": 22,
+        "changed": []
+      }
+    },
+    "translated_band_rgb_is_byte_exact": {
+      "pass": true,
+      "detail": {
+        "rows": [
+          153,
+          175
+        ],
+        "delta": 9,
+        "pixelsChecked": 19504,
+        "meaning": "pure integer row copy: x unchanged; no scaling, rotation or interpolation"
+      }
+    },
+    "expression_switching_round_trips_v2": {
+      "pass": true,
+      "detail": {
+        "neutral_is_original": true,
+        "neutral_apply_eye_l_equals_state01": true,
+        "neutral_apply_eye_r_equals_state02": true,
+        "state01_apply_eye_r_equals_state05": true,
+        "state05_remove_eye_r_equals_state01": true,
+        "state05_remove_eye_l_equals_state02": true,
+        "neutral_apply_mouth_open_equals_state03": true,
+        "state03_replace_with_smile_equals_state04": true,
+        "state03_remove_mouth_equals_neutral": true,
+        "state05_apply_smile_equals_state06": true,
+        "state02_apply_mouth_open_equals_state09": true,
+        "state06_remove_all_equals_neutral": true,
+        "left_eye_state_equals_v1": true
+      }
+    },
+    "all_10_states_16_protected_zones_pixel_identical": {
+      "pass": true,
+      "detail": {
+        "00-neutral": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "01-eye_l_closed-B": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "02-eye_r_closed-B": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "03-mouth_open-A": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "04-mouth_smile-A": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "05-both-eyes-closed": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "06-both-eyes-closed-smile": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "07-mouth_open-both-eyes-closed": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "08-eye_l_closed-smile": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        },
+        "09-eye_r_closed-mouth_open": {
+          "brow_left": 0,
+          "brow_right": 0,
+          "hair_fringe_left": 0,
+          "hair_tip_left": 0,
+          "hair_strand_center": 0,
+          "hair_strand_right": 0,
+          "ear_right": 0,
+          "nose_highlight": 0,
+          "nose_line": 0,
+          "jaw_left": 0,
+          "jaw_right_upper": 0,
+          "chin": 0,
+          "blush_left": 0,
+          "blush_right": 0,
+          "hair_lower_left": 0,
+          "hair_lower_right": 0
+        }
+      }
+    },
+    "all_10_states_mouth_skin_hair_left_eye_unchanged": {
+      "pass": true,
+      "detail": {
+        "00-neutral": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "01-eye_l_closed-B": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "02-eye_r_closed-B": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "03-mouth_open-A": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "04-mouth_smile-A": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "05-both-eyes-closed": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "06-both-eyes-closed-smile": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "07-mouth_open-both-eyes-closed": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "08-eye_l_closed-smile": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "09-eye_r_closed-mouth_open": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "right_eye_states_change_only_owned_pixels": {
+      "pass": true,
+      "detail": {
+        "02-eye_r_closed-B": 0,
+        "05-both-eyes-closed": 0,
+        "06-both-eyes-closed-smile": 0,
+        "07-mouth_open-both-eyes-closed": 0,
+        "09-eye_r_closed-mouth_open": 0
+      }
+    },
+    "png_decode_and_full_frame_dimensions": {
+      "pass": true,
+      "detail": {
+        "checked": 35,
+        "decodeErrors": [],
+        "wrongDimensions": {}
+      }
+    }
+  },
+  "summary": {
+    "checksTotal": 19,
+    "checksPassed": 19,
+    "checksFailed": 0
+  }
+}

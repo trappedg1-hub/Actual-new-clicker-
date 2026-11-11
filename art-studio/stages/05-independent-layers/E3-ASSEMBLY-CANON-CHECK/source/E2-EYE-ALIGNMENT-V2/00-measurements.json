@@ -1,0 +1,77 @@
+{
+  "reference": "HEROINE-01 untouched source frame IMG_4038_rig-pose.webp",
+  "method": "green-iris centroid for anatomy; dark closed-lid ink centroid in a +-3 px band around the peak row",
+  "originalIris": {
+    "left": {
+      "centroidY": 163.01,
+      "greenPixels": 100,
+      "xRange": [
+        380,
+        412
+      ]
+    },
+    "right": {
+      "centroidY": 163.111,
+      "greenPixels": 99,
+      "xRange": [
+        435,
+        470
+      ]
+    },
+    "verticalDifferencePx": 0.101,
+    "conclusion": "both eyes are level in the original anatomy"
+  },
+  "approvedElements": {
+    "eye_l_closed-B": {
+      "peakRow": 168,
+      "peakDarkPixels": 31,
+      "centroidY": 168.244,
+      "darkPixelsInBand": 119,
+      "offsetFromOwnIris": 5.234
+    },
+    "eye_r_closed-B": {
+      "peakRow": 159,
+      "peakDarkPixels": 27,
+      "centroidY": 159.028,
+      "darkPixelsInBand": 107,
+      "offsetFromOwnIris": -4.083
+    }
+  },
+  "displacedEye": "eye_r_closed-B (right eye)",
+  "diagnosis": "left lid sits +5.23 px below its iris (natural); right lid sits -4.08 px ABOVE its iris, i.e. in the upper-lash/crease zone. The right element is registered too high; the left element is correctly registered.",
+  "v1BothClosedState": {
+    "left": {
+      "peakRow": 168,
+      "peakDarkPixels": 29,
+      "centroidY": 168.214,
+      "darkPixelsInBand": 112
+    },
+    "right": {
+      "peakRow": 159,
+      "peakDarkPixels": 27,
+      "centroidY": 159.047,
+      "darkPixelsInBand": 106
+    },
+    "asymmetryPx": 9.167
+  },
+  "correction": {
+    "deltaPxDown": 9,
+    "type": "pure integer vertical translation, no resampling",
+    "appliedTo": "only eye_r_closed-B expression ink + its fitted lens",
+    "notAppliedTo": [
+      "eye_l_closed-B",
+      "mouth_open-A",
+      "mouth_smile-A",
+      "neutral",
+      "clean bases",
+      "skin",
+      "hair",
+      "protected zones",
+      "AI brow/context above the lid"
+    ],
+    "expectedRightLidCentroidY": 168.028,
+    "expectedResidualAsymmetryPx": 0.216
+  },
+  "publishedE2AndV1Agree": true,
+  "note": "v1 (569f984) faithfully reproduced the approved element; the shift is inherent to the element registration, not introduced by the v1 pipeline."
+}

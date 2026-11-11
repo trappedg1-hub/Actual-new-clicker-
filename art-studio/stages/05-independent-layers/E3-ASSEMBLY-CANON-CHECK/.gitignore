@@ -1,0 +1,4 @@
+__pycache__/
+.scratch/
+*.tmp.png
+.tmp-*.png

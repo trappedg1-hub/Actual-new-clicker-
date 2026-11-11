@@ -1,0 +1,663 @@
+{
+  "stage": "04-slicing-prep / technical crop map",
+  "source": "art-studio/references/originals/IMG_4038_rig-pose.webp",
+  "sourceSizePx": [
+    848,
+    1264
+  ],
+  "renderCanon": [
+    "art-studio/references/originals/IMG_4036_style-reference.webp",
+    "art-studio/references/originals/IMG_4037_campus-outfit.webp"
+  ],
+  "spec": "art-studio/ANIMATION-SPEC.md §4",
+  "graphicSlots": 20,
+  "visualStatesTotal": 24,
+  "visualStatesPresent": 20,
+  "visualStatesMissing": 4,
+  "missingStates": [
+    {
+      "state": "eye_l_closed",
+      "slotZ": 14,
+      "system": "blink",
+      "reason": "not present in the single supplied frame; requires a separate art pass, blocked by the no-generation gate"
+    },
+    {
+      "state": "eye_r_closed",
+      "slotZ": 15,
+      "system": "blink",
+      "reason": "not present in the single supplied frame; requires a separate art pass, blocked by the no-generation gate"
+    },
+    {
+      "state": "mouth_open",
+      "slotZ": 16,
+      "system": "expression",
+      "reason": "not present in the single supplied frame; requires a separate art pass, blocked by the no-generation gate"
+    },
+    {
+      "state": "mouth_smile",
+      "slotZ": 16,
+      "system": "expression",
+      "reason": "not present in the single supplied frame; requires a separate art pass, blocked by the no-generation gate"
+    }
+  ],
+  "glow": "z 0 is generated in code, not art — no crop",
+  "limitations": [
+    "Crops are geometric windows over a single composited frame; overlapping parts remain baked together.",
+    "Hidden/occluded zones are NOT repainted. Independent layers require a separate art pass with explicit permission.",
+    "No atlas assembled, no code changed, no original reference modified, no AI generation performed.",
+    "Coordinates are a preliminary technical registration derived from the alpha profile; final pivots to be confirmed during integration."
+  ],
+  "slots": [
+    {
+      "z": 1,
+      "slot": "hair_back_01",
+      "group": "backHairGroup",
+      "file": "cutouts/slots/01_hair_back_01.png",
+      "rect": {
+        "x": 130,
+        "y": 380,
+        "w": 590,
+        "h": 365
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 250
+      },
+      "pivotLocal": {
+        "x": 294,
+        "y": -130
+      },
+      "states": [
+        "hair_back_01"
+      ],
+      "statesPresent": [
+        "hair_back_01"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 64129,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 2,
+      "slot": "hair_back_02",
+      "group": "backHairGroup",
+      "file": "cutouts/slots/02_hair_back_02.png",
+      "rect": {
+        "x": 130,
+        "y": 175,
+        "w": 590,
+        "h": 300
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 245
+      },
+      "pivotLocal": {
+        "x": 294,
+        "y": 70
+      },
+      "states": [
+        "hair_back_02"
+      ],
+      "statesPresent": [
+        "hair_back_02"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 27584,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 3,
+      "slot": "leg_l",
+      "group": "legGroup",
+      "file": "cutouts/slots/03_leg_l.png",
+      "rect": {
+        "x": 185,
+        "y": 665,
+        "w": 220,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 185,
+        "y": 10
+      },
+      "states": [
+        "leg_l"
+      ],
+      "statesPresent": [
+        "leg_l"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 35182,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 4,
+      "slot": "leg_r",
+      "group": "legGroup",
+      "file": "cutouts/slots/04_leg_r.png",
+      "rect": {
+        "x": 443,
+        "y": 665,
+        "w": 220,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 35,
+        "y": 10
+      },
+      "states": [
+        "leg_r"
+      ],
+      "statesPresent": [
+        "leg_r"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 34663,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 5,
+      "slot": "torso",
+      "group": "bodyRoot",
+      "file": "cutouts/slots/05_torso.png",
+      "rect": {
+        "x": 275,
+        "y": 285,
+        "w": 300,
+        "h": 215
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 149,
+        "y": 205
+      },
+      "states": [
+        "torso"
+      ],
+      "statesPresent": [
+        "torso"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 63070,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 6,
+      "slot": "arm_l",
+      "group": "armGroup_l",
+      "file": "cutouts/slots/06_arm_l.png",
+      "rect": {
+        "x": 100,
+        "y": 325,
+        "w": 235,
+        "h": 340
+      },
+      "pivotAbsolute": {
+        "x": 300,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 200,
+        "y": 10
+      },
+      "states": [
+        "arm_l"
+      ],
+      "statesPresent": [
+        "arm_l"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 17652,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 7,
+      "slot": "arm_r",
+      "group": "armGroup_r",
+      "file": "cutouts/slots/07_arm_r.png",
+      "rect": {
+        "x": 513,
+        "y": 325,
+        "w": 235,
+        "h": 340
+      },
+      "pivotAbsolute": {
+        "x": 548,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 35,
+        "y": 10
+      },
+      "states": [
+        "arm_r"
+      ],
+      "statesPresent": [
+        "arm_r"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 17894,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 8,
+      "slot": "outfit_blouse",
+      "group": "outfitGroup",
+      "file": "cutouts/slots/08_outfit_blouse.png",
+      "rect": {
+        "x": 275,
+        "y": 285,
+        "w": 300,
+        "h": 210
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 149,
+        "y": 205
+      },
+      "states": [
+        "outfit_blouse"
+      ],
+      "statesPresent": [
+        "outfit_blouse"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 61575,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 9,
+      "slot": "outfit_collar",
+      "group": "outfitGroup",
+      "file": "cutouts/slots/09_outfit_collar.png",
+      "rect": {
+        "x": 318,
+        "y": 240,
+        "w": 214,
+        "h": 152
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 300
+      },
+      "pivotLocal": {
+        "x": 106,
+        "y": 60
+      },
+      "states": [
+        "outfit_collar"
+      ],
+      "statesPresent": [
+        "outfit_collar"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 32228,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 10,
+      "slot": "outfit_ribbon",
+      "group": "outfitGroup",
+      "file": "cutouts/slots/10_outfit_ribbon.png",
+      "rect": {
+        "x": 388,
+        "y": 315,
+        "w": 74,
+        "h": 163
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 340
+      },
+      "pivotLocal": {
+        "x": 36,
+        "y": 25
+      },
+      "states": [
+        "outfit_ribbon"
+      ],
+      "statesPresent": [
+        "outfit_ribbon"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 12062,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 11,
+      "slot": "outfit_skirt_01",
+      "group": "outfitGroup",
+      "file": "cutouts/slots/11_outfit_skirt_01.png",
+      "rect": {
+        "x": 268,
+        "y": 472,
+        "w": 314,
+        "h": 120
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 478
+      },
+      "pivotLocal": {
+        "x": 156,
+        "y": 6
+      },
+      "states": [
+        "outfit_skirt_01"
+      ],
+      "statesPresent": [
+        "outfit_skirt_01"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 37184,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 12,
+      "slot": "outfit_skirt_02",
+      "group": "outfitGroup",
+      "file": "cutouts/slots/12_outfit_skirt_02.png",
+      "rect": {
+        "x": 268,
+        "y": 562,
+        "w": 314,
+        "h": 128
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 570
+      },
+      "pivotLocal": {
+        "x": 156,
+        "y": 8
+      },
+      "states": [
+        "outfit_skirt_02"
+      ],
+      "statesPresent": [
+        "outfit_skirt_02"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 38784,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 13,
+      "slot": "head",
+      "group": "headGroup",
+      "file": "cutouts/slots/13_head.png",
+      "rect": {
+        "x": 322,
+        "y": 95,
+        "w": 206,
+        "h": 177
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 262
+      },
+      "pivotLocal": {
+        "x": 102,
+        "y": 167
+      },
+      "states": [
+        "head"
+      ],
+      "statesPresent": [
+        "head"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 31536,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 14,
+      "slot": "eye_l_open",
+      "group": "faceGroup",
+      "file": "cutouts/slots/14_eye_l_open.png",
+      "rect": {
+        "x": 372,
+        "y": 143,
+        "w": 50,
+        "h": 39
+      },
+      "pivotAbsolute": {
+        "x": 397,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 25,
+        "y": 19
+      },
+      "states": [
+        "eye_l_open",
+        "eye_l_closed"
+      ],
+      "statesPresent": [
+        "eye_l_open"
+      ],
+      "statesMissing": [
+        "eye_l_closed"
+      ],
+      "opaquePixels": 1950,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 15,
+      "slot": "eye_r_open",
+      "group": "faceGroup",
+      "file": "cutouts/slots/15_eye_r_open.png",
+      "rect": {
+        "x": 432,
+        "y": 143,
+        "w": 48,
+        "h": 39
+      },
+      "pivotAbsolute": {
+        "x": 457,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 25,
+        "y": 19
+      },
+      "states": [
+        "eye_r_open",
+        "eye_r_closed"
+      ],
+      "statesPresent": [
+        "eye_r_open"
+      ],
+      "statesMissing": [
+        "eye_r_closed"
+      ],
+      "opaquePixels": 1872,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 16,
+      "slot": "mouth_neutral",
+      "group": "faceGroup",
+      "file": "cutouts/slots/16_mouth_neutral.png",
+      "rect": {
+        "x": 402,
+        "y": 186,
+        "w": 40,
+        "h": 30
+      },
+      "pivotAbsolute": {
+        "x": 422,
+        "y": 200
+      },
+      "pivotLocal": {
+        "x": 20,
+        "y": 14
+      },
+      "states": [
+        "mouth_neutral",
+        "mouth_open",
+        "mouth_smile"
+      ],
+      "statesPresent": [
+        "mouth_neutral"
+      ],
+      "statesMissing": [
+        "mouth_open",
+        "mouth_smile"
+      ],
+      "opaquePixels": 1200,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 17,
+      "slot": "hair_side_l",
+      "group": "frontHairGroup",
+      "file": "cutouts/slots/17_hair_side_l.png",
+      "rect": {
+        "x": 316,
+        "y": 88,
+        "w": 82,
+        "h": 214
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 54,
+        "y": 32
+      },
+      "states": [
+        "hair_side_l"
+      ],
+      "statesPresent": [
+        "hair_side_l"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 14005,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 18,
+      "slot": "hair_side_r",
+      "group": "frontHairGroup",
+      "file": "cutouts/slots/18_hair_side_r.png",
+      "rect": {
+        "x": 450,
+        "y": 88,
+        "w": 82,
+        "h": 214
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 28,
+        "y": 32
+      },
+      "states": [
+        "hair_side_r"
+      ],
+      "statesPresent": [
+        "hair_side_r"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 13921,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 19,
+      "slot": "hair_front_01",
+      "group": "frontHairGroup",
+      "file": "cutouts/slots/19_hair_front_01.png",
+      "rect": {
+        "x": 332,
+        "y": 38,
+        "w": 116,
+        "h": 140
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 92,
+        "y": 77
+      },
+      "states": [
+        "hair_front_01"
+      ],
+      "statesPresent": [
+        "hair_front_01"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 12333,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    },
+    {
+      "z": 20,
+      "slot": "hair_front_02",
+      "group": "frontHairGroup",
+      "file": "cutouts/slots/20_hair_front_02.png",
+      "rect": {
+        "x": 398,
+        "y": 38,
+        "w": 120,
+        "h": 164
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 26,
+        "y": 77
+      },
+      "states": [
+        "hair_front_02"
+      ],
+      "statesPresent": [
+        "hair_front_02"
+      ],
+      "statesMissing": [],
+      "opaquePixels": 15375,
+      "type": "geometric crop window (NOT an independent layer)",
+      "occlusionRepairRequired": true
+    }
+  ]
+}

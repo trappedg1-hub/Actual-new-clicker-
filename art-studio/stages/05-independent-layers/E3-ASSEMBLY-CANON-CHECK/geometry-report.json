@@ -1,0 +1,930 @@
+{
+  "source": "layer-map.json (E1) + crop-map.json (stage 04) + ANIMATION-SPEC.md §3",
+  "canvas": [
+    848,
+    1264
+  ],
+  "graphicSlots": 20,
+  "zContinuous": true,
+  "groupsMatchSpec": true,
+  "allLayersFullFrame": true,
+  "e2ExpressionAssets": {
+    "note": "E2-V2 expression layers/mattes are full-frame 848x1264 technical assets, not tight slot rects; all four share the same canvas and coordinate system.",
+    "files": [
+      "layer-eye_l_closed-B.png",
+      "layer-eye_r_closed-B-v2.png",
+      "layer-mouth_open-A.png",
+      "layer-mouth_smile-A.png",
+      "mask-eye_l_closed-B.png",
+      "mask-eye_r_closed-B-v2.png",
+      "mask-mouth_open-A.png",
+      "mask-mouth_smile-A.png"
+    ]
+  },
+  "slots": [
+    {
+      "z": 1,
+      "slot": "hair_back_01",
+      "group": "backHairGroup",
+      "cropRect": {
+        "x": 130,
+        "y": 380,
+        "w": 590,
+        "h": 365
+      },
+      "tightRect": {
+        "x": 139,
+        "y": 447,
+        "w": 591,
+        "h": 777
+      },
+      "alphaBbox": [
+        139,
+        447,
+        729,
+        1223
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 250
+      },
+      "pivotLocal": {
+        "x": 285,
+        "y": -197
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.4822,
+        -0.2535
+      ],
+      "anchorOutside0to1": true,
+      "states": [
+        "hair_back_01"
+      ],
+      "opaquePixels": 33334,
+      "opaquePixelsOutsideCropRect": 113,
+      "tightInsideCropRect": false,
+      "knownLimit": "Back hair is baked together with shoulders/forearms/hands; dark hair shadows are RGB-indistinguishable from navy fabric. Clean separation needs E2 occlusion repair."
+    },
+    {
+      "z": 2,
+      "slot": "hair_back_02",
+      "group": "backHairGroup",
+      "cropRect": {
+        "x": 130,
+        "y": 175,
+        "w": 590,
+        "h": 300
+      },
+      "tightRect": {
+        "x": 185,
+        "y": 215,
+        "w": 478,
+        "h": 256
+      },
+      "alphaBbox": [
+        185,
+        215,
+        662,
+        470
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 245
+      },
+      "pivotLocal": {
+        "x": 239,
+        "y": 30
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.1172
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "hair_back_02"
+      ],
+      "opaquePixels": 13942,
+      "opaquePixelsOutsideCropRect": 0,
+      "tightInsideCropRect": true,
+      "knownLimit": "Upper back hair overlaps shoulders and collar; same dark-shadow ambiguity."
+    },
+    {
+      "z": 3,
+      "slot": "leg_l",
+      "group": "legGroup",
+      "cropRect": {
+        "x": 185,
+        "y": 665,
+        "w": 220,
+        "h": 591
+      },
+      "tightRect": {
+        "x": 188,
+        "y": 656,
+        "w": 220,
+        "h": 591
+      },
+      "alphaBbox": [
+        188,
+        656,
+        407,
+        1246
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 182,
+        "y": 19
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.8273,
+        0.0321
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "leg_l"
+      ],
+      "opaquePixels": 38773,
+      "opaquePixelsOutsideCropRect": 224,
+      "tightInsideCropRect": false,
+      "knownLimit": "Thigh/stocking/shoe are one continuous painted mass; no separate foot anchor."
+    },
+    {
+      "z": 4,
+      "slot": "leg_r",
+      "group": "legGroup",
+      "cropRect": {
+        "x": 443,
+        "y": 665,
+        "w": 220,
+        "h": 591
+      },
+      "tightRect": {
+        "x": 434,
+        "y": 656,
+        "w": 228,
+        "h": 591
+      },
+      "alphaBbox": [
+        434,
+        656,
+        661,
+        1246
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 19
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.193,
+        0.0321
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "leg_r"
+      ],
+      "opaquePixels": 38838,
+      "opaquePixelsOutsideCropRect": 253,
+      "tightInsideCropRect": false,
+      "knownLimit": "Same as leg_l."
+    },
+    {
+      "z": 5,
+      "slot": "torso",
+      "group": "bodyRoot",
+      "cropRect": {
+        "x": 275,
+        "y": 285,
+        "w": 300,
+        "h": 215
+      },
+      "tightRect": {
+        "x": 271,
+        "y": 285,
+        "w": 306,
+        "h": 208
+      },
+      "alphaBbox": [
+        271,
+        285,
+        576,
+        492
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 153,
+        "y": 205
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.9856
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "torso"
+      ],
+      "opaquePixels": 3750,
+      "opaquePixelsOutsideCropRect": 25,
+      "tightInsideCropRect": false,
+      "knownLimit": "Torso contains the baked V-neck skin and blouse folds; hidden zones at top/bottom appear at ±6° breath."
+    },
+    {
+      "z": 6,
+      "slot": "arm_l",
+      "group": "armGroup_l",
+      "cropRect": {
+        "x": 100,
+        "y": 325,
+        "w": 235,
+        "h": 340
+      },
+      "tightRect": {
+        "x": 104,
+        "y": 325,
+        "w": 216,
+        "h": 331
+      },
+      "alphaBbox": [
+        104,
+        325,
+        319,
+        655
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 300,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 196,
+        "y": 10
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.9074,
+        0.0302
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "arm_l"
+      ],
+      "opaquePixels": 16097,
+      "opaquePixelsOutsideCropRect": 0,
+      "tightInsideCropRect": true,
+      "knownLimit": "Hair strands lie over the forearm/hand; pixels underneath do not exist. Shoulder 'cap' is not painted."
+    },
+    {
+      "z": 7,
+      "slot": "arm_r",
+      "group": "armGroup_r",
+      "cropRect": {
+        "x": 513,
+        "y": 325,
+        "w": 235,
+        "h": 340
+      },
+      "tightRect": {
+        "x": 533,
+        "y": 325,
+        "w": 214,
+        "h": 331
+      },
+      "alphaBbox": [
+        533,
+        325,
+        746,
+        655
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 548,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 15,
+        "y": 10
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.0701,
+        0.0302
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "arm_r"
+      ],
+      "opaquePixels": 16552,
+      "opaquePixelsOutsideCropRect": 0,
+      "tightInsideCropRect": true,
+      "knownLimit": "Same as arm_l."
+    },
+    {
+      "z": 8,
+      "slot": "outfit_blouse",
+      "group": "outfitGroup",
+      "cropRect": {
+        "x": 275,
+        "y": 285,
+        "w": 300,
+        "h": 210
+      },
+      "tightRect": {
+        "x": 182,
+        "y": 281,
+        "w": 495,
+        "h": 185
+      },
+      "alphaBbox": [
+        182,
+        281,
+        676,
+        465
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 242,
+        "y": 209
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.4889,
+        1.1297
+      ],
+      "anchorOutside0to1": true,
+      "states": [
+        "outfit_blouse"
+      ],
+      "opaquePixels": 15912,
+      "opaquePixelsOutsideCropRect": 1846,
+      "tightInsideCropRect": false,
+      "knownLimit": "Blouse shares navy sleeve stripes with collar and lies under the ribbon; wide overlap with torso is expected until E2 separates them."
+    },
+    {
+      "z": 9,
+      "slot": "outfit_collar",
+      "group": "outfitGroup",
+      "cropRect": {
+        "x": 318,
+        "y": 240,
+        "w": 214,
+        "h": 152
+      },
+      "tightRect": {
+        "x": 308,
+        "y": 49,
+        "w": 232,
+        "h": 325
+      },
+      "alphaBbox": [
+        308,
+        49,
+        539,
+        373
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 300
+      },
+      "pivotLocal": {
+        "x": 116,
+        "y": 251
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.7723
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "outfit_collar"
+      ],
+      "opaquePixels": 11641,
+      "opaquePixelsOutsideCropRect": 2668,
+      "tightInsideCropRect": false,
+      "knownLimit": "Collar is baked onto the V-neck skin and blouse; hidden neck/clavicle zone appears when head tilts ±12° and collar does NOT follow."
+    },
+    {
+      "z": 10,
+      "slot": "outfit_ribbon",
+      "group": "outfitGroup",
+      "cropRect": {
+        "x": 388,
+        "y": 315,
+        "w": 74,
+        "h": 163
+      },
+      "tightRect": {
+        "x": 380,
+        "y": 308,
+        "w": 88,
+        "h": 158
+      },
+      "alphaBbox": [
+        380,
+        308,
+        467,
+        465
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 340
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 32
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.2025
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "outfit_ribbon"
+      ],
+      "opaquePixels": 12376,
+      "opaquePixelsOutsideCropRect": 2026,
+      "tightInsideCropRect": false,
+      "knownLimit": "Ribbon knot is baked onto the blouse; no underlay."
+    },
+    {
+      "z": 11,
+      "slot": "outfit_skirt_01",
+      "group": "outfitGroup",
+      "cropRect": {
+        "x": 268,
+        "y": 472,
+        "w": 314,
+        "h": 120
+      },
+      "tightRect": {
+        "x": 157,
+        "y": 466,
+        "w": 534,
+        "h": 124
+      },
+      "alphaBbox": [
+        157,
+        466,
+        690,
+        589
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 478
+      },
+      "pivotLocal": {
+        "x": 267,
+        "y": 12
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.0968
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "outfit_skirt_01"
+      ],
+      "opaquePixels": 17623,
+      "opaquePixelsOutsideCropRect": 1331,
+      "tightInsideCropRect": false,
+      "knownLimit": "Split between skirt_01 / skirt_02 is a provisional horizontal line, not an anatomical boundary; phase shift 80–150 ms opens a seam."
+    },
+    {
+      "z": 12,
+      "slot": "outfit_skirt_02",
+      "group": "outfitGroup",
+      "cropRect": {
+        "x": 268,
+        "y": 562,
+        "w": 314,
+        "h": 128
+      },
+      "tightRect": {
+        "x": 191,
+        "y": 556,
+        "w": 468,
+        "h": 676
+      },
+      "alphaBbox": [
+        191,
+        556,
+        658,
+        1231
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 570
+      },
+      "pivotLocal": {
+        "x": 233,
+        "y": 14
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.4979,
+        0.0207
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "outfit_skirt_02"
+      ],
+      "opaquePixels": 31531,
+      "opaquePixelsOutsideCropRect": 1879,
+      "tightInsideCropRect": false,
+      "knownLimit": "Hem is baked onto thighs; under-hem content does not exist."
+    },
+    {
+      "z": 13,
+      "slot": "head",
+      "group": "headGroup",
+      "cropRect": {
+        "x": 322,
+        "y": 95,
+        "w": 206,
+        "h": 177
+      },
+      "tightRect": {
+        "x": 380,
+        "y": 103,
+        "w": 108,
+        "h": 195
+      },
+      "alphaBbox": [
+        380,
+        103,
+        487,
+        297
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 262
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 159
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.4074,
+        0.8154
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "head"
+      ],
+      "opaquePixels": 7200,
+      "opaquePixelsOutsideCropRect": 1418,
+      "tightInsideCropRect": false,
+      "knownLimit": "HEAD STILL CONTAINS the open eyes and neutral mouth. Blink/expression switching by visibility cannot work until a clean face base is painted (E2/E3)."
+    },
+    {
+      "z": 14,
+      "slot": "eye_l_open",
+      "group": "faceGroup",
+      "cropRect": {
+        "x": 372,
+        "y": 143,
+        "w": 50,
+        "h": 39
+      },
+      "tightRect": {
+        "x": 378,
+        "y": 139,
+        "w": 49,
+        "h": 47
+      },
+      "alphaBbox": [
+        378,
+        139,
+        426,
+        185
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 397,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 19,
+        "y": 23
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.3878,
+        0.4894
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "eye_l_open",
+        "eye_l_closed"
+      ],
+      "opaquePixels": 1224,
+      "opaquePixelsOutsideCropRect": 190,
+      "tightInsideCropRect": false,
+      "knownLimit": "A front hair strand crosses the left eye in the source frame; eye cannot be fully isolated without repaint."
+    },
+    {
+      "z": 15,
+      "slot": "eye_r_open",
+      "group": "faceGroup",
+      "cropRect": {
+        "x": 432,
+        "y": 143,
+        "w": 48,
+        "h": 39
+      },
+      "tightRect": {
+        "x": 427,
+        "y": 138,
+        "w": 60,
+        "h": 48
+      },
+      "alphaBbox": [
+        427,
+        138,
+        486,
+        185
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 457,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 30,
+        "y": 24
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.5
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "eye_r_open",
+        "eye_r_closed"
+      ],
+      "opaquePixels": 1537,
+      "opaquePixelsOutsideCropRect": 367,
+      "tightInsideCropRect": false,
+      "knownLimit": "Right eye crop nearly touches the ear; closed state does not exist."
+    },
+    {
+      "z": 16,
+      "slot": "mouth_neutral",
+      "group": "faceGroup",
+      "cropRect": {
+        "x": 402,
+        "y": 186,
+        "w": 40,
+        "h": 30
+      },
+      "tightRect": {
+        "x": 396,
+        "y": 182,
+        "w": 52,
+        "h": 34
+      },
+      "alphaBbox": [
+        396,
+        182,
+        447,
+        215
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 422,
+        "y": 200
+      },
+      "pivotLocal": {
+        "x": 26,
+        "y": 18
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5,
+        0.5294
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "mouth_neutral",
+        "mouth_open",
+        "mouth_smile"
+      ],
+      "opaquePixels": 1362,
+      "opaquePixelsOutsideCropRect": 256,
+      "tightInsideCropRect": false,
+      "knownLimit": "Only neutral mouth exists; open/smile states need a separate art pass."
+    },
+    {
+      "z": 17,
+      "slot": "hair_side_l",
+      "group": "frontHairGroup",
+      "cropRect": {
+        "x": 316,
+        "y": 88,
+        "w": 82,
+        "h": 214
+      },
+      "tightRect": {
+        "x": 321,
+        "y": 158,
+        "w": 82,
+        "h": 153
+      },
+      "alphaBbox": [
+        321,
+        158,
+        402,
+        310
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 49,
+        "y": -38
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.5976,
+        -0.2484
+      ],
+      "anchorOutside0to1": true,
+      "states": [
+        "hair_side_l"
+      ],
+      "opaquePixels": 7897,
+      "opaquePixelsOutsideCropRect": 219,
+      "tightInsideCropRect": false,
+      "knownLimit": "Face lock crosses eyebrow/cheek/eye; underlying face pixels absent."
+    },
+    {
+      "z": 18,
+      "slot": "hair_side_r",
+      "group": "frontHairGroup",
+      "cropRect": {
+        "x": 450,
+        "y": 88,
+        "w": 82,
+        "h": 214
+      },
+      "tightRect": {
+        "x": 446,
+        "y": 203,
+        "w": 80,
+        "h": 108
+      },
+      "alphaBbox": [
+        446,
+        203,
+        525,
+        310
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 32,
+        "y": -83
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.4,
+        -0.7685
+      ],
+      "anchorOutside0to1": true,
+      "states": [
+        "hair_side_r"
+      ],
+      "opaquePixels": 5925,
+      "opaquePixelsOutsideCropRect": 228,
+      "tightInsideCropRect": false,
+      "knownLimit": "Same as hair_side_l."
+    },
+    {
+      "z": 19,
+      "slot": "hair_front_01",
+      "group": "frontHairGroup",
+      "cropRect": {
+        "x": 332,
+        "y": 38,
+        "w": 116,
+        "h": 140
+      },
+      "tightRect": {
+        "x": 343,
+        "y": 52,
+        "w": 69,
+        "h": 127
+      },
+      "alphaBbox": [
+        343,
+        52,
+        411,
+        178
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 81,
+        "y": 63
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        1.1739,
+        0.4961
+      ],
+      "anchorOutside0to1": true,
+      "states": [
+        "hair_front_01"
+      ],
+      "opaquePixels": 4019,
+      "opaquePixelsOutsideCropRect": 2,
+      "tightInsideCropRect": false,
+      "knownLimit": "Fringe is baked onto the forehead/hairline; hairline underneath absent."
+    },
+    {
+      "z": 20,
+      "slot": "hair_front_02",
+      "group": "frontHairGroup",
+      "cropRect": {
+        "x": 398,
+        "y": 38,
+        "w": 120,
+        "h": 164
+      },
+      "tightRect": {
+        "x": 394,
+        "y": 41,
+        "w": 127,
+        "h": 167
+      },
+      "alphaBbox": [
+        394,
+        41,
+        520,
+        207
+      ],
+      "tightRectEqualsAlphaBbox": true,
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 30,
+        "y": 74
+      },
+      "pivotLocalConsistent": true,
+      "anchor": [
+        0.2362,
+        0.4431
+      ],
+      "anchorOutside0to1": false,
+      "states": [
+        "hair_front_02"
+      ],
+      "opaquePixels": 9479,
+      "opaquePixelsOutsideCropRect": 566,
+      "tightInsideCropRect": false,
+      "knownLimit": "Overlaps hair_front_01; the split is provisional, not anatomical."
+    }
+  ]
+}

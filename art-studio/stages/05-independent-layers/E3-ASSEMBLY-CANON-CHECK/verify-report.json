@@ -1,0 +1,811 @@
+{
+  "stage": "E3-ASSEMBLY-CANON-CHECK",
+  "parent": "375c8c3524ec5f6f1bff5a452496cb53e84b04f4",
+  "type": "verification only",
+  "checks": {
+    "protected_files_unchanged": {
+      "pass": true,
+      "detail": {
+        "checked": 571,
+        "changed": [],
+        "totalChanged": 0
+      }
+    },
+    "source_copies_byte_identical": {
+      "pass": true,
+      "detail": {
+        "checked": "snapshot-matched files",
+        "mismatched": []
+      }
+    },
+    "20_graphic_slots_z1_to_z20": {
+      "pass": true,
+      "detail": {
+        "slots": 20
+      }
+    },
+    "groups_match_animation_spec": {
+      "pass": true,
+      "detail": null
+    },
+    "pivotLocal_consistent_for_all_slots": {
+      "pass": true,
+      "detail": null
+    },
+    "all_e1_layers_full_frame_848x1264": {
+      "pass": true,
+      "detail": null
+    },
+    "all_e2_expression_assets_full_frame_848x1264": {
+      "pass": true,
+      "detail": null
+    },
+    "geometry_out_of_crop_pixels_recorded": {
+      "pass": true,
+      "detail": {
+        "note": "E1 tightRect is a contour bbox, stage-04 rect is a preliminary window; differences are disclosed, not silently fixed",
+        "maxOutside": 2668,
+        "slotsWithOutside": 17,
+        "outsideBySlot": {
+          "hair_back_01": 113,
+          "hair_back_02": 0,
+          "leg_l": 224,
+          "leg_r": 253,
+          "torso": 25,
+          "arm_l": 0,
+          "arm_r": 0,
+          "outfit_blouse": 1846,
+          "outfit_collar": 2668,
+          "outfit_ribbon": 2026,
+          "outfit_skirt_01": 1331,
+          "outfit_skirt_02": 1879,
+          "head": 1418,
+          "eye_l_open": 190,
+          "eye_r_open": 367,
+          "mouth_neutral": 256,
+          "hair_side_l": 219,
+          "hair_side_r": 228,
+          "hair_front_01": 2,
+          "hair_front_02": 566
+        }
+      }
+    },
+    "anchors_outside_0_to_1_documented": {
+      "pass": true,
+      "detail": {
+        "slots": [
+          "hair_back_01",
+          "outfit_blouse",
+          "hair_side_l",
+          "hair_side_r",
+          "hair_front_01"
+        ],
+        "count": 5,
+        "note": "pivots above/left of tightRect are anatomical; rig integration must handle negative anchors"
+      }
+    },
+    "e1_ascending_z_composite_equals_source": {
+      "pass": true,
+      "detail": {
+        "changedPixels": 0
+      }
+    },
+    "reverse_z_order_identical_confirms_disjoint_masks": {
+      "pass": true,
+      "detail": {
+        "changedPixels": 0,
+        "note": "E1 contour masks are a disjoint partition of the silhouette, so swapping draw order in rest does not change pixels. Declared z0..20 order is checked against ANIMATION-SPEC.md §3, but true occlusion under motion is NOT demonstrated."
+      }
+    },
+    "e1_rest_coverage_100_percent_and_zero_overlap": {
+      "pass": true,
+      "detail": {
+        "silhouettePixels": 289012,
+        "coveredByAnyLayer": 289012,
+        "restGaps": 0,
+        "overlapPixels": 0
+      }
+    },
+    "e1_motion_gaps_recomputed_match_published_proxy": {
+      "pass": true,
+      "detail": {
+        "published": 9,
+        "recomputed": 9
+      }
+    },
+    "e2_v2_neutral_state_equals_source": {
+      "pass": true,
+      "detail": {
+        "changedPixels": 0
+      }
+    },
+    "all_10_assembly_states_equal_approved_e2_v2_states": {
+      "pass": true,
+      "detail": {
+        "states": 10
+      }
+    },
+    "assembly_changes_limited_to_face_diff_rect": {
+      "pass": true,
+      "detail": {
+        "diffRect": [
+          369,
+          141,
+          478,
+          224
+        ]
+      }
+    },
+    "e2_switching_round_trips_at_assembly_level": {
+      "pass": true,
+      "detail": {
+        "checks": 13,
+        "failed": [],
+        "cleanChangedPixels": {
+          "eye_l": 750,
+          "eye_r": 983,
+          "mouth": 790
+        },
+        "ownedPixels": {
+          "eye_l": 893,
+          "eye_r": 1024,
+          "mouth": 814
+        }
+      }
+    },
+    "approved_variants_unchanged": {
+      "pass": true,
+      "detail": {
+        "eye_l_closed": "B",
+        "eye_r_closed": "B",
+        "mouth_open": "A",
+        "mouth_smile": "A"
+      }
+    },
+    "mouth_closed_A_is_visual_reference_only": {
+      "pass": true,
+      "detail": null
+    },
+    "exactly_10_approved_assembly_states": {
+      "pass": true,
+      "detail": [
+        "00-neutral",
+        "01-eye_l_closed-B",
+        "02-eye_r_closed-B",
+        "03-mouth_open-A",
+        "04-mouth_smile-A",
+        "05-both-eyes-closed",
+        "06-both-eyes-closed-smile",
+        "07-mouth_open-both-eyes-closed",
+        "08-eye_l_closed-smile",
+        "09-eye_r_closed-mouth_open"
+      ]
+    },
+    "neutral_irises_level_in_assembly": {
+      "pass": true,
+      "detail": {
+        "left": {
+          "centroidY": 163.01,
+          "greenPixels": 100
+        },
+        "right": {
+          "centroidY": 163.111,
+          "greenPixels": 99
+        }
+      }
+    },
+    "both_closed_lids_level_in_assembly": {
+      "pass": true,
+      "detail": {
+        "left": {
+          "peakRow": 168,
+          "peakDarkPixels": 29,
+          "centroidY": 168.214,
+          "darkPixelsInBand": 112
+        },
+        "right": {
+          "peakRow": 168,
+          "peakDarkPixels": 27,
+          "centroidY": 168.047,
+          "darkPixelsInBand": 106
+        },
+        "residualPx": 0.167,
+        "e2V2ResidualPx": 0.167
+      }
+    },
+    "closed_states_hide_open_green_irises": {
+      "pass": true,
+      "detail": {
+        "leftGreenPx": 0,
+        "rightGreenPx": 0
+      }
+    },
+    "mouth_zone_dark_ink_changes_in_open_and_smile": {
+      "pass": true,
+      "detail": {
+        "neutralDarkPx": 23,
+        "mouthOpenDarkPx": 25,
+        "mouthSmileDarkPx": 3,
+        "note": "narrow y=202..203 dark-ink count is a diagnostic, not proof of a double line; the wide O has its own dark upper edge. E2 clean base report already documents removal of the neutral line."
+      }
+    },
+    "expression_mattes_front_hair_overlap_recorded": {
+      "pass": true,
+      "detail": {
+        "frontHairMatteOverlapPx": 564,
+        "mouthMaskOverlapPx": 790,
+        "bothOverlapPx": 4,
+        "legend": "red = expression matte ∩ E1 front hair (z17..20); cyan = mouth_open ∩ mouth_smile; yellow = both"
+      }
+    },
+    "mouth_mattes_share_zone_but_are_switch_exclusive": {
+      "pass": true,
+      "detail": {
+        "mouthMaskOverlapPx": 790,
+        "switchReplacePass": true,
+        "switchRemovePass": true,
+        "note": "the two mouth mattes cover the same fitted zone; only one expression is active per state, proven by switch round trips."
+      }
+    },
+    "canon_render_mismatch_documented": {
+      "pass": true,
+      "detail": {
+        "uniqueColors": {
+          "IMG_4036": 124223,
+          "IMG_4037": 116952,
+          "IMG_4038": 55454,
+          "E1_composite": 55454,
+          "E2_neutral": 55454
+        },
+        "verdict": "geometry derived from IMG_4038; final render manner IMG_4036/IMG_4037 NOT yet applied (E4 not authorized)",
+        "referenceReview": "ACCEPTED WITH NOTES; mirror RMSE 0.0894 (8.94%); axis deviation <=0.6 px"
+      }
+    },
+    "no_new_artistic_pixels_in_full_frame_states": {
+      "pass": true,
+      "detail": {
+        "method": "all full-frame assembly states are byte-identical to already approved E2-V2 states; other sheets are crops/zooms/overlays"
+      }
+    },
+    "png_decode_and_full_frame_dimensions": {
+      "pass": true,
+      "detail": {
+        "checked": 68,
+        "decodeErrors": [],
+        "wrongDimensions": {}
+      }
+    },
+    "all_required_visual_sheets_and_mobile_versions_exist": {
+      "pass": true,
+      "detail": {
+        "required": 21,
+        "missing": []
+      }
+    },
+    "mobile_sheets_width_le_1200px": {
+      "pass": true,
+      "detail": {
+        "maxWidth": 566,
+        "widths": {
+          "00-canon-references.png": 429,
+          "01-full-assembly-neutral-1x.png": 437,
+          "02-original-vs-E1-vs-E2-neutral-50pct.png": 450,
+          "03-all-10-states-25pct.png": 238,
+          "04-face-states-contact-1x.png": 226,
+          "05-layer-order-contact.png": 206,
+          "06-anchors-pivots-overlay.png": 424,
+          "07-alignment-grid.png": 424,
+          "08-motion-gaps-rest-vs-proxies.png": 238,
+          "09-baked-lacunae-map.png": 424,
+          "10-closeup-face-neutral-vs-both-closed.png": 466,
+          "11-closeup-eyes-8x.png": 546,
+          "12-closeup-mouth-8x.png": 346,
+          "13-closeup-head-collar-shoulders.png": 566,
+          "14-closeup-arms-hair.png": 416,
+          "15-closeup-skirt-hem.png": 566,
+          "16-closeup-legs-shoes.png": 546,
+          "17-closeup-ear-front-hair.png": 386,
+          "18-closeup-ribbon.png": 506,
+          "19-closeup-lacunae-shoulders.png": 526,
+          "20-matte-intersection-overlay.png": 466
+        }
+      }
+    }
+  },
+  "summary": {
+    "checksTotal": 31,
+    "checksPassed": 31,
+    "checksFailed": 0
+  },
+  "geometry": {
+    "slots": 20,
+    "zContinuous": true,
+    "groupsMatchSpec": true,
+    "anchorsOutside0to1": [
+      "hair_back_01",
+      "outfit_blouse",
+      "hair_side_l",
+      "hair_side_r",
+      "hair_front_01"
+    ],
+    "outsideCropBySlot": {
+      "hair_back_01": 113,
+      "hair_back_02": 0,
+      "leg_l": 224,
+      "leg_r": 253,
+      "torso": 25,
+      "arm_l": 0,
+      "arm_r": 0,
+      "outfit_blouse": 1846,
+      "outfit_collar": 2668,
+      "outfit_ribbon": 2026,
+      "outfit_skirt_01": 1331,
+      "outfit_skirt_02": 1879,
+      "head": 1418,
+      "eye_l_open": 190,
+      "eye_r_open": 367,
+      "mouth_neutral": 256,
+      "hair_side_l": 219,
+      "hair_side_r": 228,
+      "hair_front_01": 2,
+      "hair_front_02": 566
+    }
+  },
+  "assembly": {
+    "diffRect": [
+      369,
+      141,
+      478,
+      224
+    ],
+    "states": [
+      "00-neutral",
+      "01-eye_l_closed-B",
+      "02-eye_r_closed-B",
+      "03-mouth_open-A",
+      "04-mouth_smile-A",
+      "05-both-eyes-closed",
+      "06-both-eyes-closed-smile",
+      "07-mouth_open-both-eyes-closed",
+      "08-eye_l_closed-smile",
+      "09-eye_r_closed-mouth_open"
+    ],
+    "switching": {
+      "checks": {
+        "neutral_is_original": true,
+        "neutral_apply_eye_l_equals_state01": true,
+        "neutral_apply_eye_r_equals_state02": true,
+        "state01_apply_eye_r_equals_state05": true,
+        "state05_remove_eye_r_equals_state01": true,
+        "state05_remove_eye_l_equals_state02": true,
+        "neutral_apply_mouth_open_equals_state03": true,
+        "state03_replace_with_smile_equals_state04": true,
+        "state03_remove_mouth_equals_neutral": true,
+        "state05_apply_smile_equals_state06": true,
+        "state02_apply_mouth_open_equals_state09": true,
+        "state06_remove_all_equals_neutral": true,
+        "all_10_states_equal_approved_e2_files": true
+      },
+      "changed": {
+        "eye_l": 750,
+        "eye_r": 983,
+        "mouth": 790
+      },
+      "owned": {
+        "eye_l": 893,
+        "eye_r": 1024,
+        "mouth": 814
+      }
+    }
+  },
+  "canon": {
+    "uniqueColors": {
+      "IMG_4036": 124223,
+      "IMG_4037": 116952,
+      "IMG_4038": 55454,
+      "E1_composite": 55454,
+      "E2_neutral": 55454
+    },
+    "renderCanonMet": false,
+    "e4Authorized": false
+  },
+  "motionGaps": [
+    {
+      "shift": "rest",
+      "dx": 0,
+      "dy": 0,
+      "gapPixels": 0,
+      "gapRatio": 0.0
+    },
+    {
+      "shift": "hair_sway_+10deg_proxy",
+      "dx": 12,
+      "dy": 0,
+      "gapPixels": 29019,
+      "gapRatio": 0.100408
+    },
+    {
+      "shift": "hair_sway_-10deg_proxy",
+      "dx": -12,
+      "dy": 0,
+      "gapPixels": 29019,
+      "gapRatio": 0.100408
+    },
+    {
+      "shift": "arm_reaction_+25deg_proxy",
+      "dx": 10,
+      "dy": 6,
+      "gapPixels": 25212,
+      "gapRatio": 0.087235
+    },
+    {
+      "shift": "arm_reaction_-25deg_proxy",
+      "dx": -10,
+      "dy": -6,
+      "gapPixels": 25212,
+      "gapRatio": 0.087235
+    },
+    {
+      "shift": "head_tilt_+12deg_proxy",
+      "dx": 6,
+      "dy": 8,
+      "gapPixels": 17549,
+      "gapRatio": 0.060721
+    },
+    {
+      "shift": "head_tilt_-12deg_proxy",
+      "dx": -6,
+      "dy": -8,
+      "gapPixels": 17549,
+      "gapRatio": 0.060721
+    },
+    {
+      "shift": "breath_+6deg_proxy",
+      "dx": 0,
+      "dy": 5,
+      "gapPixels": 6834,
+      "gapRatio": 0.023646
+    },
+    {
+      "shift": "breath_-6deg_proxy",
+      "dx": 0,
+      "dy": -5,
+      "gapPixels": 6834,
+      "gapRatio": 0.023646
+    }
+  ],
+  "lacunae": {
+    "opaqueRowBgPixels": 6717,
+    "components": 782,
+    "largest": [
+      {
+        "pixels": 1402,
+        "bbox": [
+          579,
+          347,
+          635,
+          418
+        ]
+      },
+      {
+        "pixels": 1337,
+        "bbox": [
+          214,
+          348,
+          271,
+          415
+        ]
+      },
+      {
+        "pixels": 354,
+        "bbox": [
+          505,
+          172,
+          520,
+          233
+        ]
+      },
+      {
+        "pixels": 339,
+        "bbox": [
+          568,
+          560,
+          586,
+          608
+        ]
+      },
+      {
+        "pixels": 288,
+        "bbox": [
+          307,
+          506,
+          318,
+          553
+        ]
+      },
+      {
+        "pixels": 246,
+        "bbox": [
+          326,
+          183,
+          339,
+          232
+        ]
+      },
+      {
+        "pixels": 198,
+        "bbox": [
+          638,
+          462,
+          653,
+          489
+        ]
+      },
+      {
+        "pixels": 192,
+        "bbox": [
+          195,
+          453,
+          211,
+          487
+        ]
+      }
+    ],
+    "bboxAll": [
+      141,
+      70,
+      707,
+      1094
+    ]
+  },
+  "expressions": {
+    "iris": {
+      "left": {
+        "centroidY": 163.01,
+        "greenPixels": 100
+      },
+      "right": {
+        "centroidY": 163.111,
+        "greenPixels": 99
+      }
+    },
+    "lids": {
+      "left": {
+        "peakRow": 168,
+        "peakDarkPixels": 29,
+        "centroidY": 168.214,
+        "darkPixelsInBand": 112
+      },
+      "right": {
+        "peakRow": 168,
+        "peakDarkPixels": 27,
+        "centroidY": 168.047,
+        "darkPixelsInBand": 106
+      }
+    },
+    "greenClosed": {
+      "left": 0,
+      "right": 0
+    },
+    "mouthDarkLine": {
+      "neutral": 23,
+      "open": 25,
+      "smile": 3
+    },
+    "intersection": {
+      "frontHairMatteOverlapPx": 564,
+      "mouthMaskOverlapPx": 790,
+      "bothOverlapPx": 4,
+      "legend": "red = expression matte ∩ E1 front hair (z17..20); cyan = mouth_open ∩ mouth_smile; yellow = both"
+    }
+  },
+  "findings": {
+    "renderCanonNotMet": "IMG_4038 is flatter (55,454 colours) than IMG_4036/4037 (124,223 / 116,952); E4 not authorized.",
+    "e1HiddenZonesNotRestored": "E1 slots remain non-independent under motion; only the FACE hidden zones were restored in E2.",
+    "motionProxyGaps": [
+      {
+        "shift": "rest",
+        "dx": 0,
+        "dy": 0,
+        "gapPixels": 0,
+        "gapRatio": 0.0
+      },
+      {
+        "shift": "hair_sway_+10deg_proxy",
+        "dx": 12,
+        "dy": 0,
+        "gapPixels": 29019,
+        "gapRatio": 0.100408
+      },
+      {
+        "shift": "hair_sway_-10deg_proxy",
+        "dx": -12,
+        "dy": 0,
+        "gapPixels": 29019,
+        "gapRatio": 0.100408
+      },
+      {
+        "shift": "arm_reaction_+25deg_proxy",
+        "dx": 10,
+        "dy": 6,
+        "gapPixels": 25212,
+        "gapRatio": 0.087235
+      },
+      {
+        "shift": "arm_reaction_-25deg_proxy",
+        "dx": -10,
+        "dy": -6,
+        "gapPixels": 25212,
+        "gapRatio": 0.087235
+      },
+      {
+        "shift": "head_tilt_+12deg_proxy",
+        "dx": 6,
+        "dy": 8,
+        "gapPixels": 17549,
+        "gapRatio": 0.060721
+      },
+      {
+        "shift": "head_tilt_-12deg_proxy",
+        "dx": -6,
+        "dy": -8,
+        "gapPixels": 17549,
+        "gapRatio": 0.060721
+      },
+      {
+        "shift": "breath_+6deg_proxy",
+        "dx": 0,
+        "dy": 5,
+        "gapPixels": 6834,
+        "gapRatio": 0.023646
+      },
+      {
+        "shift": "breath_-6deg_proxy",
+        "dx": 0,
+        "dy": -5,
+        "gapPixels": 6834,
+        "gapRatio": 0.023646
+      }
+    ],
+    "lockedRowBgOpaquePixels": {
+      "opaqueRowBgPixels": 6717,
+      "components": 782,
+      "largest": [
+        {
+          "pixels": 1402,
+          "bbox": [
+            579,
+            347,
+            635,
+            418
+          ]
+        },
+        {
+          "pixels": 1337,
+          "bbox": [
+            214,
+            348,
+            271,
+            415
+          ]
+        },
+        {
+          "pixels": 354,
+          "bbox": [
+            505,
+            172,
+            520,
+            233
+          ]
+        },
+        {
+          "pixels": 339,
+          "bbox": [
+            568,
+            560,
+            586,
+            608
+          ]
+        },
+        {
+          "pixels": 288,
+          "bbox": [
+            307,
+            506,
+            318,
+            553
+          ]
+        },
+        {
+          "pixels": 246,
+          "bbox": [
+            326,
+            183,
+            339,
+            232
+          ]
+        },
+        {
+          "pixels": 198,
+          "bbox": [
+            638,
+            462,
+            653,
+            489
+          ]
+        },
+        {
+          "pixels": 192,
+          "bbox": [
+            195,
+            453,
+            211,
+            487
+          ]
+        }
+      ],
+      "bboxAll": [
+        141,
+        70,
+        707,
+        1094
+      ]
+    },
+    "e1OutOfCropOpaquePixels": {
+      "hair_back_01": 113,
+      "hair_back_02": 0,
+      "leg_l": 224,
+      "leg_r": 253,
+      "torso": 25,
+      "arm_l": 0,
+      "arm_r": 0,
+      "outfit_blouse": 1846,
+      "outfit_collar": 2668,
+      "outfit_ribbon": 2026,
+      "outfit_skirt_01": 1331,
+      "outfit_skirt_02": 1879,
+      "head": 1418,
+      "eye_l_open": 190,
+      "eye_r_open": 367,
+      "mouth_neutral": 256,
+      "hair_side_l": 219,
+      "hair_side_r": 228,
+      "hair_front_01": 2,
+      "hair_front_02": 566
+    },
+    "negativeOrOutsideAnchors": [
+      "hair_back_01",
+      "outfit_blouse",
+      "hair_side_l",
+      "hair_side_r",
+      "hair_front_01"
+    ],
+    "e1AlphaMeanDifference": "E1 composite alphaMean 0.252289 vs stage-04 cutout 0.269604 (1 px contour smoothing).",
+    "bgColor": [
+      42,
+      30,
+      63
+    ],
+    "intersections": {
+      "frontHairMatteOverlapPx": 564,
+      "mouthMaskOverlapPx": 790,
+      "bothOverlapPx": 4,
+      "legend": "red = expression matte ∩ E1 front hair (z17..20); cyan = mouth_open ∩ mouth_smile; yellow = both"
+    },
+    "visualStatesMismatch": "ANIMATION-SPEC.md §3 expects 20 slots / 24 visual states; stage-04 had 20/4 missing, E2-V2 has 10 static face states (neutral + 9 combinations), NOT 24 rig animation frames. No drawOrder manifest.",
+    "e2ResidualDefects": [
+      "eye_r_closed-B: сохранён лишний светлый штрих над веком и сдвинут вместе с коррекцией +9 px; seam_rmse относительно исходника с ОТКРЫТЫМ глазом вырос 25.6289 → 65.1796 (ожидаемо: открытый глаз вне сдвинутой линзы заменён чистой кожей; это не новый видимый шов).",
+      "eye_l_closed-B: более тонкие ресницы, мягкая лишняя складочка, seam=14.92, сдвиг [-2.31,-0.36], тёмные пиксели 339/494, ступенька тона x≈405–410 на ×8.",
+      "mouth_open-A: широкое «О» / seam=8.77; mouth_smile-A: тонкая низкоконтрастная линия / 28/44.",
+      "правый глаз на ×8: слабая разница гладкости/тона внутри fitted-линзы и короткая граница у защитной пряди x≈470–471.",
+      "чистая база техническая, а не финальная художественная реставрация: под закрытыми веками нет анатомии, у AI-элементов нет настоящей alpha, маски технические.",
+      "в E2-FACE-BASE-FULL-REPORT.md осталась известная опечатка 829 вместо 929 для частичной маски правого глаза; файл намеренно не тронут.",
+      "из пилота остаются раскрытыми registrationAnnulusMSE=3389.4, сдвиг [-4,-4], тёмные пиксели 308/732."
+    ],
+    "e2DecisionIntegrationFlag": "E2-final-decision.json still has integrated=false / e3e4Started=false; E3 is verification only, no rig integration.",
+    "planE3Label": "PLAN.md E3 05.3-face-states is only PARTIALLY realised by E2: clean face base and 4 approved expressions / 10 static states exist, but not as tight 39-48 px slots with unified rect/pivot inside a rig. Current authorised E3 is the explicit assembly/canon verification task list; no new states or slots created.",
+    "backgroundGradient": "Solid-bg technical sheets use one sampled corner colour; original gradient is not reproduced. Canon-bg assembly uses the original frame as backdrop and is byte-identical to it.",
+    "noE4OrRig": "No PixiJS rig, no code/atlas/PR change, no Vercel Preview/Production, no E4 started.",
+    "vercel": "Vercel connector is enabled; only list_connector_tools was called, no deployment/project/domain/env action."
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "stage": "E3-ASSEMBLY-CANON-CHECK",
+  "type": "read-only assembly / canon verification, NOT rig integration",
+  "parent": "375c8c3524ec5f6f1bff5a452496cb53e84b04f4",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "generation": false,
+  "newArtisticPixels": false,
+  "rigIntegration": false,
+  "e4Started": false,
+  "vercelAction": "none (connector enabled, list_connector_tools only)",
+  "approvedVariants": "eye_l_closed-B, eye_r_closed-B, mouth_open-A, mouth_smile-A",
+  "statesChecked": [
+    "00-neutral",
+    "01-eye_l_closed-B",
+    "02-eye_r_closed-B",
+    "03-mouth_open-A",
+    "04-mouth_smile-A",
+    "05-both-eyes-closed",
+    "06-both-eyes-closed-smile",
+    "07-mouth_open-both-eyes-closed",
+    "08-eye_l_closed-smile",
+    "09-eye_r_closed-mouth_open"
+  ],
+  "checks": {
+    "total": 31,
+    "passed": 31,
+    "failed": 0
+  },
+  "protectedFilesChanged": 0,
+  "selfApproval": false,
+  "residualDefectsWaived": false,
+  "renderCanonMet": false,
+  "commit": "see final chat report (separate commit after this folder)",
+  "approval": "NOT APPROVED - STOP, waiting for separate E4 permission"
+}

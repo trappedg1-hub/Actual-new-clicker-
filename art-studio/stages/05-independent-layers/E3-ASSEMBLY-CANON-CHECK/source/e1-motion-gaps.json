@@ -1,0 +1,75 @@
+{
+  "purpose": "quantify hidden-zone gaps that E2 must repair",
+  "method": "translation proxy (NOT rotation, NOT a real animation frame)",
+  "amplitudeSource": "art-studio/ANIMATION-SPEC.md §5",
+  "silhouettePixels": 289012,
+  "results": [
+    {
+      "shift": "rest",
+      "dx": 0,
+      "dy": 0,
+      "gapPixels": 0,
+      "gapRatio": 0.0
+    },
+    {
+      "shift": "hair_sway_+10deg_proxy",
+      "dx": 12,
+      "dy": 0,
+      "gapPixels": 29019,
+      "gapRatio": 0.100408
+    },
+    {
+      "shift": "hair_sway_-10deg_proxy",
+      "dx": -12,
+      "dy": 0,
+      "gapPixels": 29019,
+      "gapRatio": 0.100408
+    },
+    {
+      "shift": "arm_reaction_+25deg_proxy",
+      "dx": 10,
+      "dy": 6,
+      "gapPixels": 25212,
+      "gapRatio": 0.087235
+    },
+    {
+      "shift": "arm_reaction_-25deg_proxy",
+      "dx": -10,
+      "dy": -6,
+      "gapPixels": 25212,
+      "gapRatio": 0.087235
+    },
+    {
+      "shift": "head_tilt_+12deg_proxy",
+      "dx": 6,
+      "dy": 8,
+      "gapPixels": 17549,
+      "gapRatio": 0.060721
+    },
+    {
+      "shift": "head_tilt_-12deg_proxy",
+      "dx": -6,
+      "dy": -8,
+      "gapPixels": 17549,
+      "gapRatio": 0.060721
+    },
+    {
+      "shift": "breath_+6deg_proxy",
+      "dx": 0,
+      "dy": 5,
+      "gapPixels": 6834,
+      "gapRatio": 0.023646
+    },
+    {
+      "shift": "breath_-6deg_proxy",
+      "dx": 0,
+      "dy": -5,
+      "gapPixels": 6834,
+      "gapRatio": 0.023646
+    }
+  ],
+  "worstShift": "hair_sway_+10deg_proxy",
+  "worstGapPixels": 29019,
+  "visualisation": "preview/E1-motion-gaps.png (red = uncovered after shift)",
+  "conclusion": "Any motion opens transparent gaps because hidden zones were deliberately NOT repainted in E1. E2 requires separate permission and an art pass."
+}

@@ -1,0 +1,182 @@
+{
+  "stage": "E2-facial-states",
+  "document": "FINAL user decision on the five facial states",
+  "status": "final and authoritative for further preparation",
+  "decidedAt": "2026-11-11",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "headBeforePublication": "8e6118a077cc85f24950c940101b258c354bf251",
+  "firstRecordedInCommit": "798f884bc3294b5a80731366aaefc99c9d622d47",
+  "candidatesPublishedInCommit": "7f74ade09db403fcd5dc26624af3cf093892385d",
+  "reviewSetCommit": "8e6118a077cc85f24950c940101b258c354bf251",
+  "priority": "user decision overrides Arena recommendations and numeric metrics; chosen variants must NOT be replaced by agent recommendations",
+  "approvalScope": "appearance of the selected candidates ONLY",
+  "approvalDoesNotInclude": [
+    "permission to integrate elements into the rig, layer-map.json, public/ or the game",
+    "permission to change the original face / clean face base (head z13)",
+    "permission to restore hidden zones or do manual repaint",
+    "approval of the technical alpha / masking method",
+    "animation readiness, blink synchronisation, 120-160 ms timings, loop seams",
+    "clearing or fixing documented defects",
+    "changing slot/state counts or editing PLAN.md",
+    "permission to start E3/E4 or the next technical stage"
+  ],
+  "integrated": false,
+  "rigChanged": false,
+  "faceBaseChanged": false,
+  "hiddenZonesRestored": false,
+  "manualRepaint": false,
+  "newSlotsCreated": false,
+  "architectureChanged": false,
+  "e3e4Started": false,
+  "prMerged": false,
+  "productionChanged": false,
+  "slotCountUnchanged": "20 slots / 24 visual states per PLAN.md",
+  "planRenumbered": false,
+  "states": [
+    {
+      "state": "eye_l_closed",
+      "approvedVariant": "B",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "slotType": "existing state slot from PLAN.md, no new slot",
+      "candidate": "E2-facial-states/candidates/eye_l_closed-B.png",
+      "element": "E2-facial-states/elements/eye_l_closed-B.png",
+      "candidateSha256": "fb13667b2578230138898a983ec3cb3abe9360d7c6f6823ee5618137e22d3492",
+      "elementSha256": "cb1f664fef87dc78efdee3e0652734c7a36f345e27d15a9a173cc6c65472220c",
+      "agentRecommendation": "A",
+      "metrics": {
+        "featureCentroidShiftPx": [-2.31, -0.36],
+        "seamMeanAbsRgbDiff": 14.92,
+        "registrationAnnulusMSE": 1651.8,
+        "darkInkPixels": "339/494"
+      },
+      "documentedDefectsNotWaived": [
+        "lashes thinner than the original",
+        "soft extra crease above the lid",
+        "higher surrounding-tone mismatch than variant A"
+      ]
+    },
+    {
+      "state": "eye_r_closed",
+      "approvedVariant": "B",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "slotType": "existing state slot from PLAN.md, no new slot",
+      "candidate": "E2-facial-states/candidates/eye_r_closed-B.png",
+      "element": "E2-facial-states/elements/eye_r_closed-B.png",
+      "candidateSha256": "3ce20c6c93b983192e9541fd595a1d84e88242b9a5babf2cdcb2893b9c5a6786",
+      "elementSha256": "60e5d479c3bd4bb6606c6b10fd683a8affbfc3b83501dbfc8fa5d7843deda5a1",
+      "agentRecommendation": "A",
+      "metrics": {
+        "featureCentroidShiftPx": [1.7, 1.57],
+        "seamMeanAbsRgbDiff": 24.13,
+        "registrationAnnulusMSE": 3389.4,
+        "registrationShiftPx": [-4, -4],
+        "darkInkPixels": "308/732"
+      },
+      "documentedDefectsNotWaived": [
+        "visible extra light stroke above the lid",
+        "outer winged corner largely lost",
+        "worst seam and worst annulus among all ten candidates",
+        "portrait 992x1075 source lost context when cropped to 4:3",
+        "was flagged as defective and not recommended in E2-CANDIDATE-REVIEW.md"
+      ]
+    },
+    {
+      "state": "mouth_open",
+      "approvedVariant": "A",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "slotType": "existing state slot from PLAN.md, no new slot",
+      "candidate": "E2-facial-states/candidates/mouth_open-A.png",
+      "element": "E2-facial-states/elements/mouth_open-A.png",
+      "candidateSha256": "36e3895a41a68303f32ebbb0f67c524e318c31450e12a479f8f4d0ae019f4513",
+      "elementSha256": "966bed5785fafb5c4fc760f8a6fc930848371cea51de2eabcd9bac80207dcb86",
+      "agentRecommendation": "B",
+      "metrics": {
+        "featureCentroidShiftPx": [-0.1, 3.31],
+        "seamMeanAbsRgbDiff": 8.77,
+        "registrationAnnulusMSE": 1013.4,
+        "darkInkPixels": "102/44"
+      },
+      "documentedDefectsNotWaived": [
+        "mouth opened wider than a soft parted mouth",
+        "large white teeth highlight reads as surprise",
+        "contour denser than the original"
+      ]
+    },
+    {
+      "state": "mouth_smile",
+      "approvedVariant": "A",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "slotType": "existing state slot from PLAN.md, no new slot",
+      "candidate": "E2-facial-states/candidates/mouth_smile-A.png",
+      "element": "E2-facial-states/elements/mouth_smile-A.png",
+      "candidateSha256": "31f97632d50cb6f95a978a1be996525054820ff0c01090ac71a825bb99d4dad5",
+      "elementSha256": "bf0e8cf4dd8999c0bbcbf047f4a3d0732bc5be6d285447bf2d8f98ae0ba7ebc9",
+      "agentRecommendation": "B",
+      "metrics": {
+        "featureCentroidShiftPx": [-0.22, 0.2],
+        "seamMeanAbsRgbDiff": 2.9,
+        "registrationAnnulusMSE": 242.7,
+        "darkInkPixels": "28/44"
+      },
+      "documentedDefectsNotWaived": [
+        "lip line thinner than the original",
+        "very subtle smile, nearly indistinguishable from neutral at full-body scale"
+      ]
+    },
+    {
+      "state": "mouth_closed",
+      "approvedVariant": "A",
+      "status": "visual reference ONLY - NO separate slot",
+      "createSlot": false,
+      "reason": "duplicates the existing mouth_neutral (slot z16); mean diff in zone 4.57, 2.7% pixels changed more than 20",
+      "candidate": "E2-facial-states/candidates/mouth_closed-A.png",
+      "element": "E2-facial-states/elements/mouth_closed-A.png",
+      "candidateSha256": "c6e53ea2f7b64936d85bfe682c9121e7be244c7fff907bbd2f99872e20d30342",
+      "elementSha256": "afeb1bc724df56ddc9d9dbe947d1aeef49583ab7dd94a510ce16bfd381c9fb00",
+      "agentRecommendation": "A as reference, no new slot",
+      "metrics": {
+        "featureCentroidShiftPx": [-0.14, 2.05],
+        "seamMeanAbsRgbDiff": 3.12,
+        "registrationAnnulusMSE": 426.9,
+        "darkInkPixels": "36/44"
+      },
+      "documentedDefectsNotWaived": [
+        "near-duplicate of mouth_neutral",
+        "lip line slightly straighter and longer",
+        "zone ellipse includes the nose highlight, which gets slightly redrawn"
+      ]
+    }
+  ],
+  "unchangedArtifacts": [
+    "all 10 A/B candidates and 3 technical pilots",
+    "all 10 RGBA elements and 33 previews",
+    "E2-DECISION.md and E2-decision.json from commit 798f884",
+    "E2-FACIAL-CANDIDATES.md, E2-CANDIDATE-REVIEW.md, E2-VIEW-INDEX.md",
+    "E2-REVIEW-REPORT.md, E2-REVIEW-INDEX.md and all E2-REVIEW-SET/ materials",
+    "3 original WebP files, work-cutout.png, all 20 E1 layers",
+    "PLAN.md, E1-REPORT.md, layer-map.json, MANIFEST.json and game code",
+    "control version f13ed9e7fae4961cdb010e7cde58f5e13ac2e1bd"
+  ],
+  "gitChecks": {
+    "remoteHeadVerifiedBeforeCommit": true,
+    "localEqualsRemote": true,
+    "resetPerformed": false,
+    "rebasePerformed": false,
+    "forcePushPerformed": false,
+    "commitContainsOnlyNewDecisionFiles": true
+  },
+  "prohibitedAndNotDone": [
+    "integrating candidates into the rig",
+    "changing the original face, E1, original WebP files or existing candidates",
+    "creating new slots or changing the architecture",
+    "starting E3/E4",
+    "merging PR or any Production actions",
+    "touching Vercel, atlas or game code"
+  ],
+  "nextStage": "SEPARATE technical preparation of a clean face base and masks while preserving the approved variants; requires its own permission and is NOT started",
+  "nextAction": "STOP - wait for separate permission for the next stage"
+}
