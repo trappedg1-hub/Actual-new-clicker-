@@ -1,0 +1,318 @@
+{
+  "stage": "E2-facial-states / technical matting",
+  "status": "candidates only - NOT approved, NOT integrated",
+  "method": "AI RGB patch + registered placement + solid zone ellipse alpha",
+  "deadEnd": "Copying the sparse E1 ink-shaped alpha verbatim left the original green iris visible through its holes; rejected.",
+  "elements": [
+    {
+      "state": "eye_l_closed",
+      "variant": "A",
+      "candidate": "candidates/eye_l_closed-A.png",
+      "element": "elements/eye_l_closed-A.png",
+      "slotZ": 14,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        397.0,
+        162.0,
+        30.0,
+        24.0
+      ],
+      "contextCropOrigin": [
+        357,
+        132
+      ],
+      "registeredOrigin": [
+        357,
+        132
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 1129.3,
+      "opaquePixels": 2317,
+      "alphaSha256": "9a443331a4f7e803bf208e710a509aff7e5b998de3818a310824dd7a090db771",
+      "onFacePreview": "previews/eye_l_closed-A-on-face.png",
+      "isolatedPreview": "previews/eye_l_closed-A-element.png"
+    },
+    {
+      "state": "eye_l_closed",
+      "variant": "B",
+      "candidate": "candidates/eye_l_closed-B.png",
+      "element": "elements/eye_l_closed-B.png",
+      "slotZ": 14,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        397.0,
+        162.0,
+        30.0,
+        24.0
+      ],
+      "contextCropOrigin": [
+        357,
+        132
+      ],
+      "registeredOrigin": [
+        357,
+        132
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 1651.8,
+      "opaquePixels": 2317,
+      "alphaSha256": "9a443331a4f7e803bf208e710a509aff7e5b998de3818a310824dd7a090db771",
+      "onFacePreview": "previews/eye_l_closed-B-on-face.png",
+      "isolatedPreview": "previews/eye_l_closed-B-element.png"
+    },
+    {
+      "state": "eye_r_closed",
+      "variant": "A",
+      "candidate": "candidates/eye_r_closed-A.png",
+      "element": "elements/eye_r_closed-A.png",
+      "slotZ": 15,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        457.0,
+        162.0,
+        30.0,
+        24.0
+      ],
+      "contextCropOrigin": [
+        417,
+        132
+      ],
+      "registeredOrigin": [
+        417,
+        132
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 607.0,
+      "opaquePixels": 2317,
+      "alphaSha256": "03bd4847887f731323edfff892ef1cfc977eb454471ad38f9d38973b9c3f7a6a",
+      "onFacePreview": "previews/eye_r_closed-A-on-face.png",
+      "isolatedPreview": "previews/eye_r_closed-A-element.png"
+    },
+    {
+      "state": "eye_r_closed",
+      "variant": "B",
+      "candidate": "candidates/eye_r_closed-B.png",
+      "element": "elements/eye_r_closed-B.png",
+      "slotZ": 15,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        457.0,
+        162.0,
+        30.0,
+        24.0
+      ],
+      "contextCropOrigin": [
+        417,
+        132
+      ],
+      "registeredOrigin": [
+        413,
+        128
+      ],
+      "registrationShiftPx": [
+        -4,
+        -4
+      ],
+      "registrationAnnulusMSE": 3389.4,
+      "opaquePixels": 2317,
+      "alphaSha256": "03bd4847887f731323edfff892ef1cfc977eb454471ad38f9d38973b9c3f7a6a",
+      "onFacePreview": "previews/eye_r_closed-B-on-face.png",
+      "isolatedPreview": "previews/eye_r_closed-B-element.png"
+    },
+    {
+      "state": "mouth_closed",
+      "variant": "A",
+      "candidate": "candidates/mouth_closed-A.png",
+      "element": "elements/mouth_closed-A.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        382,
+        172
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 426.9,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_closed-A-on-face.png",
+      "isolatedPreview": "previews/mouth_closed-A-element.png"
+    },
+    {
+      "state": "mouth_closed",
+      "variant": "B",
+      "candidate": "candidates/mouth_closed-B.png",
+      "element": "elements/mouth_closed-B.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        384,
+        166
+      ],
+      "registrationShiftPx": [
+        2,
+        -6
+      ],
+      "registrationAnnulusMSE": 1492.4,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_closed-B-on-face.png",
+      "isolatedPreview": "previews/mouth_closed-B-element.png"
+    },
+    {
+      "state": "mouth_open",
+      "variant": "A",
+      "candidate": "candidates/mouth_open-A.png",
+      "element": "elements/mouth_open-A.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        382,
+        172
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 1013.4,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_open-A-on-face.png",
+      "isolatedPreview": "previews/mouth_open-A-element.png"
+    },
+    {
+      "state": "mouth_open",
+      "variant": "B",
+      "candidate": "candidates/mouth_open-B.png",
+      "element": "elements/mouth_open-B.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        382,
+        172
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 290.8,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_open-B-on-face.png",
+      "isolatedPreview": "previews/mouth_open-B-element.png"
+    },
+    {
+      "state": "mouth_smile",
+      "variant": "A",
+      "candidate": "candidates/mouth_smile-A.png",
+      "element": "elements/mouth_smile-A.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        382,
+        172
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 242.7,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_smile-A-on-face.png",
+      "isolatedPreview": "previews/mouth_smile-A-element.png"
+    },
+    {
+      "state": "mouth_smile",
+      "variant": "B",
+      "candidate": "candidates/mouth_smile-B.png",
+      "element": "elements/mouth_smile-B.png",
+      "slotZ": 16,
+      "alphaMethod": "solid zone ellipse from layer-map.json zonePolygon",
+      "zoneEllipse": [
+        422.0,
+        199.0,
+        26.0,
+        17.0
+      ],
+      "contextCropOrigin": [
+        382,
+        172
+      ],
+      "registeredOrigin": [
+        382,
+        172
+      ],
+      "registrationShiftPx": [
+        0,
+        0
+      ],
+      "registrationAnnulusMSE": 265.0,
+      "opaquePixels": 1436,
+      "alphaSha256": "bfc217584adb0c20ed02adb433f0d7a476ffd4bee4704df7e715a53d7d543503",
+      "onFacePreview": "previews/mouth_smile-B-on-face.png",
+      "isolatedPreview": "previews/mouth_smile-B-element.png"
+    }
+  ]
+}
