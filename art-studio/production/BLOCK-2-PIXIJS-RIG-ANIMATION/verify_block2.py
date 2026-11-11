@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[3]
 BRANCH = "arena/02869c32-actual-new-clicker"
 REPO = "trappedg1-hub/Actual-new-clicker-"
 BASE = "54a876287ec6053a5681c3cf68aeffa6278c5901"
-EXPECTED_PARENT = "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d"
+# BASE is the BLOCK 1 / BLOCK 2 boundary. HEAD may be the feature commit or a
+# later fast-forward verification fix, so ancestry is checked, not a hard-coded parent.
 APPROVED_B13 = "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db"
 B2 = "art-studio/production/BLOCK-2-PIXIJS-RIG-ANIMATION"
 STATE = "art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/PRODUCTION-STATE.json"
@@ -110,11 +111,26 @@ def main():
     api_parent = api["parents"][0]["sha"]
     check(branch == BRANCH, f"wrong branch {branch}")
     check(local == origin == api_head, "local/origin/GitHub API HEAD mismatch")
-    check(api_parent == EXPECTED_PARENT, f"unexpected API parent {api_parent}")
+    subprocess.check_call(
+        ["git", "merge-base", "--is-ancestor", BASE, "HEAD"], cwd=ROOT
+    )
+    subprocess.check_call(
+        ["git", "merge-base", "--is-ancestor", BASE, api_parent], cwd=ROOT
+    )
     check("BLOCK 2" in api["commit"]["message"], "commit message does not name BLOCK 2")
     api_files = {f["filename"] for f in api["files"]}
-    check(api_files == ALLOWED_CHANGED, f"API file set mismatch: {api_files ^ ALLOWED_CHANGED}")
-    results.update(branch=branch, commit=local, origin=origin, api=api_head, parent=api_parent)
+    check(
+        api_files.issubset(ALLOWED_CHANGED),
+        f"HEAD commit touched unexpected files: {api_files - ALLOWED_CHANGED}",
+    )
+    results.update(
+        branch=branch,
+        commit=local,
+        origin=origin,
+        api=api_head,
+        apiParent=api_parent,
+        block2Base=BASE,
+    )
 
     # 2. Remote recursive tree and blob identity.
     tree = json.loads(

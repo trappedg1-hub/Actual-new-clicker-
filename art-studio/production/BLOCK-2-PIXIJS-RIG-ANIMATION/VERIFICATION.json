@@ -4,6 +4,9 @@
   "branch": "arena/02869c32-actual-new-clicker",
   "baseMain": "371bd6a1603069f528b8e0aa4789dafa95f07852",
   "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
+  "featureCommit": "8f5ada9072d8e5db4e792483cbaf335af31dcded",
+  "verificationFixCommit": "HEAD_OF_BRANCH_AT_DELIVERY",
+  "fastForwardOnly": true,
   "commit": "HEAD_OF_BRANCH_AT_DELIVERY",
   "userApproval": {
     "block1": "BLOCK 1 утверждён. Начинай производство по опубликованному предложению",
@@ -108,6 +111,7 @@
       "nodeModulesIgnored": true,
       "noPycache": true,
       "noNewImagesInBlock2Directory": true,
+      "verificationFixApplied": true,
       "remoteVerification": "AFTER_PUSH_SEE_FINAL_CHAT_REPORT"
     }
   },

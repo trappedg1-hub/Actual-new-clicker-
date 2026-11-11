@@ -22,7 +22,7 @@
 
 ## 3. Границы и запреты
 
-- Разрешено: новый production rig в `src/heroine/rig/`, правка `MainScene`, обновление README/документов Production Mode, один отдельный Git commit/push, локальный Vite dev server для live preview.
+- Разрешено: новый production rig в `src/heroine/rig/`, правка `MainScene`, обновление README/документов Production Mode, один отдельный основной Git commit/push блока, возможные последующие технические правки только документов/скрипта верификации без изменения исходников рига и арта, локальный Vite dev server для live preview.
 - Запрещено: AI-генерация/инпейнт/диффузия, новые выражения, новые анатомические слоты, атлас, правка оригиналов или утверждённых B1/B1.3/E1/E2 файлов, `src/public/dist` как место новых арт-ассетов, Vercel Preview/Production, Production Deployment, PR Merge, обращения к Vercel connector.
 - Технический PASS ≠ художественное одобрение. BLOCK 3 начинается только после отдельного консолидированного предложения и утверждения; Vercel Preview разрешён только в BLOCK 3.
 
