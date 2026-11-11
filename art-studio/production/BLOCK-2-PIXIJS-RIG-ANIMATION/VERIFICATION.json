@@ -43,8 +43,19 @@
     },
     "rig": {
       "nestedGroups": 9,
-      "hiddenBaseSlots": [13, 14, 15, 16],
-      "facePlateMask": [374, 98, 116, 200, 40],
+      "hiddenBaseSlots": [
+        13,
+        14,
+        15,
+        16
+      ],
+      "facePlateMask": [
+        374,
+        98,
+        116,
+        200,
+        40
+      ],
       "masterLoopMs": 12000,
       "expressionCrossfade": true,
       "autoBlink": true,
@@ -96,7 +107,11 @@
       "approvedB13ResultUnchanged": true,
       "originalsModified": false,
       "approvedExpressionsRegenerated": false,
-      "skippedComponentsUnchanged": ["BG-0013", "BG-0017", "BG-0023"],
+      "skippedComponentsUnchanged": [
+        "BG-0013",
+        "BG-0017",
+        "BG-0023"
+      ],
       "b11MaskExpanded": false,
       "doubtfulPixelsDeleted": false
     },
@@ -144,5 +159,34 @@
     "checksums": "SHA256SUMS.txt",
     "verificationScript": "verify_block2.py",
     "productionState": "../BLOCK-1-FINISH-CHARACTER-ASSETS/PRODUCTION-STATE.json"
+  },
+  "visualReview": {
+    "performedOnPhysicalIPhone": true,
+    "result": "REJECTED",
+    "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
+    "screenshots": [
+      "IMG_4045.png",
+      "IMG_4046.png"
+    ],
+    "reportedDefects": [
+      "dotted ghost contours on hair, hands and legs",
+      "left-right sway and separated layer motion",
+      "face darkening on tap",
+      "no visible breathing"
+    ],
+    "fixApplied": true,
+    "fixScope": "runtime rig code only, no approved art changed"
+  },
+  "fixVerification": {
+    "nodeTestsPassed": 29,
+    "strictTypecheck": true,
+    "eslint": true,
+    "productionBuild": true,
+    "runtimePng200": 35,
+    "jsOrResourceErrors": 0,
+    "touchZonesResponding": 4,
+    "headlessChromiumIphoneViewport": true,
+    "physicalIPhoneRecheckPending": true,
+    "artisticApproval": false
   }
 }

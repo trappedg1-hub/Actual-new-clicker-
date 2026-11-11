@@ -283,6 +283,7 @@ export class ProductionHeroineRig extends Container {
     this.underlay.label = "z0 coverage support";
     this.underlay.position.set(0, 0);
     this.underlay.alpha = 0;
+    this.underlay.visible = false;
     this.underlay.eventMode = "none";
     this.addChild(this.underlay);
 
@@ -484,13 +485,28 @@ export class ProductionHeroineRig extends Container {
     for (const [z, holder] of this.slotContainers) {
       holder.rotation = (frame.slots[z] ?? 0) * DEG_TO_RAD;
     }
-    if (this.underlay) this.underlay.alpha = frame.underlayAlpha;
+    // The coverage underlay carried thin dotted contours; keep it disabled so
+    // taps and idle motion cannot reveal those artifacts on a real device.
+    if (this.underlay) this.underlay.visible = false;
+
+    // Render exactly one approved face plate at full opacity. Sequential
+    // alpha-blending of several plates let the dark plate background leak
+    // through and made the face turn brown on tap.
+    let dominant: ExpressionStateName = "00-neutral";
+    let dominantAlpha = -1;
+    for (const state of EXPRESSION_STATES) {
+      const alpha = frame.expressionTargets[state] ?? 0;
+      if (alpha > dominantAlpha) {
+        dominantAlpha = alpha;
+        dominant = state;
+      }
+    }
     for (const state of EXPRESSION_STATES) {
       const sprite = this.facePlates.get(state);
       if (!sprite) continue;
-      const alpha = frame.expressionTargets[state];
-      sprite.alpha = alpha;
-      sprite.visible = alpha > 0.001;
+      const active = state === dominant;
+      sprite.alpha = active ? 1 : 0;
+      sprite.visible = active;
     }
   }
 }

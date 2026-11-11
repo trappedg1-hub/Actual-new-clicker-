@@ -284,65 +284,43 @@ export function isBlinkClosed(timeMs: number): boolean {
   );
 }
 
-function motionEnergy(groups: Record<RigGroupId, Transform2D>): number {
-  let strongest = 0;
-  for (const id of Object.keys(groups) as RigGroupId[]) {
-    strongest = Math.max(strongest, Math.abs(groups[id].rotationDeg));
-  }
-  return clamp01(strongest / 12);
-}
-
 export function rigFrameAt(
   timeMs: number,
   override: ExpressionOverride | null = null,
 ): RigFrame {
   const loopMs = ((timeMs % RIG_LOOP_MS) + RIG_LOOP_MS) % RIG_LOOP_MS;
-  const breath = wave(loopMs, 4_000, 0, 1.2);
-  const bodyRot = breath;
-  const headRot = wave(loopMs, 6_000, 0.4, 3.0) - bodyRot * 0.7;
-  const backHairRot = wave(loopMs, 6_000, 0.2, 4.0) + bodyRot * 0.35;
-  const frontHairRot = wave(loopMs, 6_000, 0.7, 2.0);
-  const armLRot = wave(loopMs, 6_000, 0.9, 2.5) + bodyRot * 0.3;
-  const armRRot = wave(loopMs, 6_000, 1.4, 2.5) + bodyRot * 0.3;
-  const legRot = wave(loopMs, 4_000, 0, 0.8) - bodyRot * 0.8;
-  const skirtRot = wave(loopMs, 6_000, 0.6, 1.5) + bodyRot * 0.2;
+  // Visible breathing: vertical scale + small lift, no left/right body sway.
+  const breath = wave(loopMs, 4_000, 0, 1);
+  // One shared, very small sway keeps every layer together instead of peeling apart.
+  const sway = wave(loopMs, 6_000, 0, 0.5);
 
   const groups: Record<RigGroupId, Transform2D> = {
     bodyRoot: {
       ...identityTransform(),
-      rotationDeg: bodyRot,
-      y: -2 * (breath / 1.2),
-      scaleY: 1 + 0.006 * (breath / 1.2),
+      rotationDeg: 0,
+      y: -8 * breath,
+      scaleX: 1,
+      scaleY: 1 + 0.018 * breath,
     },
-    headGroup: { ...identityTransform(), rotationDeg: headRot },
-    backHairGroup: { ...identityTransform(), rotationDeg: backHairRot },
-    frontHairGroup: { ...identityTransform(), rotationDeg: frontHairRot },
-    legGroup: { ...identityTransform(), rotationDeg: legRot },
-    armGroupL: { ...identityTransform(), rotationDeg: armLRot },
-    armGroupR: { ...identityTransform(), rotationDeg: armRRot },
-    outfitGroup: { ...identityTransform(), rotationDeg: skirtRot },
+    headGroup: { ...identityTransform(), rotationDeg: sway * 0.6 },
+    backHairGroup: { ...identityTransform(), rotationDeg: sway * 0.8 },
+    frontHairGroup: { ...identityTransform(), rotationDeg: sway * 0.5 },
+    legGroup: { ...identityTransform(), rotationDeg: sway * 0.4 },
+    armGroupL: { ...identityTransform(), rotationDeg: sway * 0.7 },
+    armGroupR: { ...identityTransform(), rotationDeg: sway * 0.7 },
+    outfitGroup: { ...identityTransform(), rotationDeg: sway * 0.5 },
     faceGroup: identityTransform(),
   };
 
   const slots: Record<number, number> = {};
   for (let z = 1; z <= 20; z += 1) slots[z] = 0;
-  slots[1] = wave(loopMs, 6_000, 0.2, 1.5);
-  slots[2] = wave(loopMs, 6_000, 0.5, 1.5);
-  slots[3] = wave(loopMs, 4_000, 0.3, 0.6);
-  slots[4] = wave(loopMs, 4_000, 0.6, 0.6);
-  slots[11] = wave(loopMs, 6_000, 0.6, 1.2);
-  slots[12] = wave(loopMs, 6_000, 0.9, 1.2);
-  slots[17] = wave(loopMs, 6_000, 0.7, 2.0);
-  slots[18] = wave(loopMs, 6_000, 1.0, 2.0);
-  slots[19] = wave(loopMs, 6_000, 1.3, 2.0);
-  slots[20] = wave(loopMs, 6_000, 1.6, 2.0);
 
   return {
     timeMs,
     loopMs,
     groups,
     slots,
-    underlayAlpha: motionEnergy(groups) * 0.45,
+    underlayAlpha: 0,
     expressionTargets: expressionTargetsAt(loopMs, override),
     blinkClosed: isBlinkClosed(loopMs),
   };
@@ -394,28 +372,26 @@ export function applyReaction(
   for (const id of Object.keys(frame.groups) as RigGroupId[]) {
     groups[id] = { ...frame.groups[id] };
   }
-  groups.bodyRoot.rotationDeg += reaction.body * 0.35;
-  groups.bodyRoot.y -= reaction.body * 0.5;
-  groups.headGroup.rotationDeg += reaction.head;
-  groups.backHairGroup.rotationDeg += reaction.hair * 0.5;
-  groups.frontHairGroup.rotationDeg += reaction.hair * 0.3;
-  groups.armGroupL.rotationDeg += reaction.armL;
-  groups.armGroupR.rotationDeg += reaction.armR;
-  groups.legGroup.rotationDeg -= reaction.body * 0.2;
+  const REACTION_SCALE = 0.25;
+  groups.bodyRoot.rotationDeg += reaction.body * 0.08;
+  groups.bodyRoot.y -= reaction.body * 1.5;
+  groups.headGroup.rotationDeg += reaction.head * REACTION_SCALE;
+  groups.backHairGroup.rotationDeg += reaction.hair * 0.12;
+  groups.frontHairGroup.rotationDeg += reaction.hair * 0.08;
+  groups.armGroupL.rotationDeg += reaction.armL * REACTION_SCALE;
+  groups.armGroupR.rotationDeg += reaction.armR * REACTION_SCALE;
+  groups.legGroup.rotationDeg -= reaction.body * 0.05;
 
   const slots = { ...frame.slots };
-  slots[17] = (slots[17] ?? 0) + reaction.hair * 0.25;
-  slots[18] = (slots[18] ?? 0) - reaction.hair * 0.25;
-  slots[19] = (slots[19] ?? 0) + reaction.hair * 0.2;
-  slots[20] = (slots[20] ?? 0) - reaction.hair * 0.2;
+  slots[17] = (slots[17] ?? 0) + reaction.hair * 0.06;
+  slots[18] = (slots[18] ?? 0) - reaction.hair * 0.06;
+  slots[19] = (slots[19] ?? 0) + reaction.hair * 0.05;
+  slots[20] = (slots[20] ?? 0) - reaction.hair * 0.05;
 
   return {
     ...frame,
     groups,
     slots,
-    underlayAlpha: Math.min(
-      0.55,
-      frame.underlayAlpha + reactionEnergy(reaction) * 0.25,
-    ),
+    underlayAlpha: 0,
   };
 }

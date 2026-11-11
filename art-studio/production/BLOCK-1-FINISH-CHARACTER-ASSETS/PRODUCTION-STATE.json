@@ -16,7 +16,11 @@
       "BG-0012"
     ],
     "cleanedPixels": 1200,
-    "skippedComponents": ["BG-0013", "BG-0017", "BG-0023"],
+    "skippedComponents": [
+      "BG-0013",
+      "BG-0017",
+      "BG-0023"
+    ],
     "skippedPixels": 149,
     "skippedComponentsRemainUnchanged": true,
     "originalsAndPreviousStagesUnchanged": true,
@@ -98,7 +102,7 @@
     "userApprovalStatement": "approved, начинай block 2",
     "startedByUser": true,
     "noSeparateProposalApprovalRequired": true,
-    "status": "TECHNICAL_PASS_AWAITING_USER_VISUAL_REVIEW",
+    "status": "TECHNICAL_PASS_VISUAL_REJECTED_FIX_APPLIED",
     "executionStarted": true,
     "executionCompleted": true,
     "technicalPass": true,
@@ -131,8 +135,19 @@
       "preservedExpressionOverlays": 4,
       "visualStates": 24,
       "runtimeTextures": 35,
-      "facePlateMask": [374, 98, 116, 200, 40],
-      "hiddenBaseSlots": [13, 14, 15, 16],
+      "facePlateMask": [
+        374,
+        98,
+        116,
+        200,
+        40
+      ],
+      "hiddenBaseSlots": [
+        13,
+        14,
+        15,
+        16
+      ],
       "rightEyeClosedBTranslationY": 9,
       "masterLoopMs": 12000,
       "touchZones": 4,
@@ -162,8 +177,9 @@
       "approvedB13ResultSha256Unchanged": true,
       "worktreeCleanBeforeBlock2": true,
       "worktreeCleanAfterBlock2": true,
-      "browserVisualQa": false,
-      "physicalDeviceQa": false
+      "browserVisualQa": true,
+      "physicalDeviceQa": true,
+      "headlessChromiumQa": true
     },
     "documents": {
       "proposal": "../BLOCK-2-PIXIJS-RIG-ANIMATION/BLOCK-2-PROPOSAL.md",
@@ -180,6 +196,30 @@
       "full-frame state references add roughly 5.4 MB of image payload; no new cropped or derived art assets were generated in BLOCK 2",
       "coverage support may show thin ghost contours at extreme rotations; hidden anatomy is not artistically restored",
       "published E3 translation proxies are not real rotation or deformation"
+    ],
+    "visualReview": {
+      "performedOnPhysicalIPhone": true,
+      "result": "REJECTED",
+      "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
+      "screenshots": [
+        "IMG_4045.png",
+        "IMG_4046.png"
+      ],
+      "reportedDefects": [
+        "dotted ghost contours on hair, hands and legs",
+        "left-right sway and separated layer motion",
+        "face darkening on tap",
+        "no visible breathing"
+      ],
+      "fixApplied": true,
+      "fixScope": "runtime rig code only, no approved art changed"
+    },
+    "fixNotes": [
+      "coverage underlay disabled to remove dotted contours",
+      "bodyRoot rotation removed; breathing moved to visible scaleY and lift",
+      "single shared sway replaces independent per-group waves",
+      "one opaque face plate rendered at a time to stop tap darkening",
+      "tap reactions scaled down"
     ]
   },
   "gates": {
@@ -233,5 +273,15 @@
     "worktreeCleanBeforeBlock2": true,
     "vercelAppEnabled": true,
     "vercelAction": "none"
+  },
+  "postDelivery": {
+    "vercelPreviewDeploymentId": "dpl_DS7A2LtxDZxUYkthqLWkRf5yqbi8",
+    "vercelPreviewUrl": "https://actual-new-clicker-heroine01-anlr69eor-trappedg1-hub.vercel.app/",
+    "previewCommit": "3800d408b0c91b3d952fb2292eccb89c02ce5c77",
+    "productionUntouched": true,
+    "userVisualReview": "REJECTED",
+    "fixRequested": true,
+    "fixApplied": true,
+    "newPreviewDeploymentRequiredForIphoneRecheck": true
   }
 }
