@@ -1,0 +1,1552 @@
+{
+  "stage": "05 / E1 - contour masks and independent RGBA layers",
+  "sourceFrame": "art-studio/references/originals/IMG_4038_rig-pose.webp",
+  "alphaSource": "art-studio/stages/04-slicing-prep/cutouts/work-cutout.png",
+  "geometrySource": "art-studio/stages/04-slicing-prep/build_crops.py (names/z/pivot only)",
+  "canvas": [
+    848,
+    1264
+  ],
+  "method": "anatomical polygon ∩ colour class ∩ silhouette alpha; winner-takes-all ownership by z-order (no duplicate pixels); 1px alpha feather on the OUTER contour only; RGB copied verbatim",
+  "rectangularClipping": false,
+  "generation": false,
+  "repaint": false,
+  "hiddenZonesFilled": false,
+  "graphicSlots": 20,
+  "visualStatesTotal": 24,
+  "visualStatesPresent": 20,
+  "visualStatesMissing": [
+    "eye_l_closed",
+    "eye_r_closed",
+    "mouth_open",
+    "mouth_smile"
+  ],
+  "coverage": {
+    "silhouettePixels": 289012,
+    "coveredByAtLeastOneLayer": 289012,
+    "coverageRatio": 1.0,
+    "unassignedPixels": 0,
+    "assignedByNearestZoneFallback": 15918,
+    "unresolvablePixels": 0,
+    "overlapPixels": 0,
+    "overlapMeaning": "0 by construction: each pixel belongs to exactly one layer. Hidden zones still need E2 — moving a layer exposes transparent gaps underneath."
+  },
+  "classCounts": {
+    "other": 11440,
+    "hair": 53085,
+    "navy": 63098,
+    "dark_line": 19918,
+    "skin_hl": 13028,
+    "white": 27473,
+    "stocking": 57946,
+    "skin": 42801,
+    "eye_green": 223
+  },
+  "gates": {
+    "originalsModified": false,
+    "controlVersion": "f13ed9e7fae4961cdb010e7cde58f5e13ac2e1bd",
+    "e2Started": false,
+    "atlas": false,
+    "code": false,
+    "deployment": false
+  },
+  "slots": [
+    {
+      "z": 1,
+      "slot": "hair_back_01",
+      "group": "backHairGroup",
+      "file": "layers/01_hair_back_01.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 139,
+        "y": 447,
+        "w": 591,
+        "h": 777
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 250
+      },
+      "pivotLocal": {
+        "x": 285,
+        "y": -197
+      },
+      "zonePolygon": [
+        [
+          [
+            132,
+            385
+          ],
+          [
+            325,
+            405
+          ],
+          [
+            312,
+            718
+          ],
+          [
+            148,
+            705
+          ]
+        ],
+        [
+          [
+            523,
+            405
+          ],
+          [
+            716,
+            385
+          ],
+          [
+            700,
+            705
+          ],
+          [
+            536,
+            718
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 33334,
+      "internalTransparentRegions": 7,
+      "longestOpaqueRunPx": 66,
+      "states": [
+        "hair_back_01"
+      ],
+      "knownLimit": "Back hair is baked together with shoulders/forearms/hands; dark hair shadows are RGB-indistinguishable from navy fabric. Clean separation needs E2 occlusion repair.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 2,
+      "slot": "hair_back_02",
+      "group": "backHairGroup",
+      "file": "layers/02_hair_back_02.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 185,
+        "y": 215,
+        "w": 478,
+        "h": 256
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 245
+      },
+      "pivotLocal": {
+        "x": 239,
+        "y": 30
+      },
+      "zonePolygon": [
+        [
+          [
+            152,
+            285
+          ],
+          [
+            320,
+            190
+          ],
+          [
+            338,
+            445
+          ],
+          [
+            190,
+            470
+          ]
+        ],
+        [
+          [
+            528,
+            190
+          ],
+          [
+            696,
+            285
+          ],
+          [
+            658,
+            470
+          ],
+          [
+            510,
+            445
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 13942,
+      "internalTransparentRegions": 12,
+      "longestOpaqueRunPx": 49,
+      "states": [
+        "hair_back_02"
+      ],
+      "knownLimit": "Upper back hair overlaps shoulders and collar; same dark-shadow ambiguity.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 3,
+      "slot": "leg_l",
+      "group": "legGroup",
+      "file": "layers/03_leg_l.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 188,
+        "y": 656,
+        "w": 220,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 182,
+        "y": 19
+      },
+      "zonePolygon": [
+        [
+          [
+            272,
+            658
+          ],
+          [
+            398,
+            658
+          ],
+          [
+            362,
+            985
+          ],
+          [
+            308,
+            1188
+          ],
+          [
+            182,
+            1262
+          ],
+          [
+            188,
+            1195
+          ],
+          [
+            242,
+            895
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 38773,
+      "internalTransparentRegions": 8,
+      "longestOpaqueRunPx": 112,
+      "states": [
+        "leg_l"
+      ],
+      "knownLimit": "Thigh/stocking/shoe are one continuous painted mass; no separate foot anchor.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 4,
+      "slot": "leg_r",
+      "group": "legGroup",
+      "file": "layers/04_leg_r.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 434,
+        "y": 656,
+        "w": 228,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 675
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 19
+      },
+      "zonePolygon": [
+        [
+          [
+            450,
+            658
+          ],
+          [
+            576,
+            658
+          ],
+          [
+            606,
+            895
+          ],
+          [
+            660,
+            1195
+          ],
+          [
+            666,
+            1262
+          ],
+          [
+            540,
+            1188
+          ],
+          [
+            486,
+            985
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 38838,
+      "internalTransparentRegions": 11,
+      "longestOpaqueRunPx": 112,
+      "states": [
+        "leg_r"
+      ],
+      "knownLimit": "Same as leg_l.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 5,
+      "slot": "torso",
+      "group": "bodyRoot",
+      "file": "layers/05_torso.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 271,
+        "y": 285,
+        "w": 306,
+        "h": 208
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 153,
+        "y": 205
+      },
+      "zonePolygon": [
+        [
+          [
+            268,
+            272
+          ],
+          [
+            580,
+            272
+          ],
+          [
+            592,
+            478
+          ],
+          [
+            560,
+            508
+          ],
+          [
+            288,
+            508
+          ],
+          [
+            256,
+            478
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "eye_green"
+      ],
+      "opaquePixels": 3750,
+      "internalTransparentRegions": 1,
+      "longestOpaqueRunPx": 52,
+      "states": [
+        "torso"
+      ],
+      "knownLimit": "Torso contains the baked V-neck skin and blouse folds; hidden zones at top/bottom appear at ±6° breath.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 6,
+      "slot": "arm_l",
+      "group": "armGroup_l",
+      "file": "layers/06_arm_l.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 104,
+        "y": 325,
+        "w": 216,
+        "h": 331
+      },
+      "pivotAbsolute": {
+        "x": 300,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 196,
+        "y": 10
+      },
+      "zonePolygon": [
+        [
+          [
+            262,
+            318
+          ],
+          [
+            332,
+            352
+          ],
+          [
+            262,
+            512
+          ],
+          [
+            156,
+            612
+          ],
+          [
+            92,
+            652
+          ],
+          [
+            98,
+            598
+          ],
+          [
+            192,
+            428
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 16097,
+      "internalTransparentRegions": 11,
+      "longestOpaqueRunPx": 85,
+      "states": [
+        "arm_l"
+      ],
+      "knownLimit": "Hair strands lie over the forearm/hand; pixels underneath do not exist. Shoulder 'cap' is not painted.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 7,
+      "slot": "arm_r",
+      "group": "armGroup_r",
+      "file": "layers/07_arm_r.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 533,
+        "y": 325,
+        "w": 214,
+        "h": 331
+      },
+      "pivotAbsolute": {
+        "x": 548,
+        "y": 335
+      },
+      "pivotLocal": {
+        "x": 15,
+        "y": 10
+      },
+      "zonePolygon": [
+        [
+          [
+            586,
+            318
+          ],
+          [
+            516,
+            352
+          ],
+          [
+            586,
+            512
+          ],
+          [
+            692,
+            612
+          ],
+          [
+            756,
+            652
+          ],
+          [
+            750,
+            598
+          ],
+          [
+            656,
+            428
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 16552,
+      "internalTransparentRegions": 15,
+      "longestOpaqueRunPx": 86,
+      "states": [
+        "arm_r"
+      ],
+      "knownLimit": "Same as arm_l.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 8,
+      "slot": "outfit_blouse",
+      "group": "outfitGroup",
+      "file": "layers/08_outfit_blouse.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 182,
+        "y": 281,
+        "w": 495,
+        "h": 185
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "pivotLocal": {
+        "x": 242,
+        "y": 209
+      },
+      "zonePolygon": [
+        [
+          [
+            266,
+            272
+          ],
+          [
+            582,
+            272
+          ],
+          [
+            594,
+            478
+          ],
+          [
+            558,
+            504
+          ],
+          [
+            290,
+            504
+          ],
+          [
+            254,
+            478
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "skin",
+        "skin_hl",
+        "eye_green"
+      ],
+      "opaquePixels": 15912,
+      "internalTransparentRegions": 23,
+      "longestOpaqueRunPx": 98,
+      "states": [
+        "outfit_blouse"
+      ],
+      "knownLimit": "Blouse shares navy sleeve stripes with collar and lies under the ribbon; wide overlap with torso is expected until E2 separates them.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 9,
+      "slot": "outfit_collar",
+      "group": "outfitGroup",
+      "file": "layers/09_outfit_collar.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 308,
+        "y": 49,
+        "w": 232,
+        "h": 325
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 300
+      },
+      "pivotLocal": {
+        "x": 116,
+        "y": 251
+      },
+      "zonePolygon": [
+        [
+          [
+            312,
+            232
+          ],
+          [
+            536,
+            232
+          ],
+          [
+            540,
+            328
+          ],
+          [
+            424,
+            402
+          ],
+          [
+            308,
+            328
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "skin",
+        "eye_green"
+      ],
+      "opaquePixels": 11641,
+      "internalTransparentRegions": 5,
+      "longestOpaqueRunPx": 74,
+      "states": [
+        "outfit_collar"
+      ],
+      "knownLimit": "Collar is baked onto the V-neck skin and blouse; hidden neck/clavicle zone appears when head tilts ±12° and collar does NOT follow.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 10,
+      "slot": "outfit_ribbon",
+      "group": "outfitGroup",
+      "file": "layers/10_outfit_ribbon.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 380,
+        "y": 308,
+        "w": 88,
+        "h": 158
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 340
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 32
+      },
+      "zonePolygon": [
+        [
+          [
+            382,
+            308
+          ],
+          [
+            466,
+            308
+          ],
+          [
+            468,
+            468
+          ],
+          [
+            424,
+            484
+          ],
+          [
+            380,
+            468
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "skin",
+        "eye_green"
+      ],
+      "opaquePixels": 12376,
+      "internalTransparentRegions": 11,
+      "longestOpaqueRunPx": 88,
+      "states": [
+        "outfit_ribbon"
+      ],
+      "knownLimit": "Ribbon knot is baked onto the blouse; no underlay.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 11,
+      "slot": "outfit_skirt_01",
+      "group": "outfitGroup",
+      "file": "layers/11_outfit_skirt_01.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 157,
+        "y": 466,
+        "w": 534,
+        "h": 124
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 478
+      },
+      "pivotLocal": {
+        "x": 267,
+        "y": 12
+      },
+      "zonePolygon": [
+        [
+          [
+            268,
+            466
+          ],
+          [
+            580,
+            466
+          ],
+          [
+            594,
+            590
+          ],
+          [
+            254,
+            590
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "skin",
+        "skin_hl",
+        "eye_green"
+      ],
+      "opaquePixels": 17623,
+      "internalTransparentRegions": 4,
+      "longestOpaqueRunPx": 230,
+      "states": [
+        "outfit_skirt_01"
+      ],
+      "knownLimit": "Split between skirt_01 / skirt_02 is a provisional horizontal line, not an anatomical boundary; phase shift 80–150 ms opens a seam.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 12,
+      "slot": "outfit_skirt_02",
+      "group": "outfitGroup",
+      "file": "layers/12_outfit_skirt_02.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 191,
+        "y": 556,
+        "w": 468,
+        "h": 676
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 570
+      },
+      "pivotLocal": {
+        "x": 233,
+        "y": 14
+      },
+      "zonePolygon": [
+        [
+          [
+            254,
+            556
+          ],
+          [
+            594,
+            556
+          ],
+          [
+            582,
+            694
+          ],
+          [
+            266,
+            694
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "skin",
+        "skin_hl",
+        "eye_green"
+      ],
+      "opaquePixels": 31531,
+      "internalTransparentRegions": 13,
+      "longestOpaqueRunPx": 324,
+      "states": [
+        "outfit_skirt_02"
+      ],
+      "knownLimit": "Hem is baked onto thighs; under-hem content does not exist.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 13,
+      "slot": "head",
+      "group": "headGroup",
+      "file": "layers/13_head.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 380,
+        "y": 103,
+        "w": 108,
+        "h": 195
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 262
+      },
+      "pivotLocal": {
+        "x": 44,
+        "y": 159
+      },
+      "zonePolygon": [
+        [
+          [
+            318,
+            88
+          ],
+          [
+            530,
+            88
+          ],
+          [
+            526,
+            238
+          ],
+          [
+            472,
+            286
+          ],
+          [
+            424,
+            298
+          ],
+          [
+            376,
+            286
+          ],
+          [
+            322,
+            238
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "white",
+        "stocking"
+      ],
+      "opaquePixels": 7200,
+      "internalTransparentRegions": 1,
+      "longestOpaqueRunPx": 74,
+      "states": [
+        "head"
+      ],
+      "knownLimit": "HEAD STILL CONTAINS the open eyes and neutral mouth. Blink/expression switching by visibility cannot work until a clean face base is painted (E2/E3).",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 14,
+      "slot": "eye_l_open",
+      "group": "faceGroup",
+      "file": "layers/14_eye_l_open.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 378,
+        "y": 139,
+        "w": 49,
+        "h": 47
+      },
+      "pivotAbsolute": {
+        "x": 397,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 19,
+        "y": 23
+      },
+      "zonePolygon": [
+        [
+          [
+            427,
+            162
+          ],
+          [
+            426,
+            169
+          ],
+          [
+            421,
+            176
+          ],
+          [
+            415,
+            181
+          ],
+          [
+            406,
+            185
+          ],
+          [
+            397,
+            186
+          ],
+          [
+            388,
+            185
+          ],
+          [
+            379,
+            181
+          ],
+          [
+            373,
+            176
+          ],
+          [
+            368,
+            169
+          ],
+          [
+            367,
+            162
+          ],
+          [
+            368,
+            155
+          ],
+          [
+            373,
+            148
+          ],
+          [
+            379,
+            143
+          ],
+          [
+            388,
+            139
+          ],
+          [
+            397,
+            138
+          ],
+          [
+            406,
+            139
+          ],
+          [
+            415,
+            143
+          ],
+          [
+            421,
+            148
+          ],
+          [
+            426,
+            155
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "navy",
+        "stocking"
+      ],
+      "opaquePixels": 1224,
+      "internalTransparentRegions": 4,
+      "longestOpaqueRunPx": 45,
+      "states": [
+        "eye_l_open",
+        "eye_l_closed"
+      ],
+      "knownLimit": "A front hair strand crosses the left eye in the source frame; eye cannot be fully isolated without repaint.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 15,
+      "slot": "eye_r_open",
+      "group": "faceGroup",
+      "file": "layers/15_eye_r_open.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 427,
+        "y": 138,
+        "w": 60,
+        "h": 48
+      },
+      "pivotAbsolute": {
+        "x": 457,
+        "y": 162
+      },
+      "pivotLocal": {
+        "x": 30,
+        "y": 24
+      },
+      "zonePolygon": [
+        [
+          [
+            487,
+            162
+          ],
+          [
+            486,
+            169
+          ],
+          [
+            481,
+            176
+          ],
+          [
+            475,
+            181
+          ],
+          [
+            466,
+            185
+          ],
+          [
+            457,
+            186
+          ],
+          [
+            448,
+            185
+          ],
+          [
+            439,
+            181
+          ],
+          [
+            433,
+            176
+          ],
+          [
+            428,
+            169
+          ],
+          [
+            427,
+            162
+          ],
+          [
+            428,
+            155
+          ],
+          [
+            433,
+            148
+          ],
+          [
+            439,
+            143
+          ],
+          [
+            448,
+            139
+          ],
+          [
+            457,
+            138
+          ],
+          [
+            466,
+            139
+          ],
+          [
+            475,
+            143
+          ],
+          [
+            481,
+            148
+          ],
+          [
+            486,
+            155
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "navy",
+        "stocking"
+      ],
+      "opaquePixels": 1537,
+      "internalTransparentRegions": 3,
+      "longestOpaqueRunPx": 42,
+      "states": [
+        "eye_r_open",
+        "eye_r_closed"
+      ],
+      "knownLimit": "Right eye crop nearly touches the ear; closed state does not exist.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 16,
+      "slot": "mouth_neutral",
+      "group": "faceGroup",
+      "file": "layers/16_mouth_neutral.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 396,
+        "y": 182,
+        "w": 52,
+        "h": 34
+      },
+      "pivotAbsolute": {
+        "x": 422,
+        "y": 200
+      },
+      "pivotLocal": {
+        "x": 26,
+        "y": 18
+      },
+      "zonePolygon": [
+        [
+          [
+            448,
+            199
+          ],
+          [
+            447,
+            204
+          ],
+          [
+            443,
+            209
+          ],
+          [
+            437,
+            213
+          ],
+          [
+            430,
+            215
+          ],
+          [
+            422,
+            216
+          ],
+          [
+            414,
+            215
+          ],
+          [
+            407,
+            213
+          ],
+          [
+            401,
+            209
+          ],
+          [
+            397,
+            204
+          ],
+          [
+            396,
+            199
+          ],
+          [
+            397,
+            194
+          ],
+          [
+            401,
+            189
+          ],
+          [
+            407,
+            185
+          ],
+          [
+            414,
+            183
+          ],
+          [
+            422,
+            182
+          ],
+          [
+            430,
+            183
+          ],
+          [
+            437,
+            185
+          ],
+          [
+            443,
+            189
+          ],
+          [
+            447,
+            194
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "hair",
+        "white",
+        "navy",
+        "stocking",
+        "eye_green"
+      ],
+      "opaquePixels": 1362,
+      "internalTransparentRegions": 0,
+      "longestOpaqueRunPx": 52,
+      "states": [
+        "mouth_neutral",
+        "mouth_open",
+        "mouth_smile"
+      ],
+      "knownLimit": "Only neutral mouth exists; open/smile states need a separate art pass.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 17,
+      "slot": "hair_side_l",
+      "group": "frontHairGroup",
+      "file": "layers/17_hair_side_l.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 321,
+        "y": 158,
+        "w": 82,
+        "h": 153
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 49,
+        "y": -38
+      },
+      "zonePolygon": [
+        [
+          [
+            310,
+            82
+          ],
+          [
+            402,
+            82
+          ],
+          [
+            398,
+            300
+          ],
+          [
+            348,
+            314
+          ],
+          [
+            310,
+            232
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 7897,
+      "internalTransparentRegions": 13,
+      "longestOpaqueRunPx": 75,
+      "states": [
+        "hair_side_l"
+      ],
+      "knownLimit": "Face lock crosses eyebrow/cheek/eye; underlying face pixels absent.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 18,
+      "slot": "hair_side_r",
+      "group": "frontHairGroup",
+      "file": "layers/18_hair_side_r.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 446,
+        "y": 203,
+        "w": 80,
+        "h": 108
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 120
+      },
+      "pivotLocal": {
+        "x": 32,
+        "y": -83
+      },
+      "zonePolygon": [
+        [
+          [
+            446,
+            82
+          ],
+          [
+            538,
+            82
+          ],
+          [
+            538,
+            232
+          ],
+          [
+            500,
+            314
+          ],
+          [
+            450,
+            300
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 5925,
+      "internalTransparentRegions": 6,
+      "longestOpaqueRunPx": 62,
+      "states": [
+        "hair_side_r"
+      ],
+      "knownLimit": "Same as hair_side_l.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 19,
+      "slot": "hair_front_01",
+      "group": "frontHairGroup",
+      "file": "layers/19_hair_front_01.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 343,
+        "y": 52,
+        "w": 69,
+        "h": 127
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 81,
+        "y": 63
+      },
+      "zonePolygon": [
+        [
+          [
+            328,
+            32
+          ],
+          [
+            452,
+            32
+          ],
+          [
+            458,
+            172
+          ],
+          [
+            400,
+            192
+          ],
+          [
+            328,
+            150
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 4019,
+      "internalTransparentRegions": 4,
+      "longestOpaqueRunPx": 59,
+      "states": [
+        "hair_front_01"
+      ],
+      "knownLimit": "Fringe is baked onto the forehead/hairline; hairline underneath absent.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    },
+    {
+      "z": 20,
+      "slot": "hair_front_02",
+      "group": "frontHairGroup",
+      "file": "layers/20_hair_front_02.png",
+      "canvas": [
+        848,
+        1264
+      ],
+      "tightRect": {
+        "x": 394,
+        "y": 41,
+        "w": 127,
+        "h": 167
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "pivotLocal": {
+        "x": 30,
+        "y": 74
+      },
+      "zonePolygon": [
+        [
+          [
+            394,
+            32
+          ],
+          [
+            522,
+            32
+          ],
+          [
+            528,
+            202
+          ],
+          [
+            456,
+            208
+          ],
+          [
+            394,
+            150
+          ]
+        ]
+      ],
+      "excludedClasses": [
+        "skin",
+        "white",
+        "eye_green"
+      ],
+      "opaquePixels": 9479,
+      "internalTransparentRegions": 12,
+      "longestOpaqueRunPx": 83,
+      "states": [
+        "hair_front_02"
+      ],
+      "knownLimit": "Overlaps hair_front_01; the split is provisional, not anatomical.",
+      "independent": false,
+      "independentNote": "contour RGBA of visible fragments only; hidden zones require E2 (separate permission)"
+    }
+  ]
+}
