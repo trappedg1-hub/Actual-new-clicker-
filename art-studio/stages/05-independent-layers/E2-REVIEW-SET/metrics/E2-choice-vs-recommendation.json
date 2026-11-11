@@ -1,0 +1,203 @@
+{
+  "status": "review only - previous user decision 798f884 stays authoritative",
+  "userDecisionDoc": "../E2-facial-states/E2-DECISION.md",
+  "arenaRecommendationDoc": "reports/E2-CANDIDATE-REVIEW.md",
+  "metricSource": "E2-facial-states/E2-final-metrics.json",
+  "rows": [
+    {
+      "state": "eye_l_closed",
+      "userChoice798f884": "B",
+      "arenaRecommendation": "A",
+      "identical": false,
+      "separateSlot": false,
+      "userMetrics": {
+        "featureCentroidShiftPx": [
+          -2.31,
+          -0.36
+        ],
+        "seamMeanAbsRgbDiff": 14.92,
+        "registrationAnnulusMSE": 1651.8,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          339,
+          494
+        ]
+      },
+      "arenaMetrics": {
+        "featureCentroidShiftPx": [
+          0.44,
+          0.67
+        ],
+        "seamMeanAbsRgbDiff": 11.33,
+        "registrationAnnulusMSE": 1129.3,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          391,
+          494
+        ]
+      }
+    },
+    {
+      "state": "eye_r_closed",
+      "userChoice798f884": "B",
+      "arenaRecommendation": "A",
+      "identical": false,
+      "separateSlot": false,
+      "userMetrics": {
+        "featureCentroidShiftPx": [
+          1.7,
+          1.57
+        ],
+        "seamMeanAbsRgbDiff": 24.13,
+        "registrationAnnulusMSE": 3389.4,
+        "registrationShiftPx": [
+          -4,
+          -4
+        ],
+        "darkInkPixels": [
+          308,
+          732
+        ]
+      },
+      "arenaMetrics": {
+        "featureCentroidShiftPx": [
+          2.01,
+          0.72
+        ],
+        "seamMeanAbsRgbDiff": 10.35,
+        "registrationAnnulusMSE": 607.0,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          695,
+          732
+        ]
+      }
+    },
+    {
+      "state": "mouth_closed",
+      "userChoice798f884": "A",
+      "arenaRecommendation": "A",
+      "identical": true,
+      "separateSlot": false,
+      "userMetrics": {
+        "featureCentroidShiftPx": [
+          -0.14,
+          2.05
+        ],
+        "seamMeanAbsRgbDiff": 3.12,
+        "registrationAnnulusMSE": 426.9,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          36,
+          44
+        ]
+      },
+      "arenaMetrics": {
+        "featureCentroidShiftPx": [
+          -0.14,
+          2.05
+        ],
+        "seamMeanAbsRgbDiff": 3.12,
+        "registrationAnnulusMSE": 426.9,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          36,
+          44
+        ]
+      }
+    },
+    {
+      "state": "mouth_open",
+      "userChoice798f884": "A",
+      "arenaRecommendation": "B",
+      "identical": false,
+      "separateSlot": false,
+      "userMetrics": {
+        "featureCentroidShiftPx": [
+          -0.1,
+          3.31
+        ],
+        "seamMeanAbsRgbDiff": 8.77,
+        "registrationAnnulusMSE": 1013.4,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          102,
+          44
+        ]
+      },
+      "arenaMetrics": {
+        "featureCentroidShiftPx": [
+          -0.25,
+          2.95
+        ],
+        "seamMeanAbsRgbDiff": 2.73,
+        "registrationAnnulusMSE": 290.8,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          81,
+          44
+        ]
+      }
+    },
+    {
+      "state": "mouth_smile",
+      "userChoice798f884": "A",
+      "arenaRecommendation": "B",
+      "identical": false,
+      "separateSlot": false,
+      "userMetrics": {
+        "featureCentroidShiftPx": [
+          -0.22,
+          0.2
+        ],
+        "seamMeanAbsRgbDiff": 2.9,
+        "registrationAnnulusMSE": 242.7,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          28,
+          44
+        ]
+      },
+      "arenaMetrics": {
+        "featureCentroidShiftPx": [
+          -0.21,
+          0.32
+        ],
+        "seamMeanAbsRgbDiff": 3.14,
+        "registrationAnnulusMSE": 265.0,
+        "registrationShiftPx": [
+          0,
+          0
+        ],
+        "darkInkPixels": [
+          43,
+          44
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,247 @@
+{
+  "stage": "E2-facial-states / alignment check",
+  "status": "measurement only - candidates NOT approved",
+  "method": "dark-ink centroid inside the zone ellipse plus mean RGB difference in the ring at 0.82-0.98 of the ellipse radius",
+  "rows": [
+    {
+      "state": "eye_l_closed",
+      "variant": "A",
+      "opaquePixels": 2317,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 494,
+      "darkInkPixelsElement": 391,
+      "darkInkCentroidOriginal": [
+        37.66,
+        27.22
+      ],
+      "darkInkCentroidElement": [
+        38.09,
+        27.9
+      ],
+      "featureCentroidShiftPx": [
+        0.44,
+        0.67
+      ],
+      "seamMeanAbsRgbDiff": 11.33,
+      "seamSamples": 658,
+      "candidate": "candidates/eye_l_closed-A.png"
+    },
+    {
+      "state": "eye_l_closed",
+      "variant": "B",
+      "opaquePixels": 2317,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 494,
+      "darkInkPixelsElement": 339,
+      "darkInkCentroidOriginal": [
+        37.66,
+        27.22
+      ],
+      "darkInkCentroidElement": [
+        35.35,
+        26.86
+      ],
+      "featureCentroidShiftPx": [
+        -2.31,
+        -0.36
+      ],
+      "seamMeanAbsRgbDiff": 14.92,
+      "seamSamples": 658,
+      "candidate": "candidates/eye_l_closed-B.png"
+    },
+    {
+      "state": "eye_r_closed",
+      "variant": "A",
+      "opaquePixels": 2317,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 732,
+      "darkInkPixelsElement": 695,
+      "darkInkCentroidOriginal": [
+        46.02,
+        26.09
+      ],
+      "darkInkCentroidElement": [
+        48.04,
+        26.81
+      ],
+      "featureCentroidShiftPx": [
+        2.01,
+        0.72
+      ],
+      "seamMeanAbsRgbDiff": 10.35,
+      "seamSamples": 658,
+      "candidate": "candidates/eye_r_closed-A.png"
+    },
+    {
+      "state": "eye_r_closed",
+      "variant": "B",
+      "opaquePixels": 2317,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 732,
+      "darkInkPixelsElement": 308,
+      "darkInkCentroidOriginal": [
+        46.02,
+        26.09
+      ],
+      "darkInkCentroidElement": [
+        47.72,
+        27.66
+      ],
+      "featureCentroidShiftPx": [
+        1.7,
+        1.57
+      ],
+      "seamMeanAbsRgbDiff": 24.13,
+      "seamSamples": 658,
+      "candidate": "candidates/eye_r_closed-B.png"
+    },
+    {
+      "state": "mouth_closed",
+      "variant": "A",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 36,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        41.97,
+        29.78
+      ],
+      "featureCentroidShiftPx": [
+        -0.14,
+        2.05
+      ],
+      "seamMeanAbsRgbDiff": 3.12,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_closed-A.png"
+    },
+    {
+      "state": "mouth_closed",
+      "variant": "B",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 16,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        41.06,
+        23.25
+      ],
+      "featureCentroidShiftPx": [
+        -1.05,
+        -4.48
+      ],
+      "seamMeanAbsRgbDiff": 5.05,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_closed-B.png"
+    },
+    {
+      "state": "mouth_open",
+      "variant": "A",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 102,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        42.01,
+        31.04
+      ],
+      "featureCentroidShiftPx": [
+        -0.1,
+        3.31
+      ],
+      "seamMeanAbsRgbDiff": 8.77,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_open-A.png"
+    },
+    {
+      "state": "mouth_open",
+      "variant": "B",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 81,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        41.86,
+        30.68
+      ],
+      "featureCentroidShiftPx": [
+        -0.25,
+        2.95
+      ],
+      "seamMeanAbsRgbDiff": 2.73,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_open-B.png"
+    },
+    {
+      "state": "mouth_smile",
+      "variant": "A",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 28,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        41.89,
+        27.93
+      ],
+      "featureCentroidShiftPx": [
+        -0.22,
+        0.2
+      ],
+      "seamMeanAbsRgbDiff": 2.9,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_smile-A.png"
+    },
+    {
+      "state": "mouth_smile",
+      "variant": "B",
+      "opaquePixels": 1436,
+      "pixelsOutsideZoneEllipse": 0,
+      "cornersTransparent": true,
+      "darkInkPixelsOriginal": 44,
+      "darkInkPixelsElement": 43,
+      "darkInkCentroidOriginal": [
+        42.11,
+        27.73
+      ],
+      "darkInkCentroidElement": [
+        41.91,
+        28.05
+      ],
+      "featureCentroidShiftPx": [
+        -0.21,
+        0.32
+      ],
+      "seamMeanAbsRgbDiff": 3.14,
+      "seamSamples": 410,
+      "candidate": "candidates/mouth_smile-B.png"
+    }
+  ]
+}
