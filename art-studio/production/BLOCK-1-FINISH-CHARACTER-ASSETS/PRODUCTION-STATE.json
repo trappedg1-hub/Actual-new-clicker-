@@ -1,0 +1,131 @@
+{
+  "mode": "PRODUCTION_MODE",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "b13": {
+    "visualApproval": "APPROVED_BY_USER",
+    "approvalStatement": "Всё окей, устраивает",
+    "commit": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+    "approvedResult": "art-studio/stages/05-independent-layers/B1-BACKGROUND-CLEANUP-BATCH-01/work-cutout-after.png",
+    "approvedResultSha256": "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db",
+    "cleanedComponents": [
+      "BG-0003",
+      "BG-0006",
+      "BG-0007",
+      "BG-0008",
+      "BG-0011",
+      "BG-0012"
+    ],
+    "cleanedPixels": 1200,
+    "skippedComponents": [
+      "BG-0013",
+      "BG-0017",
+      "BG-0023"
+    ],
+    "skippedPixels": 149,
+    "skippedComponentsRemainUnchanged": true,
+    "originalsAndPreviousStagesUnchanged": true,
+    "reverificationWithoutSpecificReason": false
+  },
+  "authoritativeDecisions": {
+    "eye_l_closed": "B",
+    "eye_r_closed": "B",
+    "mouth_open": "A",
+    "mouth_smile": "A",
+    "mouth_closed": "A_ONLY_VISUAL_REFERENCE_NO_SEPARATE_SLOT",
+    "eye_r_closed_B_translationY": 9,
+    "regenerateApprovedExpressions": false,
+    "returnToOldE2Decisions": false
+  },
+  "block1": {
+    "id": "BLOCK-1-FINISH-CHARACTER-ASSETS",
+    "userApproval": "APPROVED_AS_ONE_WHOLE_PUBLISHED_PACKAGE",
+    "userApprovalStatement": "BLOCK 1 утверждён. Начинай производство по опубликованному предложению",
+    "noSeparateApprovalPerOperation": true,
+    "status": "TECHNICAL_PASS_AWAITING_USER_VISUAL_REVIEW",
+    "executionStarted": true,
+    "executionCompleted": true,
+    "technicalPass": true,
+    "artisticApproval": false,
+    "technicalPassEqualsArtisticApproval": false,
+    "hiddenAnatomyArtisticallyRestored": false,
+    "hiddenAnatomyTechnicalUnderlaysPrepared": true,
+    "newCharacterSlots": 0,
+    "newExpressions": 0,
+    "aiRestoration": false,
+    "execution": {
+      "versionedBuild": "BUILD-v01/",
+      "graphicSlots": 20,
+      "visualStates": 24,
+      "fullFrameFaceStates": 10,
+      "hzZoneMasks": 26,
+      "underlayUnionPixels": 64856,
+      "underlayOutsideHZRectPixels": 24408,
+      "publishedE3UniformPhases": 8,
+      "worstVisibleGapBefore": 31393,
+      "worstVisibleGapAfter": 0,
+      "restRgbaByteIdenticalToB13": true,
+      "restGatedUnderlayPixels": 0,
+      "doubtfulPixelDeletions": 0,
+      "finalLayerOverlapPixels": 0,
+      "protectedFilesChecked": 956,
+      "protectedFilesChanged": 0,
+      "generatedPngs": 124,
+      "generatedFiles": 135
+    },
+    "visualReview": {
+      "agentOpenedComparisonSheets": 15,
+      "agentOpenedFullPhaseFrames": 9,
+      "awaitingUser": true,
+      "residualDefectsDisclosed": [
+        "thin dotted/ghost edge lines in hair and near skirt at 200%",
+        "thin static contour echoes on legs/shoes and doubled shoe outlines at some extreme uniform proxies",
+        "hidden anatomy is not artistically restored",
+        "E3 phases are translation proxies, not real rotation or PixiJS animation"
+      ]
+    },
+    "documents": {
+      "proposal": "BLOCK-1-PROPOSAL.md",
+      "preflight": "PREFLIGHT.json",
+      "report": "BUILD-v01/BLOCK-1-REPORT.md",
+      "verification": "BUILD-v01/VERIFICATION.json",
+      "manifest": "BUILD-v01/ASSEMBLY-MANIFEST.json",
+      "changedPixels": "BUILD-v01/CHANGED-PIXELS.json",
+      "underlayGating": "BUILD-v01/underlays/UNDERLAY-GATING.json",
+      "checksums": "BUILD-v01/SHA256SUMS.txt",
+      "deterministicBuilder": "BUILD-v01/build_block1.py"
+    }
+  },
+  "gates": {
+    "productionDeployment": false,
+    "prMerge": false,
+    "vercelPreview": false,
+    "vercelPreviewAllowedOnlyAfter": "BLOCK-3-QA-MOBILE-PREVIEW",
+    "srcPublicDistChanges": false,
+    "originalsModified": false,
+    "block2Started": false,
+    "block2NeedsSeparateConsolidatedProposalApproval": true,
+    "block3NeedsSeparateConsolidatedProposalApproval": true,
+    "noAiInpaintingOrGenerativeFill": true,
+    "noApprovedExpressionRegeneration": true,
+    "noB11MaskExpansion": true,
+    "noDoubtfulPixelDeletion": true
+  },
+  "documents": {
+    "proposal": "BLOCK-1-PROPOSAL.md",
+    "preflight": "PREFLIGHT.json",
+    "examples": "Existing approved B1.3 and E3 images linked inside BLOCK-1-PROPOSAL.md",
+    "generatedAssetsAtProposalStage": 0,
+    "generatedAssetsAtExecution": 135
+  },
+  "preflight": {
+    "localOriginAndFreshGitHubApiHead": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+    "githubApiParent": "d155dc69005165b3a6db4f5f21df3b0361182fa1",
+    "worktreeCleanBeforeProposal": true,
+    "trackedChangesAtProposalDelivery": 0,
+    "untrackedProposalDocuments": 3,
+    "protectedFilesChecked": 956,
+    "protectedFilesChanged": 0,
+    "protectedSnapshotSha256": "78c31383cb45b3d6822a8b9bc79359f4e174d06f21a9f3e05329e4605da51779",
+    "approvedB13ResultSha256": "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db"
+  }
+}

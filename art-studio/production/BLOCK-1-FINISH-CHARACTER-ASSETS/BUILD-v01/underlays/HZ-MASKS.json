@@ -1,0 +1,446 @@
+{
+  "source": "../../../stages/05-independent-layers/E3.5-RESTORATION-PLAN/ISSUE-MAP.json",
+  "canvas": [
+    848,
+    1264
+  ],
+  "gapMetric": "top-layer coverage < 128 on approved B1.3 silhouette; 8 published uniform E3 translation proxies",
+  "zoneCount": 26,
+  "unionPixels": 64856,
+  "outsideHZRectPixels": 24408,
+  "fallbackZoneId": "HZ-26",
+  "zones": {
+    "HZ-01": {
+      "rect": [
+        130,
+        380,
+        720,
+        745
+      ],
+      "category": "A+C",
+      "pixels": 29501,
+      "bbox": [
+        130,
+        380,
+        720,
+        745
+      ],
+      "mask": "underlays/HZ-01.png"
+    },
+    "HZ-02": {
+      "rect": [
+        130,
+        175,
+        720,
+        475
+      ],
+      "category": "A",
+      "pixels": 11803,
+      "bbox": [
+        156,
+        175,
+        693,
+        475
+      ],
+      "mask": "underlays/HZ-02.png"
+    },
+    "HZ-03": {
+      "rect": [
+        130,
+        420,
+        330,
+        660
+      ],
+      "category": "A+C",
+      "pixels": 11198,
+      "bbox": [
+        130,
+        420,
+        330,
+        660
+      ],
+      "mask": "underlays/HZ-03.png"
+    },
+    "HZ-04": {
+      "rect": [
+        520,
+        420,
+        720,
+        660
+      ],
+      "category": "A+C",
+      "pixels": 11447,
+      "bbox": [
+        520,
+        420,
+        720,
+        660
+      ],
+      "mask": "underlays/HZ-04.png"
+    },
+    "HZ-05": {
+      "rect": [
+        343,
+        38,
+        521,
+        208
+      ],
+      "category": "A",
+      "pixels": 4214,
+      "bbox": [
+        343,
+        41,
+        521,
+        208
+      ],
+      "mask": "underlays/HZ-05.png"
+    },
+    "HZ-06": {
+      "rect": [
+        321,
+        88,
+        404,
+        390
+      ],
+      "category": "A",
+      "pixels": 2487,
+      "bbox": [
+        321,
+        88,
+        370,
+        283
+      ],
+      "mask": "underlays/HZ-06.png"
+    },
+    "HZ-07": {
+      "rect": [
+        446,
+        88,
+        526,
+        390
+      ],
+      "category": "A",
+      "pixels": 2394,
+      "bbox": [
+        479,
+        88,
+        526,
+        279
+      ],
+      "mask": "underlays/HZ-07.png"
+    },
+    "HZ-08": {
+      "rect": [
+        380,
+        240,
+        488,
+        300
+      ],
+      "category": "A",
+      "pixels": 0,
+      "bbox": null,
+      "mask": "underlays/HZ-08.png"
+    },
+    "HZ-09": {
+      "rect": [
+        322,
+        95,
+        528,
+        272
+      ],
+      "category": "A",
+      "pixels": 4651,
+      "bbox": [
+        322,
+        95,
+        528,
+        272
+      ],
+      "mask": "underlays/HZ-09.png"
+    },
+    "HZ-10": {
+      "rect": [
+        270,
+        325,
+        330,
+        375
+      ],
+      "category": "A",
+      "pixels": 405,
+      "bbox": [
+        270,
+        325,
+        289,
+        375
+      ],
+      "mask": "underlays/HZ-10.png"
+    },
+    "HZ-11": {
+      "rect": [
+        518,
+        325,
+        578,
+        375
+      ],
+      "category": "A",
+      "pixels": 334,
+      "bbox": [
+        563,
+        325,
+        578,
+        368
+      ],
+      "mask": "underlays/HZ-11.png"
+    },
+    "HZ-12": {
+      "rect": [
+        275,
+        330,
+        300,
+        430
+      ],
+      "category": "A",
+      "pixels": 149,
+      "bbox": [
+        275,
+        330,
+        284,
+        368
+      ],
+      "mask": "underlays/HZ-12.png"
+    },
+    "HZ-13": {
+      "rect": [
+        548,
+        330,
+        575,
+        430
+      ],
+      "category": "A",
+      "pixels": 169,
+      "bbox": [
+        567,
+        330,
+        575,
+        365
+      ],
+      "mask": "underlays/HZ-13.png"
+    },
+    "HZ-14": {
+      "rect": [
+        100,
+        560,
+        200,
+        650
+      ],
+      "category": "A+C",
+      "pixels": 2969,
+      "bbox": [
+        104,
+        560,
+        200,
+        650
+      ],
+      "mask": "underlays/HZ-14.png"
+    },
+    "HZ-15": {
+      "rect": [
+        650,
+        560,
+        748,
+        650
+      ],
+      "category": "A+C",
+      "pixels": 2876,
+      "bbox": [
+        650,
+        560,
+        746,
+        650
+      ],
+      "mask": "underlays/HZ-15.png"
+    },
+    "HZ-16": {
+      "rect": [
+        271,
+        285,
+        577,
+        300
+      ],
+      "category": "C",
+      "pixels": 416,
+      "bbox": [
+        297,
+        285,
+        552,
+        300
+      ],
+      "mask": "underlays/HZ-16.png"
+    },
+    "HZ-17": {
+      "rect": [
+        271,
+        470,
+        577,
+        500
+      ],
+      "category": "C",
+      "pixels": 67,
+      "bbox": [
+        301,
+        490,
+        551,
+        500
+      ],
+      "mask": "underlays/HZ-17.png"
+    },
+    "HZ-18": {
+      "rect": [
+        260,
+        300,
+        590,
+        480
+      ],
+      "category": "A+C",
+      "pixels": 2173,
+      "bbox": [
+        260,
+        300,
+        590,
+        386
+      ],
+      "mask": "underlays/HZ-18.png"
+    },
+    "HZ-19": {
+      "rect": [
+        318,
+        240,
+        532,
+        392
+      ],
+      "category": "A",
+      "pixels": 972,
+      "bbox": [
+        318,
+        240,
+        532,
+        289
+      ],
+      "mask": "underlays/HZ-19.png"
+    },
+    "HZ-20": {
+      "rect": [
+        380,
+        308,
+        468,
+        478
+      ],
+      "category": "C",
+      "pixels": 0,
+      "bbox": null,
+      "mask": "underlays/HZ-20.png"
+    },
+    "HZ-21": {
+      "rect": [
+        268,
+        562,
+        582,
+        592
+      ],
+      "category": "A+C",
+      "pixels": 722,
+      "bbox": [
+        268,
+        562,
+        582,
+        592
+      ],
+      "mask": "underlays/HZ-21.png"
+    },
+    "HZ-22": {
+      "rect": [
+        191,
+        670,
+        659,
+        720
+      ],
+      "category": "A",
+      "pixels": 2866,
+      "bbox": [
+        231,
+        670,
+        615,
+        720
+      ],
+      "mask": "underlays/HZ-22.png"
+    },
+    "HZ-23": {
+      "rect": [
+        188,
+        665,
+        662,
+        700
+      ],
+      "category": "A+C",
+      "pixels": 1649,
+      "bbox": [
+        231,
+        665,
+        615,
+        700
+      ],
+      "mask": "underlays/HZ-23.png"
+    },
+    "HZ-24": {
+      "rect": [
+        380,
+        95,
+        488,
+        280
+      ],
+      "category": "A",
+      "pixels": 107,
+      "bbox": [
+        482,
+        95,
+        488,
+        125
+      ],
+      "mask": "underlays/HZ-24.png"
+    },
+    "HZ-25": {
+      "rect": [
+        130,
+        200,
+        720,
+        700
+      ],
+      "category": "T",
+      "pixels": 32314,
+      "bbox": [
+        130,
+        200,
+        720,
+        700
+      ],
+      "mask": "underlays/HZ-25.png"
+    },
+    "HZ-26": {
+      "rect": [
+        100,
+        240,
+        748,
+        720
+      ],
+      "category": "T+C",
+      "pixels": 57815,
+      "bbox": [
+        104,
+        240,
+        746,
+        1246
+      ],
+      "mask": "underlays/HZ-26.png"
+    }
+  }
+}

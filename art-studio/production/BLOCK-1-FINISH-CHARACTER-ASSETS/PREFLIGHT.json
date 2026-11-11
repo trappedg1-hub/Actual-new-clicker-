@@ -1,0 +1,49 @@
+{
+  "purpose": "B1.3 visual acceptance and BLOCK 1 proposal boundary",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "localHeadBeforeProposal": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+  "originHeadBeforeProposal": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+  "githubApiHeadBeforeProposal": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+  "githubApiParent": "d155dc69005165b3a6db4f5f21df3b0361182fa1",
+  "worktreeCleanBeforeProposal": true,
+  "b13Commit": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+  "protectedFilesChecked": 956,
+  "protectedFilesChanged": [],
+  "protectedSnapshotSha256": "78c31383cb45b3d6822a8b9bc79359f4e174d06f21a9f3e05329e4605da51779",
+  "criticalHashes": {
+    "art-studio/references/originals/IMG_4038_rig-pose.webp": "477c64490b1e966109d8f68b815c4983a655373473fa2856d1a9ff57fd52dbf9",
+    "art-studio/stages/04-slicing-prep/cutouts/work-cutout.png": "bb6dd0ef7af83a16cdc4258f60517eb1a13001c4f981f8506170afecffe05b4e",
+    "art-studio/stages/04-slicing-prep/cutouts/alpha-mask.png": "752dda3d3f2fc2661c5e1434579e1e792a4a75cd81be5fad1f32937ade799f6d",
+    "art-studio/stages/05-independent-layers/E2-FINAL-DECISION/E2-final-decision.json": "e40d48e378a36d971684a033497aabb86c1072247d6733b2506ea86f0bb37095",
+    "art-studio/stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/01-re-registered-element-eye_r_closed-B.png": "7763fb64b1024f864a6402c11b71ccac7c2028c4de25a75cf1b037b91bdf603e",
+    "art-studio/stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/layers/layer-eye_r_closed-B-v2.png": "0e636b68f4acc957905664fecd084da91a15e5003b49d8376ef11bed91c80d5d",
+    "art-studio/stages/05-independent-layers/E3.5-RESTORATION-PLAN/ISSUE-MAP.json": "5ccb59f3421b1ebc02ed02e63676e488b86b822dfc8aea5bd13296b65713f7c2",
+    "art-studio/stages/05-independent-layers/B1-BACKGROUND-CLASSIFICATION/COMPONENTS.json": "afa99359a9a9e73c85274025348bc04c853c6b7465a6a8efb54f092b2efa16f1",
+    "art-studio/stages/05-independent-layers/B1-BACKGROUND-CLEANUP-PILOT/work-cutout-after.png": "142ea49e03fab0b60e116851ddfd31331531bfa720c0ac5ea430b250030c4298",
+    "art-studio/stages/05-independent-layers/B1-BACKGROUND-CLEANUP-BATCH-01/work-cutout-after.png": "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db",
+    "art-studio/stages/05-independent-layers/B1-BACKGROUND-CLEANUP-BATCH-01/CHANGED-PIXELS.json": "ec8a23e3fce5b616f5d9f1618562d5a7c794e0a84df0e26070ef97b034671c9b"
+  },
+  "noResetRebaseForcePushAmend": true,
+  "vercelAction": "none",
+  "productionDeployment": false,
+  "prMerge": false,
+  "srcPublicDistChanges": false,
+  "freshVerification": {
+    "gitFetch": "origin/arena/02869c32-actual-new-clicker",
+    "localHead": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+    "originHead": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+    "githubApiHead": "7fce8f4679e0e49a9c9b92a72f0a5d10dbbf8d8d",
+    "githubApiParent": "d155dc69005165b3a6db4f5f21df3b0361182fa1",
+    "githubApiMessage": "B1.3: пакетная очистка 6 проверенных LIKELY_BACKGROUND компонентов\n\nCo-authored-by: arena-agent <297053741+arena-agent@users.noreply.github.com>",
+    "approvedB13ResultSha256": "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db"
+  },
+  "worktreeAtProposalDelivery": {
+    "trackedChanges": [],
+    "untrackedFiles": [
+      "art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BLOCK-1-PROPOSAL.md",
+      "art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/PREFLIGHT.json",
+      "art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/PRODUCTION-STATE.json"
+    ],
+    "note": "Before writing these three proposal/state/preflight documents the worktree was clean; no generated assets, no modified tracked files."
+  }
+}

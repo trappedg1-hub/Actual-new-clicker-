@@ -1,0 +1,785 @@
+{
+  "stage": "BLOCK 1 / FINISH CHARACTER ASSETS",
+  "status": "TECHNICAL_PASS / NOT_ARTISTICALLY_APPROVED",
+  "canvas": [
+    848,
+    1264
+  ],
+  "graphicSlots": 20,
+  "visualStates": 24,
+  "publishedE3Phases": 9,
+  "underlayGating": {
+    "rule": "render underlays/UNDERLAY-<phase>.png at z0 only at pixels where top-layer coverage < 128",
+    "restGatedPixels": 0,
+    "unionPixels": 64856,
+    "config": "underlays/UNDERLAY-GATING.json"
+  },
+  "drawOrderByPhase": {
+    "rest": [
+      "underlays/UNDERLAY-rest.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "hair_sway_+10deg_proxy": [
+      "underlays/UNDERLAY-hair_sway_+10deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "hair_sway_-10deg_proxy": [
+      "underlays/UNDERLAY-hair_sway_-10deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "arm_reaction_+25deg_proxy": [
+      "underlays/UNDERLAY-arm_reaction_+25deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "arm_reaction_-25deg_proxy": [
+      "underlays/UNDERLAY-arm_reaction_-25deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "head_tilt_+12deg_proxy": [
+      "underlays/UNDERLAY-head_tilt_+12deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "head_tilt_-12deg_proxy": [
+      "underlays/UNDERLAY-head_tilt_-12deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "breath_+6deg_proxy": [
+      "underlays/UNDERLAY-breath_+6deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "breath_-6deg_proxy": [
+      "underlays/UNDERLAY-breath_-6deg_proxy.png",
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/10_outfit_ribbon.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/13_head.png",
+      "layers/14_eye_l_open.png",
+      "layers/15_eye_r_open.png",
+      "layers/16_mouth_neutral.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ]
+  },
+  "slots": [
+    {
+      "z": 1,
+      "slot": "hair_back_01",
+      "group": "backHairGroup",
+      "file": "layers/01_hair_back_01.png",
+      "tightRect": {
+        "x": 139,
+        "y": 447,
+        "w": 591,
+        "h": 777
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 250
+      },
+      "states": [
+        "hair_back_01"
+      ]
+    },
+    {
+      "z": 2,
+      "slot": "hair_back_02",
+      "group": "backHairGroup",
+      "file": "layers/02_hair_back_02.png",
+      "tightRect": {
+        "x": 185,
+        "y": 215,
+        "w": 478,
+        "h": 256
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 245
+      },
+      "states": [
+        "hair_back_02"
+      ]
+    },
+    {
+      "z": 3,
+      "slot": "leg_l",
+      "group": "legGroup",
+      "file": "layers/03_leg_l.png",
+      "tightRect": {
+        "x": 188,
+        "y": 656,
+        "w": 220,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 675
+      },
+      "states": [
+        "leg_l"
+      ]
+    },
+    {
+      "z": 4,
+      "slot": "leg_r",
+      "group": "legGroup",
+      "file": "layers/04_leg_r.png",
+      "tightRect": {
+        "x": 434,
+        "y": 656,
+        "w": 228,
+        "h": 591
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 675
+      },
+      "states": [
+        "leg_r"
+      ]
+    },
+    {
+      "z": 5,
+      "slot": "torso",
+      "group": "bodyRoot",
+      "file": "layers/05_torso.png",
+      "tightRect": {
+        "x": 271,
+        "y": 285,
+        "w": 306,
+        "h": 208
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "states": [
+        "torso"
+      ]
+    },
+    {
+      "z": 6,
+      "slot": "arm_l",
+      "group": "armGroup_l",
+      "file": "layers/06_arm_l.png",
+      "tightRect": {
+        "x": 104,
+        "y": 325,
+        "w": 216,
+        "h": 331
+      },
+      "pivotAbsolute": {
+        "x": 300,
+        "y": 335
+      },
+      "states": [
+        "arm_l"
+      ]
+    },
+    {
+      "z": 7,
+      "slot": "arm_r",
+      "group": "armGroup_r",
+      "file": "layers/07_arm_r.png",
+      "tightRect": {
+        "x": 533,
+        "y": 325,
+        "w": 214,
+        "h": 331
+      },
+      "pivotAbsolute": {
+        "x": 548,
+        "y": 335
+      },
+      "states": [
+        "arm_r"
+      ]
+    },
+    {
+      "z": 8,
+      "slot": "outfit_blouse",
+      "group": "outfitGroup",
+      "file": "layers/08_outfit_blouse.png",
+      "tightRect": {
+        "x": 182,
+        "y": 281,
+        "w": 495,
+        "h": 185
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 490
+      },
+      "states": [
+        "outfit_blouse"
+      ]
+    },
+    {
+      "z": 9,
+      "slot": "outfit_collar",
+      "group": "outfitGroup",
+      "file": "layers/09_outfit_collar.png",
+      "tightRect": {
+        "x": 308,
+        "y": 49,
+        "w": 232,
+        "h": 325
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 300
+      },
+      "states": [
+        "outfit_collar"
+      ]
+    },
+    {
+      "z": 10,
+      "slot": "outfit_ribbon",
+      "group": "outfitGroup",
+      "file": "layers/10_outfit_ribbon.png",
+      "tightRect": {
+        "x": 380,
+        "y": 308,
+        "w": 88,
+        "h": 158
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 340
+      },
+      "states": [
+        "outfit_ribbon"
+      ]
+    },
+    {
+      "z": 11,
+      "slot": "outfit_skirt_01",
+      "group": "outfitGroup",
+      "file": "layers/11_outfit_skirt_01.png",
+      "tightRect": {
+        "x": 157,
+        "y": 466,
+        "w": 534,
+        "h": 124
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 478
+      },
+      "states": [
+        "outfit_skirt_01"
+      ]
+    },
+    {
+      "z": 12,
+      "slot": "outfit_skirt_02",
+      "group": "outfitGroup",
+      "file": "layers/12_outfit_skirt_02.png",
+      "tightRect": {
+        "x": 191,
+        "y": 556,
+        "w": 468,
+        "h": 676
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 570
+      },
+      "states": [
+        "outfit_skirt_02"
+      ]
+    },
+    {
+      "z": 13,
+      "slot": "head",
+      "group": "headGroup",
+      "file": "layers/13_head.png",
+      "tightRect": {
+        "x": 380,
+        "y": 103,
+        "w": 108,
+        "h": 195
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 262
+      },
+      "states": [
+        "head"
+      ]
+    },
+    {
+      "z": 14,
+      "slot": "eye_l_open",
+      "group": "faceGroup",
+      "file": "layers/14_eye_l_open.png",
+      "tightRect": {
+        "x": 378,
+        "y": 139,
+        "w": 49,
+        "h": 47
+      },
+      "pivotAbsolute": {
+        "x": 397,
+        "y": 162
+      },
+      "states": [
+        "eye_l_open",
+        "eye_l_closed"
+      ]
+    },
+    {
+      "z": 15,
+      "slot": "eye_r_open",
+      "group": "faceGroup",
+      "file": "layers/15_eye_r_open.png",
+      "tightRect": {
+        "x": 427,
+        "y": 138,
+        "w": 60,
+        "h": 48
+      },
+      "pivotAbsolute": {
+        "x": 457,
+        "y": 162
+      },
+      "states": [
+        "eye_r_open",
+        "eye_r_closed"
+      ]
+    },
+    {
+      "z": 16,
+      "slot": "mouth_neutral",
+      "group": "faceGroup",
+      "file": "layers/16_mouth_neutral.png",
+      "tightRect": {
+        "x": 396,
+        "y": 182,
+        "w": 52,
+        "h": 34
+      },
+      "pivotAbsolute": {
+        "x": 422,
+        "y": 200
+      },
+      "states": [
+        "mouth_neutral",
+        "mouth_open",
+        "mouth_smile"
+      ]
+    },
+    {
+      "z": 17,
+      "slot": "hair_side_l",
+      "group": "frontHairGroup",
+      "file": "layers/17_hair_side_l.png",
+      "tightRect": {
+        "x": 321,
+        "y": 158,
+        "w": 82,
+        "h": 153
+      },
+      "pivotAbsolute": {
+        "x": 370,
+        "y": 120
+      },
+      "states": [
+        "hair_side_l"
+      ]
+    },
+    {
+      "z": 18,
+      "slot": "hair_side_r",
+      "group": "frontHairGroup",
+      "file": "layers/18_hair_side_r.png",
+      "tightRect": {
+        "x": 446,
+        "y": 203,
+        "w": 80,
+        "h": 108
+      },
+      "pivotAbsolute": {
+        "x": 478,
+        "y": 120
+      },
+      "states": [
+        "hair_side_r"
+      ]
+    },
+    {
+      "z": 19,
+      "slot": "hair_front_01",
+      "group": "frontHairGroup",
+      "file": "layers/19_hair_front_01.png",
+      "tightRect": {
+        "x": 343,
+        "y": 52,
+        "w": 69,
+        "h": 127
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "states": [
+        "hair_front_01"
+      ]
+    },
+    {
+      "z": 20,
+      "slot": "hair_front_02",
+      "group": "frontHairGroup",
+      "file": "layers/20_hair_front_02.png",
+      "tightRect": {
+        "x": 394,
+        "y": 41,
+        "w": 127,
+        "h": 167
+      },
+      "pivotAbsolute": {
+        "x": 424,
+        "y": 115
+      },
+      "states": [
+        "hair_front_02"
+      ]
+    }
+  ],
+  "states": [
+    {
+      "z": 1,
+      "slot": "hair_back_01",
+      "state": "hair_back_01",
+      "file": "states/state-01-hair_back_01.png"
+    },
+    {
+      "z": 2,
+      "slot": "hair_back_02",
+      "state": "hair_back_02",
+      "file": "states/state-02-hair_back_02.png"
+    },
+    {
+      "z": 3,
+      "slot": "leg_l",
+      "state": "leg_l",
+      "file": "states/state-03-leg_l.png"
+    },
+    {
+      "z": 4,
+      "slot": "leg_r",
+      "state": "leg_r",
+      "file": "states/state-04-leg_r.png"
+    },
+    {
+      "z": 5,
+      "slot": "torso",
+      "state": "torso",
+      "file": "states/state-05-torso.png"
+    },
+    {
+      "z": 6,
+      "slot": "arm_l",
+      "state": "arm_l",
+      "file": "states/state-06-arm_l.png"
+    },
+    {
+      "z": 7,
+      "slot": "arm_r",
+      "state": "arm_r",
+      "file": "states/state-07-arm_r.png"
+    },
+    {
+      "z": 8,
+      "slot": "outfit_blouse",
+      "state": "outfit_blouse",
+      "file": "states/state-08-outfit_blouse.png"
+    },
+    {
+      "z": 9,
+      "slot": "outfit_collar",
+      "state": "outfit_collar",
+      "file": "states/state-09-outfit_collar.png"
+    },
+    {
+      "z": 10,
+      "slot": "outfit_ribbon",
+      "state": "outfit_ribbon",
+      "file": "states/state-10-outfit_ribbon.png"
+    },
+    {
+      "z": 11,
+      "slot": "outfit_skirt_01",
+      "state": "outfit_skirt_01",
+      "file": "states/state-11-outfit_skirt_01.png"
+    },
+    {
+      "z": 12,
+      "slot": "outfit_skirt_02",
+      "state": "outfit_skirt_02",
+      "file": "states/state-12-outfit_skirt_02.png"
+    },
+    {
+      "z": 13,
+      "slot": "head",
+      "state": "head",
+      "file": "states/state-13-head.png"
+    },
+    {
+      "z": 14,
+      "slot": "eye_l_open",
+      "state": "eye_l_open",
+      "file": "states/state-14-eye_l_open.png"
+    },
+    {
+      "z": 15,
+      "slot": "eye_r_open",
+      "state": "eye_r_open",
+      "file": "states/state-15-eye_r_open.png"
+    },
+    {
+      "z": 16,
+      "slot": "mouth_neutral",
+      "state": "mouth_neutral",
+      "file": "states/state-16-mouth_neutral.png"
+    },
+    {
+      "z": 17,
+      "slot": "hair_side_l",
+      "state": "hair_side_l",
+      "file": "states/state-17-hair_side_l.png"
+    },
+    {
+      "z": 18,
+      "slot": "hair_side_r",
+      "state": "hair_side_r",
+      "file": "states/state-18-hair_side_r.png"
+    },
+    {
+      "z": 19,
+      "slot": "hair_front_01",
+      "state": "hair_front_01",
+      "file": "states/state-19-hair_front_01.png"
+    },
+    {
+      "z": 20,
+      "slot": "hair_front_02",
+      "state": "hair_front_02",
+      "file": "states/state-20-hair_front_02.png"
+    },
+    {
+      "z": null,
+      "slot": null,
+      "state": "eye_l_closed-B",
+      "file": "states/state-eye_l_closed-B.png"
+    },
+    {
+      "z": null,
+      "slot": null,
+      "state": "eye_r_closed-B",
+      "file": "states/state-eye_r_closed-B.png"
+    },
+    {
+      "z": null,
+      "slot": null,
+      "state": "mouth_open-A",
+      "file": "states/state-mouth_open-A.png"
+    },
+    {
+      "z": null,
+      "slot": null,
+      "state": "mouth_smile-A",
+      "file": "states/state-mouth_smile-A.png"
+    }
+  ],
+  "expressionAssets": {
+    "eye_l_closed-B": {
+      "source": "../../../stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/layers/layer-eye_l_closed-B.png",
+      "file": "states/state-eye_l_closed-B.png",
+      "sha256": "5e198f22ef34f411d4e8f704e5d242934c07a15a692a924282107ee123da604f"
+    },
+    "eye_r_closed-B": {
+      "source": "../../../stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/layers/layer-eye_r_closed-B-v2.png",
+      "file": "states/state-eye_r_closed-B.png",
+      "sha256": "0e636b68f4acc957905664fecd084da91a15e5003b49d8376ef11bed91c80d5d"
+    },
+    "mouth_open-A": {
+      "source": "../../../stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/layers/layer-mouth_open-A.png",
+      "file": "states/state-mouth_open-A.png",
+      "sha256": "52661fcb862bcaa0433bd2984738dc3d25c59642017b4abcbf2def50f62779cb"
+    },
+    "mouth_smile-A": {
+      "source": "../../../stages/05-independent-layers/E2-EYE-ALIGNMENT-V2/layers/layer-mouth_smile-A.png",
+      "file": "states/state-mouth_smile-A.png",
+      "sha256": "5837e0bd471f5db2ab0681fb2b9e94087672004df9f7d07ac86b8d7b11ec9936"
+    }
+  },
+  "mouthClosedA": "visual reference only, no separate slot",
+  "hiddenAnatomyArtisticallyRestored": false,
+  "newAnatomicalSlots": 0,
+  "newExpressions": 0,
+  "aiRestoration": false
+}

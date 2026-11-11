@@ -1,0 +1,73 @@
+{
+  "sourceOfPhases": "../../../stages/05-independent-layers/E3-ASSEMBLY-CANON-CHECK/source/e1-motion-gaps.json",
+  "method": "uniform integer translation of all 20 slots; underlay is visible only where top-layer coverage < 128",
+  "silhouette": "approved B1.3 work-cutout-after.png, alpha >= 128; cleared B1.2/B1.3 coordinates are excluded",
+  "unionPixels": 64856,
+  "unionImage": "underlays/UNDERLAY-UNION.png",
+  "restGatedPixels": 0,
+  "phases": {
+    "rest": {
+      "file": "underlays/UNDERLAY-rest.png",
+      "dx": 0,
+      "dy": 0,
+      "gatedPixels": 0,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "hair_sway_+10deg_proxy": {
+      "file": "underlays/UNDERLAY-hair_sway_+10deg_proxy.png",
+      "dx": 12,
+      "dy": 0,
+      "gatedPixels": 31393,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "hair_sway_-10deg_proxy": {
+      "file": "underlays/UNDERLAY-hair_sway_-10deg_proxy.png",
+      "dx": -12,
+      "dy": 0,
+      "gatedPixels": 31393,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "arm_reaction_+25deg_proxy": {
+      "file": "underlays/UNDERLAY-arm_reaction_+25deg_proxy.png",
+      "dx": 10,
+      "dy": 6,
+      "gatedPixels": 27509,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "arm_reaction_-25deg_proxy": {
+      "file": "underlays/UNDERLAY-arm_reaction_-25deg_proxy.png",
+      "dx": -10,
+      "dy": -6,
+      "gatedPixels": 27509,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "head_tilt_+12deg_proxy": {
+      "file": "underlays/UNDERLAY-head_tilt_+12deg_proxy.png",
+      "dx": 6,
+      "dy": 8,
+      "gatedPixels": 19727,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "head_tilt_-12deg_proxy": {
+      "file": "underlays/UNDERLAY-head_tilt_-12deg_proxy.png",
+      "dx": -6,
+      "dy": -8,
+      "gatedPixels": 19727,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "breath_+6deg_proxy": {
+      "file": "underlays/UNDERLAY-breath_+6deg_proxy.png",
+      "dx": 0,
+      "dy": 5,
+      "gatedPixels": 7960,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    },
+    "breath_-6deg_proxy": {
+      "file": "underlays/UNDERLAY-breath_-6deg_proxy.png",
+      "dx": 0,
+      "dy": -5,
+      "gatedPixels": 7960,
+      "metric": "cov[nm][p] < 128 AND p IN union"
+    }
+  }
+}
