@@ -1,0 +1,143 @@
+{
+  "stage": "BLOCK 2 / PIXIJS RIG + ANIMATION",
+  "status": "TECHNICAL_PASS / NOT_ARTISTICALLY_APPROVED",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "baseMain": "371bd6a1603069f528b8e0aa4789dafa95f07852",
+  "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
+  "commit": "HEAD_OF_BRANCH_AT_DELIVERY",
+  "userApproval": {
+    "block1": "BLOCK 1 утверждён. Начинай производство по опубликованному предложению",
+    "b13Visual": "Всё окей, устраивает",
+    "block2Start": "approved, начинай block 2",
+    "noSeparateApprovalPerOperation": true
+  },
+  "inputs": {
+    "approvedBuild": "art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/",
+    "graphicSlots": 20,
+    "visualStates": 24,
+    "fullFrameE2V2StateReferences": 10,
+    "transparentExpressionOverlays": 4,
+    "hzZoneMasks": 26,
+    "coverageGatedUnderlay": "underlays/UNDERLAY-UNION.png",
+    "switchMatrix": "references/switch-matrix.json",
+    "layerMap": "art-studio/stages/05-independent-layers/layer-map.json",
+    "animationSpec": "art-studio/ANIMATION-SPEC.md"
+  },
+  "implementation": {
+    "productionRig": "src/heroine/rig/ProductionHeroineRig.ts",
+    "animationMath": "src/heroine/rig/animationMath.ts",
+    "assetUrlMap": "src/heroine/rig/heroineAssets.ts",
+    "sceneIntegration": "src/app/scenes/MainScene.ts",
+    "regressionTests": "tests/heroineProductionRig.test.ts",
+    "stack": {
+      "pixiJs": "8.22.0",
+      "typescript": "strict",
+      "vite": "6.4.6",
+      "live2dCubismSpine": false,
+      "phaserUnityGodot": false,
+      "aiGeneratedArt": false
+    },
+    "rig": {
+      "nestedGroups": 9,
+      "hiddenBaseSlots": [13, 14, 15, 16],
+      "facePlateMask": [374, 98, 116, 200, 40],
+      "masterLoopMs": 12000,
+      "expressionCrossfade": true,
+      "autoBlink": true,
+      "touchZones": 4,
+      "reactionDecayMs": 220,
+      "underlayAlphaAtRest": 0,
+      "eye_r_closed_B_translationY": 9
+    },
+    "runtimeTextures": 35,
+    "facePlateBackgroundExcluded": true,
+    "newExpressions": 0,
+    "newAnatomicalSlots": 0,
+    "newArtAssets": 0
+  },
+  "checks": {
+    "nodeTests": 29,
+    "nodeTestsPassed": 29,
+    "block2Tests": 6,
+    "eslint": true,
+    "strictTypecheck": true,
+    "viteProductionBuild": true,
+    "buildOutput": {
+      "mainJs": "583.63 kB raw / 192.88 kB gzip",
+      "inkChunk": "130.05 kB raw / 32.71 kB gzip",
+      "warning": "known >500 kB raw-chunk advisory only"
+    },
+    "devServer": {
+      "host": "0.0.0.0",
+      "port": 5173,
+      "localhostHttp200": true,
+      "e2bHostHttp200": true,
+      "unlistedHostHttp403": true,
+      "uniqueProductionUrlsHttp200": 36,
+      "transformedRigHttp200": true,
+      "jsonImportHttp200": true
+    },
+    "deterministicMath": {
+      "loopSeamExact": true,
+      "expressionTargetsNormalized": true,
+      "reactionRestartWithoutDrift": true,
+      "identityFrameUnchanged": true,
+      "switchMatrixCombosMatch": true,
+      "expressionDeltasInsideFaceCrop": true
+    },
+    "preservation": {
+      "protectedArtFilesChecked": 1041,
+      "protectedArtFilesChanged": 0,
+      "approvedB13ResultSha256": "5bd23a22de6a52c304657d21e707309a0f106a57217bc753b4fbed1060d360db",
+      "approvedB13ResultUnchanged": true,
+      "originalsModified": false,
+      "approvedExpressionsRegenerated": false,
+      "skippedComponentsUnchanged": ["BG-0013", "BG-0017", "BG-0023"],
+      "b11MaskExpanded": false,
+      "doubtfulPixelsDeleted": false
+    },
+    "documentsAndRepo": {
+      "jsonValid": true,
+      "cjkInNewDocs": false,
+      "markdownLinksResolve": true,
+      "checksumsFile": "SHA256SUMS.txt",
+      "checksumsVerified": true,
+      "worktreeCleanBeforeBlock2": true,
+      "worktreeCleanAfterBlock2": true,
+      "distIgnored": true,
+      "nodeModulesIgnored": true,
+      "noPycache": true,
+      "noNewImagesInBlock2Directory": true,
+      "remoteVerification": "AFTER_PUSH_SEE_FINAL_CHAT_REPORT"
+    }
+  },
+  "disclosedLimitations": [
+    "No interactive browser execution, browser emulation, physical iPhone/Android testing, touch-behavior verification or IndexedDB-in-browser verification was performed.",
+    "No Vercel Preview/Production, Production Deployment, PR Merge or Vercel API call was made.",
+    "Technical PASS is not artistic approval.",
+    "The 10 approved E2-V2 state references are flattened RGB PNGs with the original purple background. A rounded face mask isolates only approved face pixels at runtime; no background patch or new expression art is introduced.",
+    "The 10 full-frame state references add roughly 5.4 MB of image payload. No cropped or derived art assets were generated in BLOCK 2; payload optimization would need separate approval.",
+    "Coverage support may show thin ghost contours at extreme rotations; hidden anatomy is not artistically restored.",
+    "Published E3 phases are uniform translation proxies, not real rotation or deformation."
+  ],
+  "gates": {
+    "productionDeployment": false,
+    "prMerge": false,
+    "vercelPreview": false,
+    "vercelPreviewAllowedOnlyAfter": "BLOCK-3-QA-MOBILE-PREVIEW",
+    "vercelConnectorEnabled": true,
+    "vercelConnectorIsDeploymentAuthorization": false,
+    "vercelApiCalls": 0,
+    "block3Started": false,
+    "block3NeedsSeparateConsolidatedProposalApproval": true,
+    "technicalPassEqualsArtisticApproval": false
+  },
+  "documents": {
+    "proposal": "BLOCK-2-PROPOSAL.md",
+    "report": "BLOCK-2-REPORT.md",
+    "verification": "VERIFICATION.json",
+    "checksums": "SHA256SUMS.txt",
+    "verificationScript": "verify_block2.py",
+    "productionState": "../BLOCK-1-FINISH-CHARACTER-ASSETS/PRODUCTION-STATE.json"
+  }
+}

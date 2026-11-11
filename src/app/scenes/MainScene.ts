@@ -5,7 +5,7 @@ import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
 import { isIntroDialogueUnlocked } from "../../domain/unlocks/unlocks.ts";
 import type { InkIntroStory as InkIntroStoryType } from "../../narrative/ink/InkIntroStory.ts";
 import { GameSession } from "../GameSession.ts";
-import { LayeredHeroineRig } from "../../heroine/rig/LayeredHeroineRig.ts";
+import { ProductionHeroineRig } from "../../heroine/rig/ProductionHeroineRig.ts";
 import { downloadGameBackup } from "../../persistence/backups/exportGameSave.ts";
 import { BottomNavigation } from "../../presentation/ui/BottomNavigation.ts";
 import { DialogueOverlay } from "../../presentation/ui/DialogueOverlay.ts";
@@ -24,7 +24,7 @@ export class MainScene extends Container {
   private readonly callbacks: MainSceneCallbacks;
   private readonly background = new Graphics();
   private readonly ambient = new Graphics();
-  private readonly heroine: LayeredHeroineRig;
+  private readonly heroine: ProductionHeroineRig;
   private readonly statusHud: StatusHud;
   private readonly upgradePanel: UpgradePanel;
   private readonly bottomNavigation: BottomNavigation;
@@ -60,7 +60,7 @@ export class MainScene extends Container {
     this.ambient.eventMode = "none";
     this.addChild(this.background, this.ambient);
 
-    this.heroine = new LayeredHeroineRig((zone, localX, localY) =>
+    this.heroine = new ProductionHeroineRig((zone, localX, localY) =>
       this.onHeroineTap(zone, localX, localY),
     );
     this.addChild(this.heroine);
@@ -90,6 +90,7 @@ export class MainScene extends Container {
 
   update(elapsedMs: number): void {
     if (this.paused || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
+    this.heroine.update(elapsedMs);
     this.session.tick(elapsedMs);
     this.uiAccumulatorMs += elapsedMs;
     this.autosaveAccumulatorMs += elapsedMs;
@@ -151,8 +152,8 @@ export class MainScene extends Container {
       const availableHeight = Math.max(150, cardTop - areaTop - 22);
       heroineScale = Math.min(
         1.04,
-        availableHeight / 376,
-        (widthSafe - 88) / 150,
+        availableHeight / 1264,
+        (widthSafe - 88) / 848,
       );
       heroineCenterX = widthSafe / 2;
       heroineCenterY = areaTop + availableHeight / 2;
@@ -168,8 +169,8 @@ export class MainScene extends Container {
       const availableHeight = Math.max(150, areaBottom - areaTop);
       heroineScale = Math.min(
         0.92,
-        availableHeight / 376,
-        availableWidth / 198,
+        availableHeight / 1264,
+        availableWidth / 848,
       );
       heroineCenterX = areaLeft + availableWidth / 2;
       heroineCenterY = areaTop + availableHeight / 2;
@@ -178,17 +179,9 @@ export class MainScene extends Container {
     }
     this.heroine.position.set(heroineCenterX, heroineCenterY);
     this.heroine.setScaleForViewport(heroineScale);
-    // The "TECHNICAL LAYER PLACEHOLDER" caption sits 188 px below the rig origin at scale 1.
-    // On short/narrow viewports that row overlaps the touch-zone hint, so constrain it to the
-    // free space above the hint and convert the pixel limit back into rig-local units.
-    const hintTop = portrait
-      ? heightSafe - 66 - 82 - 8 - 18
-      : heightSafe - 68 - 12;
-    // A 22 px gap keeps the caption legible next to the hint on a 280 px screen.
-    const tagLimitLocal = (hintTop - 22 - heroineCenterY) / heroineScale;
-    this.heroine.setTagBottomLimit(
-      Number.isFinite(tagLimitLocal) ? tagLimitLocal : null,
-    );
+    // The production rig has no placeholder caption; the method is retained as
+    // a no-op for the existing scene layout contract.
+    this.heroine.setTagBottomLimit(null);
     this.dialogue.resize(widthSafe, heightSafe);
     this.renderState();
   }

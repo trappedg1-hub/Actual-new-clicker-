@@ -1,0 +1,33 @@
+# BLOCK 2 — PIXIJS RIG + ANIMATION / консолидированное предложение
+
+**Статус:** `APPROVED_BY_USER / EXECUTION_STARTED`.  
+**Утверждение пользователя:** «approved, начинай block 2».  
+**Ветка:** `arena/02869c32-actual-new-clicker`.  
+**База:** commit `54a876287ec6053a5681c3cf68aeffa6278c5901` (BLOCK 1 завершён и запушен).  
+**Вход:** только утверждённые материалы [BLOCK 1 BUILD-v01](../BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/BLOCK-1-REPORT.md), [20/24 манифест](../BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/ASSEMBLY-MANIFEST.json), [E2-V2 switch matrix](../BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/references/switch-matrix.json), [ANIMATION-SPEC.md](../../ANIMATION-SPEC.md) и уже существующий стек из [package.json](../../../package.json).
+
+## 1. Цель
+
+Заменить технический wireframe-риг в работающем vertical slice на настоящий собственный 2D-риг HEROINE-01 из 20 утверждённых RGBA-слотов, сохранить 24 визуальных состояния и сделать «живую» анимацию, а не просто пульсацию масштабом.
+
+## 2. Что реализуется
+
+1. **Стек:** PixiJS `8.22.0`, TypeScript strict, Vite `6.4.6`, существующий mobile-first `MainScene`/bootstrap/IndexedDB/UI без переписывания домена. Без Live2D, Cubism, Spine, Phaser, Unity, Godot.
+2. **Иерархия и пивоты:** `bodyRoot` → `backHairGroup`, `legGroup`, `armGroupL/R`, `outfitGroup`, `headGroup` → `faceGroup`, `frontHairGroup`. Для каждого слота используется `pivotAbsolute` из `layer-map.json`; art-контейнеры в покое identity, а трансформы живут на pose/idle/reaction-контейнерах.
+3. **Idle:** внутреннее дыхание корпуса (`rotation`, `y`, `scaleY`), независимые фазы задних/передних прядей, инерция юбки, лёгкое движение ног и рук, наклон головы. Мастер-петля 12 с, periods делят 12 с, на границе цикла трансформы и видимость совпадают.
+4. **Выражения и моргание:** 10 утверждённых полнокадровых состояний E2-V2 — это сплющенные RGB-эталоны с исходным фоном; в рантайме из каждого берётся только область лица `374,98,116,200` со скруглением `40 px`, а фон и волосы вне маски не попадают в прозрачный риг. Переключение — плавный alpha-crossfade этих 10 пластин, авто-блинк весом, без масштабирования радужки и без регенерации выражений. Четыре утверждённых прозрачных expression-оверлея из BUILD-v01 загружаются и сохраняются в runtime-кэше; решения B/B/A/A и сдвиг правого закрытого глаза `+9 px` уже зашиты в эталонные состояния и не пересчитываются.
+5. **Реакции на касание:** зоны `head / hair / body / arms`, фиксированные импульсы от identity с экспоненциальным затуханием без накопления дрейфа, плюс кратковременное выражение лица. Награда/экономика остаются прежними.
+6. **Подложки:** статичный `UNDERLAY-UNION` из BLOCK 1 рисуется за z1–z20 с alpha `0` в покое и плавно усиливается при движении; approved B1.3 покой остаётся точным. Coverage-gated phase-варианты BLOCK 1 сохраняются как диагностика, но production rig использует иерархические повороты, а не E3 translation-proxy.
+7. **Мобильная раскладка:** масштаб под полный кадр `848×1264`, safe-area CSS и существующий ResizeObserver сохраняются; интерактивные hit-зоны заданы в координатах кадра.
+
+## 3. Границы и запреты
+
+- Разрешено: новый production rig в `src/heroine/rig/`, правка `MainScene`, обновление README/документов Production Mode, один отдельный Git commit/push, локальный Vite dev server для live preview.
+- Запрещено: AI-генерация/инпейнт/диффузия, новые выражения, новые анатомические слоты, атлас, правка оригиналов или утверждённых B1/B1.3/E1/E2 файлов, `src/public/dist` как место новых арт-ассетов, Vercel Preview/Production, Production Deployment, PR Merge, обращения к Vercel connector.
+- Технический PASS ≠ художественное одобрение. BLOCK 3 начинается только после отдельного консолидированного предложения и утверждения; Vercel Preview разрешён только в BLOCK 3.
+
+## 4. Проверки на границе блока
+
+`npm test` (включая новые тесты loop seam / reaction restart / expression matrix / bbox внутри face-crop), `npm run lint`, `npm run typecheck`, `npm run build`, HTTP smoke check локального Vite и representative `*.e2b.app` Host, проверка отдачи PNG/TS/JSON, чистый worktree, отдельный commit/push, проверка remote GitHub и сохранности 1041 защищённого art-файла базы BLOCK 1 (все `art-studio/`, кроме обновляемого `PRODUCTION-STATE.json` и новой папки BLOCK 2). Физические iPhone/Android тесты, браузерная эмуляция и Vercel Preview остаются в BLOCK 3.
+
+**Далее — реализация без дополнительного STOP:** пользователь уже дал утверждение начинать BLOCK 2.
