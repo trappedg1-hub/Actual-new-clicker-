@@ -154,7 +154,8 @@ def main():
     check(status == "", f"worktree not clean: {status}")
     check(git("ls-files", "dist", "node_modules").strip() == "", "dist/node_modules tracked")
     check(git("ls-files", "*__pycache__*").strip() == "", "__pycache__ tracked")
-    subprocess.check_call(["git", "check-ignore", "-q", "dist", "node_modules"], cwd=ROOT)
+    for ignored in ("dist", "node_modules"):
+        subprocess.check_call(["git", "check-ignore", "-q", ignored], cwd=ROOT)
     results["worktreeClean"] = True
     results["distIgnored"] = True
     results["nodeModulesIgnored"] = True

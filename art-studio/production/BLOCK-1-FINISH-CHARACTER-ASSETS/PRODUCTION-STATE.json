@@ -107,6 +107,7 @@
     "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
     "featureCommit": "8f5ada9072d8e5db4e792483cbaf335af31dcded",
     "verificationFixCommit": "HEAD_OF_BRANCH_AT_DELIVERY",
+    "verificationFixCommits": 2,
     "fastForwardOnly": true,
     "commit": "HEAD_OF_BRANCH_AT_DELIVERY",
     "remoteVerification": "AFTER_PUSH_SEE_FINAL_CHAT_REPORT",
