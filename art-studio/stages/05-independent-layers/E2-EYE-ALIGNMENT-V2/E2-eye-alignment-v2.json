@@ -1,0 +1,25 @@
+{
+  "stage": "E2-EYE-ALIGNMENT-V2",
+  "parent": "569f984974f3ec7ade15c90a7b8dfb4bc83cce1a",
+  "displacedEye": "eye_r_closed-B",
+  "deltaPxDown": 9,
+  "measuredAsymmetryPx": 9.167,
+  "residualAsymmetryPx": 0.167,
+  "checks": {
+    "checksTotal": 19,
+    "checksPassed": 19,
+    "checksFailed": 0
+  },
+  "v1FilesChecked": 147,
+  "v1FilesChanged": 0,
+  "carriedAssets": 22,
+  "seamV1": 25.6289,
+  "seamV2": 65.1796,
+  "links": {
+    "linksChecked": 53,
+    "brokenLinks": [],
+    "cjk": 0
+  },
+  "commit": "see final chat report (separate commit on arena/02869c32-actual-new-clicker)",
+  "approval": "NOT APPROVED - waiting for user visual confirmation"
+}

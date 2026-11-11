@@ -1,0 +1,265 @@
+{
+  "semantics": "v2: right-eye closed lid re-registered +9 px down; neutral = untouched source; ON = clean zone + approved expression; OFF = restore source over all zone-owned pixels.",
+  "states": {
+    "00-neutral": {
+      "expressions": [],
+      "cleanZones": [],
+      "diffFromOriginal": {
+        "changedPixels": 0,
+        "bbox": null
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 0,
+        "bbox": null
+      }
+    },
+    "01-eye_l_closed-B": {
+      "expressions": [
+        "eye_l_closed-B"
+      ],
+      "cleanZones": [
+        "eye_l"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 881,
+        "bbox": [
+          377,
+          150,
+          411,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 869,
+        "bbox": [
+          377,
+          150,
+          411,
+          179
+        ]
+      }
+    },
+    "02-eye_r_closed-B": {
+      "expressions": [
+        "eye_r_closed-B"
+      ],
+      "cleanZones": [
+        "eye_r"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1021,
+        "bbox": [
+          431,
+          149,
+          470,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 561,
+        "bbox": [
+          431,
+          162,
+          470,
+          179
+        ]
+      }
+    },
+    "03-mouth_open-A": {
+      "expressions": [
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 802,
+        "bbox": [
+          402,
+          192,
+          444,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 774,
+        "bbox": [
+          403,
+          193,
+          444,
+          216
+        ]
+      }
+    },
+    "04-mouth_smile-A": {
+      "expressions": [
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 788,
+        "bbox": [
+          402,
+          192,
+          443,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 664,
+        "bbox": [
+          404,
+          193,
+          443,
+          216
+        ]
+      }
+    },
+    "05-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1902,
+        "bbox": [
+          377,
+          149,
+          470,
+          179
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1430,
+        "bbox": [
+          377,
+          150,
+          470,
+          179
+        ]
+      }
+    },
+    "06-both-eyes-closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 2690,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 2094,
+        "bbox": [
+          377,
+          150,
+          470,
+          216
+        ]
+      }
+    },
+    "07-mouth_open-both-eyes-closed": {
+      "expressions": [
+        "eye_l_closed-B",
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 2704,
+        "bbox": [
+          377,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 2204,
+        "bbox": [
+          377,
+          150,
+          470,
+          216
+        ]
+      }
+    },
+    "08-eye_l_closed-smile": {
+      "expressions": [
+        "eye_l_closed-B",
+        "mouth_smile-A"
+      ],
+      "cleanZones": [
+        "eye_l",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1669,
+        "bbox": [
+          377,
+          150,
+          443,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1533,
+        "bbox": [
+          377,
+          150,
+          443,
+          216
+        ]
+      }
+    },
+    "09-eye_r_closed-mouth_open": {
+      "expressions": [
+        "eye_r_closed-B",
+        "mouth_open-A"
+      ],
+      "cleanZones": [
+        "eye_r",
+        "mouth"
+      ],
+      "diffFromOriginal": {
+        "changedPixels": 1823,
+        "bbox": [
+          402,
+          149,
+          470,
+          216
+        ]
+      },
+      "diffFromOwnStateBase": {
+        "changedPixels": 1335,
+        "bbox": [
+          403,
+          162,
+          470,
+          216
+        ]
+      }
+    }
+  }
+}
