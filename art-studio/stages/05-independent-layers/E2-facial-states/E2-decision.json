@@ -1,0 +1,143 @@
+{
+  "stage": "E2-facial-states",
+  "document": "user selection of facial state variants",
+  "decidedAt": "2026-11-11",
+  "branch": "arena/02869c32-actual-new-clicker",
+  "baseCommit": "7f74ade09db403fcd5dc26624af3cf093892385d",
+  "authoritative": true,
+  "approvalScope": "appearance of the selected candidates only",
+  "approvalDoesNotInclude": [
+    "integration into the rig, layer-map.json, public/ or the game",
+    "approval of the technical alpha / masking method",
+    "animation readiness, blink timings, loop seams or extreme poses",
+    "clearing or fixing documented defects",
+    "changing slot/state counts or editing PLAN.md",
+    "restoring hidden zones or changing the clean face base",
+    "permission to start the next stage"
+  ],
+  "integrated": false,
+  "rigChanged": false,
+  "faceBaseChanged": false,
+  "hiddenZonesRestored": false,
+  "manualRepaint": false,
+  "slotCountUnchanged": "20 slots / 24 visual states per PLAN.md",
+  "planRenumbered": false,
+  "states": [
+    {
+      "state": "eye_l_closed",
+      "selectedVariant": "B",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "candidate": "candidates/eye_l_closed-B.png",
+      "element": "elements/eye_l_closed-B.png",
+      "candidateSha256": "fb13667b2578230138898a983ec3cb3abe9360d7c6f6823ee5618137e22d3492",
+      "elementSha256": "cb1f664fef87dc78efdee3e0652734c7a36f345e27d15a9a173cc6c65472220c",
+      "agentRecommendation": "A",
+      "seamMeanAbsRgbDiff": 14.92,
+      "registrationAnnulusMSE": 1651.8,
+      "darkInkPixels": "339/494",
+      "knownDefects": [
+        "lashes thinner than the original",
+        "soft extra crease above the lid",
+        "feature centroid shifted -2.31 px in x",
+        "higher surrounding-tone mismatch than variant A"
+      ]
+    },
+    {
+      "state": "eye_r_closed",
+      "selectedVariant": "B",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "candidate": "candidates/eye_r_closed-B.png",
+      "element": "elements/eye_r_closed-B.png",
+      "candidateSha256": "3ce20c6c93b983192e9541fd595a1d84e88242b9a5babf2cdcb2893b9c5a6786",
+      "elementSha256": "60e5d479c3bd4bb6606c6b10fd683a8affbfc3b83501dbfc8fa5d7843deda5a1",
+      "agentRecommendation": "A",
+      "seamMeanAbsRgbDiff": 24.13,
+      "registrationAnnulusMSE": 3389.4,
+      "registrationShiftPx": [-4, -4],
+      "darkInkPixels": "308/732",
+      "knownDefects": [
+        "visible extra light stroke above the lid",
+        "outer winged corner largely lost",
+        "worst seam and worst annulus among all ten candidates",
+        "portrait 992x1075 source lost context when cropped to 4:3",
+        "was flagged as defective and not recommended in E2-CANDIDATE-REVIEW.md"
+      ]
+    },
+    {
+      "state": "mouth_open",
+      "selectedVariant": "A",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "candidate": "candidates/mouth_open-A.png",
+      "element": "elements/mouth_open-A.png",
+      "candidateSha256": "36e3895a41a68303f32ebbb0f67c524e318c31450e12a479f8f4d0ae019f4513",
+      "elementSha256": "966bed5785fafb5c4fc760f8a6fc930848371cea51de2eabcd9bac80207dcb86",
+      "agentRecommendation": "B",
+      "seamMeanAbsRgbDiff": 8.77,
+      "registrationAnnulusMSE": 1013.4,
+      "darkInkPixels": "102/44",
+      "knownDefects": [
+        "mouth opened wider than a soft parted mouth",
+        "large white teeth highlight reads as surprise",
+        "contour denser than the original"
+      ]
+    },
+    {
+      "state": "mouth_smile",
+      "selectedVariant": "A",
+      "status": "appearance-approved, NOT integrated",
+      "createSlot": true,
+      "candidate": "candidates/mouth_smile-A.png",
+      "element": "elements/mouth_smile-A.png",
+      "candidateSha256": "31f97632d50cb6f95a978a1be996525054820ff0c01090ac71a825bb99d4dad5",
+      "elementSha256": "bf0e8cf4dd8999c0bbcbf047f4a3d0732bc5be6d285447bf2d8f98ae0ba7ebc9",
+      "agentRecommendation": "B",
+      "seamMeanAbsRgbDiff": 2.9,
+      "registrationAnnulusMSE": 242.7,
+      "darkInkPixels": "28/44",
+      "knownDefects": [
+        "lip line thinner than the original",
+        "very subtle smile, nearly indistinguishable from neutral at full-body scale"
+      ]
+    },
+    {
+      "state": "mouth_closed",
+      "selectedVariant": "A",
+      "status": "reference only - appearance accepted as a reference, NO separate slot",
+      "createSlot": false,
+      "reason": "nearly duplicates the existing mouth_neutral (slot z16)",
+      "candidate": "candidates/mouth_closed-A.png",
+      "element": "elements/mouth_closed-A.png",
+      "candidateSha256": "c6e53ea2f7b64936d85bfe682c9121e7be244c7fff907bbd2f99872e20d30342",
+      "elementSha256": "afeb1bc724df56ddc9d9dbe947d1aeef49583ab7dd94a510ce16bfd381c9fb00",
+      "agentRecommendation": "A as reference, no new slot",
+      "meanAbsRgbDiffInsideZoneVsNeutral": 4.57,
+      "pixelsChangedMoreThan20Pct": 2.7,
+      "seamMeanAbsRgbDiff": 3.12,
+      "knownDefects": [
+        "near-duplicate of mouth_neutral",
+        "lip line slightly straighter and longer",
+        "zone ellipse includes the nose highlight, which gets slightly redrawn"
+      ]
+    }
+  ],
+  "openTechnicalLimitations": [
+    "AI output has no real alpha channel; transparency is a technical zonePolygon mask",
+    "E1 donor alpha is sparse ink-shaped while selected elements use a solid zone ellipse",
+    "head z13 still contains baked open eyes and neutral mouth; clean face base not restored",
+    "elements follow IMG_4038 manner; render canon IMG_4036/IMG_4037 alignment is deferred to E4",
+    "blink synchronisation, 120-160 ms timings, loop seam, 8 extreme poses not tested",
+    "PLAN.md calls hidden zones E2 and face states E3; folder name kept as E2-facial-states without renumbering",
+    "AI remains forbidden for hair, body, skin, clothes and other hidden zones"
+  ],
+  "historicalDocumentsUnchanged": [
+    "E2-FACIAL-CANDIDATES.md",
+    "E2-CANDIDATE-REVIEW.md",
+    "E2-alignment.json",
+    "E2-alignment-check.json",
+    "E2-final-metrics.json"
+  ],
+  "nextAction": "STOP - wait for separate permission to start the next stage"
+}
