@@ -3,6 +3,7 @@
  * HEROINE-01 rig.  No PixiJS imports here, so Node tests can verify the loop
  * seam and reaction restart rules without a browser.
  */
+import { LEG_POSE } from "./renderConfig.ts";
 
 export const RIG_CANVAS = { width: 848, height: 1264 } as const;
 export const RIG_LOOP_MS = 12_000;
@@ -118,6 +119,8 @@ export interface RigFrame {
   loopMs: number;
   groups: Record<RigGroupId, Transform2D>;
   slots: Record<number, number>;
+  /** Whole-pixel horizontal pose warp for the two one-slot leg meshes. */
+  slotWarp: Record<number, number>;
   underlayAlpha: number;
   expressionTargets: Record<ExpressionStateName, number>;
   blinkClosed: boolean;
@@ -328,10 +331,11 @@ function deg(value: number): number {
  * so frame 0 and frame 12 000 (and every further cycle) are bit-identical.
  *
  * The approved cut-outs have ZERO overlap by construction: each pixel belongs
- * to exactly one of the 20 slots.  Independent motion therefore needs the
- * runtime coverage composite behind them (built in ProductionHeroineRig from
- * the same 20 approved textures).  That composite fills the sub-pixel seams
- * with approved rest pixels instead of the near-black page background.
+ * to exactly one of the 20 slots.  Static non-limb slots are composited behind
+ * the rig at rest; the four animated limb slots are NEVER duplicated there.
+ * A full-body static duplicate made the moving legs look frozen and produced
+ * double shoe/ankle contours.  Each animated limb draws only its own approved
+ * pixels, with a 2px alpha bleed so linear sampling cannot expose black seams.
  *
  * No global scale, no global rotation, no whole-figure stretch.  All breathing
  * is distributed across chest, shoulders, waist, head compensation, hair and
@@ -351,8 +355,14 @@ export function rigFrameAt(
   const hairWave = wave(loopMs, 3_000, 0.9, 1);
   const armL = wave(loopMs, 6_000, 0.35, 1);
   const armR = wave(loopMs, 6_000, 0.35 + Math.PI, 1);
-  const legL = wave(loopMs, 6_000, 1.15, 1);
-  const legR = wave(loopMs, 6_000, 1.15 + Math.PI, 1);
+  // Leg pose is a true bipolar 6s sine (exactly zero at 0 and 12 000 ms),
+  // with a small shared slow sway.  The earlier phase-shifted wave was almost
+  // one-sided: one leg barely reached its outward pose.  This driver gives
+  // each leg a visible max left, rest and max right within one cycle.
+  const legBase = Math.sin((2 * Math.PI * loopMs) / 6_000);
+  const legShared = slow * 0.12;
+  const legL = clamp(legBase + legShared, -1, 1);
+  const legR = clamp(-legBase + legShared, -1, 1);
   const skirt = wave(loopMs, 4_000, 1.25, 1);
 
   // Breathing: chest rises, shoulders follow with a slight left/right delay,
@@ -397,12 +407,21 @@ export function rigFrameAt(
   };
 
   const slots: Record<number, number> = {};
-  for (let z = 1; z <= 20; z += 1) slots[z] = 0;
+  const slotWarp: Record<number, number> = {};
+  for (let z = 1; z <= 20; z += 1) {
+    slots[z] = 0;
+    slotWarp[z] = 0;
+  }
   // Independent pivots come from the approved layer-map `pivotAbsolute`.
   slots[1] = deg(hairWave * 0.25); // back hair left mass
   slots[2] = deg(-hairWave * 0.2); // back hair right mass
-  slots[3] = deg(legL * 0.55); // left leg, hip pivot (370, 675)
-  slots[4] = deg(legR * 0.55); // right leg, hip pivot (478, 675)
+  // Each leg stays ONE approved slot.  A bounded hip rotation plus a graded
+  // knee-area mesh warp makes the pose visible; it is not anatomical knee or
+  // ankle articulation and needs no new art layer or hidden anatomy.
+  slots[3] = deg(legL * LEG_POSE.rotationDeg); // left leg, hip pivot (370, 675)
+  slots[4] = deg(legR * LEG_POSE.rotationDeg); // right leg, hip pivot (478, 675)
+  slotWarp[3] = px(legL * LEG_POSE.warpPx);
+  slotWarp[4] = px(legR * LEG_POSE.warpPx);
   slots[6] = deg(armL * 0.35); // left arm, shoulder pivot (300, 335)
   slots[7] = deg(armR * 0.35); // right arm, shoulder pivot (548, 335)
   slots[11] = deg(skirt * 0.4); // upper skirt inertia
@@ -417,6 +436,7 @@ export function rigFrameAt(
     loopMs,
     groups,
     slots,
+    slotWarp,
     underlayAlpha: 0,
     expressionTargets: expressionTargetsAt(loopMs, override),
     blinkClosed: isBlinkClosed(loopMs),
@@ -497,8 +517,11 @@ export function applyReaction(
   groups.legGroup.y += px(-reaction.body * 0.15);
 
   const slots: Record<number, number> = { ...frame.slots };
+  const slotWarp: Record<number, number> = { ...frame.slotWarp };
   slots[3] = deg((slots[3] ?? 0) + reaction.body * 0.04);
   slots[4] = deg((slots[4] ?? 0) - reaction.body * 0.04);
+  slotWarp[3] = px((slotWarp[3] ?? 0) + reaction.body * 0.25);
+  slotWarp[4] = px((slotWarp[4] ?? 0) - reaction.body * 0.25);
   slots[6] = deg((slots[6] ?? 0) + reaction.armL * 0.08);
   slots[7] = deg((slots[7] ?? 0) + reaction.armR * 0.08);
   slots[11] = deg((slots[11] ?? 0) + reaction.body * 0.06);
@@ -510,6 +533,7 @@ export function applyReaction(
     ...frame,
     groups,
     slots,
+    slotWarp,
     underlayAlpha: 0,
   };
 }

@@ -31,3 +31,8 @@
 `npm test` (включая новые тесты loop seam / reaction restart / expression matrix / bbox внутри face-crop), `npm run lint`, `npm run typecheck`, `npm run build`, HTTP smoke check локального Vite и representative `*.e2b.app` Host, проверка отдачи PNG/TS/JSON, чистый worktree, отдельный commit/push, проверка remote GitHub и сохранности 1041 защищённого art-файла базы BLOCK 1 (все `art-studio/`, кроме обновляемого `PRODUCTION-STATE.json` и новой папки BLOCK 2). Физические iPhone/Android тесты, браузерная эмуляция и Vercel Preview остаются в BLOCK 3.
 
 **Далее — реализация без дополнительного STOP:** пользователь уже дал утверждение начинать BLOCK 2.
+
+
+## 5. Текущий статус после отклонения на физическом iPhone
+
+Последующие явные разрешения пользователя допустили автоматический Vercel Preview и физическую проверку внутри текущего блока; соответствующие запреты разделов 3–4 считаются заменёнными. Production Deployment, PR Merge и ручной `create_deployment` остаются запрещены. Технический PASS не является визуальной приёмкой: три скриншота `IMG_4048.png`, `IMG_4049.png`, `IMG_4050.png` отклонили предыдущий результат. Новые анатомические слои, перерезка одобренных PNG и скрытая анатомия не создавались без отдельного явного разрешения.

@@ -24,14 +24,16 @@ export async function bootstrapGame(): Promise<void> {
     background: "#100b20",
     antialias: true,
     autoDensity: true,
-    // iPhone renders at devicePixelRatio 3. Capping the backing store at 2
-    // forced the browser to stretch the canvas by 1.5x, which broke the thin
+    // iPhone renders at devicePixelRatio 3. Capping the backing store below 3
+    // forced the browser to stretch the canvas, which broke the thin
     // dark line-art into visible black dots. Render at native density instead.
     resolution: Math.min(window.devicePixelRatio || 1, 3),
-    // Rounding vertices to whole pixels keeps the 20 approved cut-out layers
-    // on one sampling grid; without it, sub-pixel drift makes their dark
-    // semi-alpha edges reappear as dots, lines and dark trails.
-    roundPixels: true,
+    // Do not snap rotated/mesh-warped vertices to whole physical pixels.  The
+    // old global snap made the approved one-pixel cut-out contours jump between
+    // sampling grids on iPhone DPR3, breaking them into dots and duplicate
+    // edges.  Native resolution + straight-alpha padded textures + subpixel
+    // transforms keep one continuous contour while the limbs actually move.
+    roundPixels: false,
     resizeTo: host,
     preference: "webgl",
   });

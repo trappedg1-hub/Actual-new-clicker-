@@ -27,8 +27,10 @@ ALLOWED_CHANGED = {
     "src/assets/heroine/README.md",
     "src/heroine/rig/ProductionHeroineRig.ts",
     "src/heroine/rig/animationMath.ts",
+    "src/heroine/rig/renderConfig.ts",
     "src/heroine/rig/heroineAssets.ts",
     "tests/heroineProductionRig.test.ts",
+    "tests/renderedFrames.test.ts",
     STATE,
     f"{B2}/BLOCK-2-PROPOSAL.md",
     f"{B2}/BLOCK-2-REPORT.md",
@@ -217,7 +219,7 @@ def main():
     verification = json.loads((ROOT / f"{B2}/VERIFICATION.json").read_text())
     check(state["block1"]["visualReview"]["awaitingUser"] is False, "stale B1 awaitingUser flag")
     check(state["b13"]["visualApproval"] == "APPROVED_BY_USER", "B1.3 approval overwritten")
-    check(state["block2"]["checks"]["nodeTests"] == 37, "state nodeTests not 37")
+    check(state["block2"]["checks"]["nodeTests"] == 40, "state nodeTests not 40")
     check(state["block2"]["checks"]["protectedArtFilesChanged"] == 0, "state protected count wrong")
     check(state["gates"]["manualVercelPreviewDeployment"] is False, "manual Vercel deployment opened")
     check(state["gates"]["productionDeployment"] is False, "productionDeployment gate opened")
@@ -233,10 +235,10 @@ def main():
         "verification status wrong",
     )
     check(verification["implementation"]["runtimeTextures"] == 35, "runtimeTextures not 35")
-    check(verification["checks"]["nodeTestsPassed"] == 37, "verification tests not 37")
+    check(verification["checks"]["nodeTestsPassed"] == 40, "verification tests not 40")
     # Guard the iPhone visual-defect mitigation in runtime source.
     bootstrap_src = (ROOT / "src/app/bootstrap/bootstrap.ts").read_text()
-    check("roundPixels: true" in bootstrap_src, "renderer pixel snapping missing")
+    check("roundPixels: false" in bootstrap_src, "global pixel snapping not disabled")
     check(
         "Math.min(window.devicePixelRatio || 1, 3)" in bootstrap_src,
         "native resolution cap missing",
@@ -250,15 +252,19 @@ def main():
     check("bodyRoot: identityTransform()" in math_src, "root is not identity-welded")
     check("Math.round(-8 * breath)" not in math_src, "whole-root bounce restored")
     check("armGroupL:" in math_src and "armGroupR:" in math_src, "independent arm groups missing")
-    check("slots[3] = deg(legL * 0.55)" in math_src, "left leg motion missing")
-    check("slots[4] = deg(legR * 0.55)" in math_src, "right leg motion missing")
+    check("slots[3] = deg(legL * LEG_POSE.rotationDeg)" in math_src, "left leg motion missing")
+    check("slotWarp[4] = px(legR * LEG_POSE.warpPx)" in math_src, "right leg row warp missing")
     check("TAP_EXPRESSION_STATES" in math_src, "both-eye tap mapping missing")
-    check("Texture.from(canvas)" in rig_src, "clean runtime coverage composite missing")
+    check("COVERAGE_STATIC_SLOTS" in rig_src, "static-only coverage missing")
+    check("alphaBleedCanvas" in rig_src, "straight-alpha bleed missing")
+    check("MeshGeometry" in rig_src, "leg row-warp mesh missing")
+    check("RUNTIME_TEXTURE.alphaMode" in rig_src, "runtime texture options missing")
     check("ctx.imageSmoothingEnabled = false" in rig_src, "coverage GPU resampling not disabled")
     check("01-eye_l_closed-B" not in rig_src, "one-eye wink mapping restored")
     check("weight: 1," in rig_src, "tap override no longer keeps both eyes dominant")
     check("this.underlay.visible = false" in rig_src, "dotted underlay not hidden")
     results["visualDefectMitigationGuards"] = True
+    results["staticCoverageAndLegMeshGuards"] = True
     results["fullAnimationRestorationGuards"] = True
     results["jsonValid"] = True
     results["stateGatesOk"] = True

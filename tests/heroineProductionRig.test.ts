@@ -40,6 +40,9 @@ function snapshot(frame: RigFrame): unknown {
     slots: Object.fromEntries(
       Object.entries(frame.slots).map(([z, deg]) => [z, round(deg)]),
     ),
+    slotWarp: Object.fromEntries(
+      Object.entries(frame.slotWarp).map(([z, dx]) => [z, round(dx)]),
+    ),
     underlayAlpha: round(frame.underlayAlpha),
     expressionTargets: Object.fromEntries(
       Object.entries(frame.expressionTargets).map(([state, alpha]) => [
@@ -180,6 +183,11 @@ function assertFiniteTransform(frame: RigFrame, label: string): void {
     assert.ok(Number.isFinite(deg), `${label} slot ${z} not finite`);
     assert.ok(Math.abs(deg) <= 3.5, `${label} slot ${z} out of bounds`);
   }
+  for (const [z, dx] of Object.entries(frame.slotWarp)) {
+    assert.ok(Number.isFinite(dx), `${label} slotWarp ${z} not finite`);
+    assert.ok(Number.isInteger(dx), `${label} slotWarp ${z} not integer`);
+    assert.ok(Math.abs(dx) <= 12, `${label} slotWarp ${z} out of bounds`);
+  }
   assert.equal(frame.underlayAlpha, 0, `${label} underlay revived`);
 }
 
@@ -206,6 +214,8 @@ test("BLOCK 2 animation: both arms, both legs, hair, fabric and head really move
     armSlotR: frames.map((f) => f.slots[7] ?? 0),
     legSlotL: frames.map((f) => f.slots[3] ?? 0),
     legSlotR: frames.map((f) => f.slots[4] ?? 0),
+    legWarpL: frames.map((f) => f.slotWarp[3] ?? 0),
+    legWarpR: frames.map((f) => f.slotWarp[4] ?? 0),
     backHairL: frames.map((f) => f.slots[1] ?? 0),
     backHairR: frames.map((f) => f.slots[2] ?? 0),
     sideHairL: frames.map((f) => f.slots[17] ?? 0),
@@ -233,6 +243,17 @@ test("BLOCK 2 animation: both arms, both legs, hair, fabric and head really move
     channels.legSlotL.some((v, i) => v !== channels.legSlotR[i]),
     "left and right legs move identically",
   );
+  assert.ok(
+    channels.legWarpL.some((v, i) => v !== channels.legWarpR[i]),
+    "left and right leg pose warps move identically",
+  );
+  for (const name of ["legSlotL", "legSlotR", "legWarpL", "legWarpR"]) {
+    const values = channels[name];
+    assert.ok(
+      Math.min(...values) < -0.5 && Math.max(...values) > 0.5,
+      `${name} never reaches both sides of the pose`,
+    );
+  }
   assert.ok(
     channels.skirtUpper.some((v, i) => v !== channels.skirtLower[i]),
     "skirt has no counter-motion",
@@ -342,6 +363,19 @@ test("BLOCK 2 animation: tap distributes motion without root lift, scale or rota
       tapped.slots[4],
       idle.slots[4],
       `right leg frozen on ${zone}`,
+    );
+    // A head tap has only body=0.3; its integer knee warp can legitimately
+    // round to the same whole pixel while the hip rotation still changes.
+    // The combined rendered leg pose must move for every zone.
+    assert.ok(
+      tapped.slots[3] !== idle.slots[3] ||
+        tapped.slotWarp[3] !== idle.slotWarp[3],
+      `left leg pose frozen on ${zone}`,
+    );
+    assert.ok(
+      tapped.slots[4] !== idle.slots[4] ||
+        tapped.slotWarp[4] !== idle.slotWarp[4],
+      `right leg pose frozen on ${zone}`,
     );
     const headHeavy = zone === "head" || zone === "hair";
     if (headHeavy) {
