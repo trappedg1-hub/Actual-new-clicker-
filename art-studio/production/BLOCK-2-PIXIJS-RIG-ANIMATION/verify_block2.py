@@ -40,18 +40,6 @@ ALLOWED_CHANGED = {
     f"{B2}/SHA256SUMS.txt",
     f"{B2}/verify_block2.py",
 }
-# 2026-11-12 defect-map evidence sheets (binary, committed alongside DEFECT-MAP.md)
-EVIDENCE_ZONES = [
-    "PHASES_fullbody", "PHASES_hair_crown", "PHASES_face_neck",
-    "PHASES_chest_shoulders", "PHASES_arms_sleeves_L", "PHASES_arms_sleeves_R",
-    "PHASES_belly_skirt", "PHASES_hips_stockings", "PHASES_legs_shoes",
-    "PHASES_hair_sliver_L", "PHASES_hair_sliver_R",
-    "CONSEC_hair_sliver_L", "CONSEC_hair_sliver_R", "CONSEC_chest_shoulders",
-    "CONSEC_belly_skirt", "CONSEC_legs_shoes",
-]
-ALLOWED_CHANGED |= {
-    f"{B2}/evidence-2026-11-12/{zone}.png" for zone in EVIDENCE_ZONES
-}
 
 DOCS_FOR_TEXT_CHECKS = [
     "README.md",

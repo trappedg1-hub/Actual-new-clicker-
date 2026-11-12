@@ -467,7 +467,7 @@
         ]
       }
     },
-    "evidence": "evidence-2026-11-12/ (11 PHASES sheets, 5 CONSEC sheets)",
+    "evidence": "qa-animation/final-verify/sheets/ (workspace, 11 PHASES + 5 CONSEC sheets); raw frames qa-animation/final-verify/",
     "tests": "47/47, tsc=0, eslint=0",
     "approvedPngsModified": false,
     "requiresUserPermission": "optional permanent baking of category-A fixes into layer PNGs (see DEFECT-MAP.md)",
