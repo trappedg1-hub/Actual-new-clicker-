@@ -39,8 +39,13 @@ export const NATURAL_POSE = {
   ankleY: 1210,
   /** Inward stance offset per leg at the ankle, approved art pixels. */
   stanceInwardPx: 105,
-  /** Additional relaxed-knee inward ease on the bounded knee weight. */
-  kneeEaseInwardPx: 10,
+  /**
+   * Relaxed-knee inward ease on the bounded knee weight.  Set to 0 after
+   * user review (2026-11-12): combined with the former smoothstep stance
+   * field the legs read slightly bow-legged; the straightened pose keeps
+   * the legs geometrically straight, so no knee-level ease is applied.
+   */
+  kneeEaseInwardPx: 0,
 } as const;
 
 function clamp01(value: number): number {
@@ -48,16 +53,23 @@ function clamp01(value: number): number {
 }
 
 /**
- * Stance weight: 0 at/above the pinned hip row, smoothstep over the shin,
- * 1 at/below the ankle so the whole foot translates without distortion.
+ * Stance weight: 0 at/above the pinned hip row, LINEAR over the leg, 1
+ * at/below the ankle so the whole foot translates rigidly.
+ *
+ * Linear on purpose (user fix request 2026-11-12, "ноги чуть колесом"):
+ * the original smoothstep profile lagged behind the straight hip-to-ankle
+ * line over the upper shin and overtook it below the knee, which bowed the
+ * displaced leg outward (O-legs).  A linear ramp is an affine shear in y —
+ * straight leg contours stay perfectly straight, and the only angle change
+ * sits at the hip row under the skirt where natural adduction reads
+ * correctly.
  */
 export function poseStanceWeight(y: number): number {
   if (y <= NATURAL_POSE.pinY) return 0;
   if (y >= NATURAL_POSE.ankleY) return 1;
-  const t = clamp01(
+  return clamp01(
     (y - NATURAL_POSE.pinY) / (NATURAL_POSE.ankleY - NATURAL_POSE.pinY),
   );
-  return t * t * (3 - 2 * t);
 }
 
 /**
