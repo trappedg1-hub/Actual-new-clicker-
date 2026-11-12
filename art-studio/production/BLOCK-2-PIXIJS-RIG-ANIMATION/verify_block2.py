@@ -243,9 +243,16 @@ def main():
         state["gates"]["block3NeedsSeparateConsolidatedProposalApproval"] is True,
         "BLOCK 3 gate missing",
     )
+    # 2026-11-12: the user accepted BLOCK 2 on a physical iPhone
+    # ("BLOCK 2 VISUALLY APPROVED"); the status gate reflects the final
+    # acceptance instead of the interim rejected state.
     check(
-        verification["status"] == "TECHNICAL_PASS / NOT_ARTISTICALLY_APPROVED",
+        verification["status"] == "TECHNICAL_PASS / VISUAL_APPROVED",
         "verification status wrong",
+    )
+    check(
+        verification["finalVisualAcceptance"]["result"] == "VISUALLY APPROVED",
+        "final visual acceptance record missing",
     )
     check(verification["implementation"]["runtimeTextures"] == 35, "runtimeTextures not 35")
     check(verification["checks"]["nodeTestsPassed"] == 42, "verification tests not 42")
