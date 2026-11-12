@@ -145,3 +145,58 @@ test("BLOCK 2: approved expression deltas fit inside the face-plate crop", () =>
     );
   }
 });
+
+test("BLOCK 2 fix: every layer stays welded to the root (no relative motion)", () => {
+  const rootKeys = new Set(["bodyRoot"]);
+  for (const timeMs of [0, 500, 1_000, 2_670, 4_000, 8_000, 11_900, 12_000]) {
+    const frame = rigFrameAt(timeMs);
+    for (const [id, t] of Object.entries(frame.groups)) {
+      if (rootKeys.has(id)) continue;
+      assert.equal(t.rotationDeg, 0, `${id} rotated at ${timeMs}`);
+      assert.equal(t.x, 0, `${id} shifted x at ${timeMs}`);
+      assert.equal(t.y, 0, `${id} shifted y at ${timeMs}`);
+      assert.equal(t.scaleX, 1, `${id} scaled x at ${timeMs}`);
+      assert.equal(t.scaleY, 1, `${id} scaled y at ${timeMs}`);
+    }
+    for (const [z, deg] of Object.entries(frame.slots)) {
+      assert.equal(deg, 0, `slot ${z} rotated at ${timeMs}`);
+    }
+    assert.equal(frame.groups.bodyRoot.rotationDeg, 0);
+    // Scaling the root resamples every approved cut-out and turns its thin
+    // dark contour into black speckles. Motion must be an integer translation.
+    assert.equal(frame.groups.bodyRoot.scaleX, 1, `root scaled x at ${timeMs}`);
+    assert.equal(frame.groups.bodyRoot.scaleY, 1, `root scaled y at ${timeMs}`);
+    assert.ok(
+      Number.isInteger(frame.groups.bodyRoot.y),
+      `root y fractional at ${timeMs}`,
+    );
+    assert.equal(frame.underlayAlpha, 0);
+  }
+});
+
+test("BLOCK 2 fix: a tap never separates any layer or revives the dotted underlay", () => {
+  const idle = rigFrameAt(1_000);
+  for (const zone of ["head", "hair", "body", "arms"] as const) {
+    const tapped = applyReaction(idle, triggerReaction(zone));
+    assert.equal(tapped.underlayAlpha, 0, `underlay revived by ${zone}`);
+    for (const [id, t] of Object.entries(tapped.groups)) {
+      if (id === "bodyRoot") continue;
+      assert.deepEqual(
+        t,
+        idle.groups[id as keyof typeof idle.groups],
+        `${id} moved on ${zone}`,
+      );
+    }
+    for (const [z, deg] of Object.entries(tapped.slots)) {
+      assert.equal(deg, idle.slots[Number(z)], `slot ${z} moved on ${zone}`);
+    }
+    assert.equal(tapped.groups.bodyRoot.rotationDeg, 0);
+    assert.equal(tapped.groups.bodyRoot.x, idle.groups.bodyRoot.x);
+    assert.equal(tapped.groups.bodyRoot.scaleX, 1, `root scaled x on ${zone}`);
+    assert.equal(tapped.groups.bodyRoot.scaleY, 1, `root scaled y on ${zone}`);
+    assert.ok(
+      Number.isInteger(tapped.groups.bodyRoot.y),
+      `root y fractional on ${zone}`,
+    );
+  }
+});

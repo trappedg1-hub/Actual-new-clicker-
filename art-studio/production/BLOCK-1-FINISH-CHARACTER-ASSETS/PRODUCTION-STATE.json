@@ -156,8 +156,8 @@
       "previewHostAccepted": true
     },
     "checks": {
-      "nodeTests": 29,
-      "nodeTestsPassed": 29,
+      "nodeTests": 31,
+      "nodeTestsPassed": 31,
       "eslint": true,
       "strictTypecheck": true,
       "viteProductionBuild": true,
@@ -179,7 +179,11 @@
       "worktreeCleanAfterBlock2": true,
       "browserVisualQa": true,
       "physicalDeviceQa": true,
-      "headlessChromiumQa": true
+      "headlessChromiumQa": true,
+      "rendererRoundPixels": true,
+      "nativeResolutionCap": 3,
+      "tapToastDarkStrokeRemoved": true,
+      "integerRootMotionOnly": true
     },
     "documents": {
       "proposal": "../BLOCK-2-PIXIJS-RIG-ANIMATION/BLOCK-2-PROPOSAL.md",
@@ -189,7 +193,7 @@
       "verificationScript": "../BLOCK-2-PIXIJS-RIG-ANIMATION/verify_block2.py"
     },
     "disclosedLimitations": [
-      "no interactive browser execution, browser emulation or physical iPhone/Android testing yet",
+      "headless Chromium WebGL checks were performed locally at devicePixelRatio 3; physical iPhone/Android recheck after the latest fix is still pending",
       "no Vercel Preview until BLOCK 3",
       "technical PASS is not artistic approval",
       "10 flattened E2-V2 state references are loaded as approved full-frame PNGs; a rounded face mask isolates only face pixels at runtime, so their purple background never enters the transparent rig",
@@ -201,6 +205,8 @@
       "performedOnPhysicalIPhone": true,
       "result": "REJECTED",
       "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
+      "latestUserStatement": "Уже лучше, но при нажатии появляются точки черные, так же видны линии, когда тапаю на нее, так же при движении частей тела они как бы оставляют черный цвет, исправляй",
+      "latestResult": "IMPROVED_NOT_APPROVED",
       "screenshots": [
         "IMG_4045.png",
         "IMG_4046.png"
@@ -209,17 +215,21 @@
         "dotted ghost contours on hair, hands and legs",
         "left-right sway and separated layer motion",
         "face darkening on tap",
-        "no visible breathing"
+        "no visible breathing",
+        "black dots and lines appearing at the tap point",
+        "dark residue trailing behind moving body parts"
       ],
       "fixApplied": true,
-      "fixScope": "runtime rig code only, no approved art changed"
+      "fixScope": "runtime renderer, rig, scene and feedback code only, no approved art changed"
     },
     "fixNotes": [
       "coverage underlay disabled to remove dotted contours",
-      "bodyRoot rotation removed; breathing moved to visible scaleY and lift",
-      "single shared sway replaces independent per-group waves",
-      "one opaque face plate rendered at a time to stop tap darkening",
-      "tap reactions scaled down"
+      "all 20 slots and 8 child groups welded to identity so no seam can expose the near-black background",
+      "breathing and tap reaction reduced to an integer whole-root translation; root scaling and rotation removed to stop dark contour resampling",
+      "renderer now uses native devicePixelRatio up to 3 and global roundPixels, with per-sprite roundPixels on rig views",
+      "tap reward toasts moved from the touch point into the empty dark band above the artwork; dark stroke replaced by a soft light halo",
+      "long status toasts moved to the empty dark band below the artwork",
+      "one opaque face plate rendered at a time to stop tap darkening"
     ]
   },
   "gates": {

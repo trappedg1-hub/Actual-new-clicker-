@@ -22,6 +22,8 @@ ALLOWED_CHANGED = {
     "README.md",
     "index.html",
     "src/app/scenes/MainScene.ts",
+    "src/app/bootstrap/bootstrap.ts",
+    "src/presentation/pixi/RewardFeedback.ts",
     "src/assets/heroine/README.md",
     "src/heroine/rig/ProductionHeroineRig.ts",
     "src/heroine/rig/animationMath.ts",
@@ -38,6 +40,8 @@ ALLOWED_CHANGED = {
 DOCS_FOR_TEXT_CHECKS = [
     "README.md",
     "index.html",
+    "src/app/bootstrap/bootstrap.ts",
+    "src/presentation/pixi/RewardFeedback.ts",
     "src/assets/heroine/README.md",
     STATE,
     f"{B2}/BLOCK-2-PROPOSAL.md",
@@ -213,7 +217,7 @@ def main():
     verification = json.loads((ROOT / f"{B2}/VERIFICATION.json").read_text())
     check(state["block1"]["visualReview"]["awaitingUser"] is False, "stale B1 awaitingUser flag")
     check(state["b13"]["visualApproval"] == "APPROVED_BY_USER", "B1.3 approval overwritten")
-    check(state["block2"]["checks"]["nodeTests"] == 29, "state nodeTests not 29")
+    check(state["block2"]["checks"]["nodeTests"] == 31, "state nodeTests not 31")
     check(state["block2"]["checks"]["protectedArtFilesChanged"] == 0, "state protected count wrong")
     check(state["gates"]["vercelPreview"] is False, "vercelPreview gate opened")
     check(state["gates"]["productionDeployment"] is False, "productionDeployment gate opened")
@@ -228,7 +232,22 @@ def main():
         "verification status wrong",
     )
     check(verification["implementation"]["runtimeTextures"] == 35, "runtimeTextures not 35")
-    check(verification["checks"]["nodeTestsPassed"] == 29, "verification tests not 29")
+    check(verification["checks"]["nodeTestsPassed"] == 31, "verification tests not 31")
+    # Guard the iPhone visual-defect mitigation in runtime source.
+    bootstrap_src = (ROOT / "src/app/bootstrap/bootstrap.ts").read_text()
+    check("roundPixels: true" in bootstrap_src, "renderer pixel snapping missing")
+    check(
+        "Math.min(window.devicePixelRatio || 1, 3)" in bootstrap_src,
+        "native resolution cap missing",
+    )
+    feedback_src = (ROOT / "src/presentation/pixi/RewardFeedback.ts").read_text()
+    check("#321844" not in feedback_src, "dark tap-toast stroke restored")
+    scene_src = (ROOT / "src/app/scenes/MainScene.ts").read_text()
+    check("rewardToastY" in scene_src, "tap toasts not relocated")
+    math_src = (ROOT / "src/heroine/rig/animationMath.ts").read_text()
+    check("Math.round(-8 * breath)" in math_src, "integer breathing missing")
+    check("scaleY: 1," in math_src, "root scaling restored")
+    results["visualDefectMitigationGuards"] = True
     results["jsonValid"] = True
     results["stateGatesOk"] = True
 

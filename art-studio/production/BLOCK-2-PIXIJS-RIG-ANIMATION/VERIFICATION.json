@@ -6,7 +6,7 @@
   "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
   "featureCommit": "8f5ada9072d8e5db4e792483cbaf335af31dcded",
   "verificationFixCommit": "HEAD_OF_BRANCH_AT_DELIVERY",
-  "verificationFixCommits": 2,
+  "verificationFixCommits": 3,
   "fastForwardOnly": true,
   "commit": "HEAD_OF_BRANCH_AT_DELIVERY",
   "userApproval": {
@@ -65,20 +65,43 @@
       "eye_r_closed_B_translationY": 9
     },
     "runtimeTextures": 35,
+    "renderer": {
+      "resolutionCap": 3,
+      "roundPixels": true,
+      "antialias": true,
+      "autoDensity": true,
+      "preference": "webgl"
+    },
+    "tapFeedback": {
+      "darkStrokeRemoved": true,
+      "haloStroke": "#efe3ff",
+      "toastsRelocatedToDarkBand": true,
+      "verticalDriftPx": 20
+    },
+    "animation": {
+      "rootOnlyIntegerTranslationPx": 8,
+      "rootScale": 1,
+      "nonRootGroupsWelded": true,
+      "underlayAlpha": 0
+    },
     "facePlateBackgroundExcluded": true,
     "newExpressions": 0,
     "newAnatomicalSlots": 0,
     "newArtAssets": 0
   },
   "checks": {
-    "nodeTests": 29,
-    "nodeTestsPassed": 29,
-    "block2Tests": 6,
+    "nodeTests": 31,
+    "nodeTestsPassed": 31,
+    "block2Tests": 8,
     "eslint": true,
     "strictTypecheck": true,
     "viteProductionBuild": true,
+    "rendererRoundPixels": true,
+    "nativeResolutionCap": 3,
+    "tapToastDarkStrokeRemoved": true,
+    "integerRootMotionOnly": true,
     "buildOutput": {
-      "mainJs": "583.63 kB raw / 192.88 kB gzip",
+      "mainJs": "583.04 kB raw / 192.69 kB gzip",
       "inkChunk": "130.05 kB raw / 32.71 kB gzip",
       "warning": "known >500 kB raw-chunk advisory only"
     },
@@ -132,7 +155,7 @@
     }
   },
   "disclosedLimitations": [
-    "No interactive browser execution, browser emulation, physical iPhone/Android testing, touch-behavior verification or IndexedDB-in-browser verification was performed.",
+    "Headless Chromium WebGL checks were performed locally at devicePixelRatio 3; physical iPhone/Android recheck after the latest fix is still pending.",
     "No Vercel Preview/Production, Production Deployment, PR Merge or Vercel API call was made.",
     "Technical PASS is not artistic approval.",
     "The 10 approved E2-V2 state references are flattened RGB PNGs with the original purple background. A rounded face mask isolates only approved face pixels at runtime; no background patch or new expression art is introduced.",
@@ -164,6 +187,8 @@
     "performedOnPhysicalIPhone": true,
     "result": "REJECTED",
     "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
+    "latestUserStatement": "Уже лучше, но при нажатии появляются точки черные, так же видны линии, когда тапаю на нее, так же при движении частей тела они как бы оставляют черный цвет, исправляй",
+    "latestResult": "IMPROVED_NOT_APPROVED",
     "screenshots": [
       "IMG_4045.png",
       "IMG_4046.png"
@@ -172,13 +197,15 @@
       "dotted ghost contours on hair, hands and legs",
       "left-right sway and separated layer motion",
       "face darkening on tap",
-      "no visible breathing"
+      "no visible breathing",
+      "black dots and lines appearing at the tap point",
+      "dark residue trailing behind moving body parts"
     ],
     "fixApplied": true,
-    "fixScope": "runtime rig code only, no approved art changed"
+    "fixScope": "runtime renderer, rig, scene and feedback code only, no approved art changed"
   },
   "fixVerification": {
-    "nodeTestsPassed": 29,
+    "nodeTestsPassed": 31,
     "strictTypecheck": true,
     "eslint": true,
     "productionBuild": true,
@@ -186,6 +213,11 @@
     "jsOrResourceErrors": 0,
     "touchZonesResponding": 4,
     "headlessChromiumIphoneViewport": true,
+    "headlessReadPixelsDpr3": true,
+    "rendererRoundPixels": true,
+    "nativeResolutionCap": 3,
+    "tapToastDarkStrokeRemoved": true,
+    "integerRootMotionOnly": true,
     "physicalIPhoneRecheckPending": true,
     "artisticApproval": false
   }

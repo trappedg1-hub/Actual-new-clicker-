@@ -289,26 +289,29 @@ export function rigFrameAt(
   override: ExpressionOverride | null = null,
 ): RigFrame {
   const loopMs = ((timeMs % RIG_LOOP_MS) + RIG_LOOP_MS) % RIG_LOOP_MS;
-  // Visible breathing: vertical scale + small lift, no left/right body sway.
+  // Breathing lives ONLY on the root and ONLY as a WHOLE-PIXEL translation.
+  // Scaling or rotating the root resamples all 20 approved cut-outs; their
+  // dark semi-alpha contour pixels then break into "black dots" and leave
+  // dark trails on a 3x iPhone screen. Integer motion keeps every layer on the
+  // exact same sampling grid, so no seam can ever expose the near-black page
+  // background and no contour can shimmer.
   const breath = wave(loopMs, 4_000, 0, 1);
-  // One shared, very small sway keeps every layer together instead of peeling apart.
-  const sway = wave(loopMs, 6_000, 0, 0.5);
 
   const groups: Record<RigGroupId, Transform2D> = {
     bodyRoot: {
       ...identityTransform(),
       rotationDeg: 0,
-      y: -8 * breath,
+      y: Math.round(-8 * breath),
       scaleX: 1,
-      scaleY: 1 + 0.018 * breath,
+      scaleY: 1,
     },
-    headGroup: { ...identityTransform(), rotationDeg: sway * 0.6 },
-    backHairGroup: { ...identityTransform(), rotationDeg: sway * 0.8 },
-    frontHairGroup: { ...identityTransform(), rotationDeg: sway * 0.5 },
-    legGroup: { ...identityTransform(), rotationDeg: sway * 0.4 },
-    armGroupL: { ...identityTransform(), rotationDeg: sway * 0.7 },
-    armGroupR: { ...identityTransform(), rotationDeg: sway * 0.7 },
-    outfitGroup: { ...identityTransform(), rotationDeg: sway * 0.5 },
+    headGroup: identityTransform(),
+    backHairGroup: identityTransform(),
+    frontHairGroup: identityTransform(),
+    legGroup: identityTransform(),
+    armGroupL: identityTransform(),
+    armGroupR: identityTransform(),
+    outfitGroup: identityTransform(),
     faceGroup: identityTransform(),
   };
 
@@ -368,30 +371,22 @@ export function applyReaction(
   frame: RigFrame,
   reaction: ReactionState,
 ): RigFrame {
+  // A tap must never peel one layer away from another and must never rescale
+  // the artwork. The only animated channel is a whole-pixel lift of the root,
+  // shared by every layer, so the cut-outs stay welded AND stay on the same
+  // sampling grid. No sub-pixel geometry means no dotted contours, no seam
+  // lines and no dark residue behind moving parts.
+  const energy = reactionEnergy(reaction);
   const groups = {} as Record<RigGroupId, Transform2D>;
   for (const id of Object.keys(frame.groups) as RigGroupId[]) {
     groups[id] = { ...frame.groups[id] };
   }
-  const REACTION_SCALE = 0.25;
-  groups.bodyRoot.rotationDeg += reaction.body * 0.08;
-  groups.bodyRoot.y -= reaction.body * 1.5;
-  groups.headGroup.rotationDeg += reaction.head * REACTION_SCALE;
-  groups.backHairGroup.rotationDeg += reaction.hair * 0.12;
-  groups.frontHairGroup.rotationDeg += reaction.hair * 0.08;
-  groups.armGroupL.rotationDeg += reaction.armL * REACTION_SCALE;
-  groups.armGroupR.rotationDeg += reaction.armR * REACTION_SCALE;
-  groups.legGroup.rotationDeg -= reaction.body * 0.05;
-
-  const slots = { ...frame.slots };
-  slots[17] = (slots[17] ?? 0) + reaction.hair * 0.06;
-  slots[18] = (slots[18] ?? 0) - reaction.hair * 0.06;
-  slots[19] = (slots[19] ?? 0) + reaction.hair * 0.05;
-  slots[20] = (slots[20] ?? 0) - reaction.hair * 0.05;
+  groups.bodyRoot.y -= Math.round(energy * 8);
 
   return {
     ...frame,
     groups,
-    slots,
+    slots: { ...frame.slots },
     underlayAlpha: 0,
   };
 }

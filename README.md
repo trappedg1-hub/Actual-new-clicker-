@@ -60,7 +60,7 @@ HEROINE-01 now uses the approved BLOCK 1 production assets: 20 independent RGBA 
 
 Environment: Node.js `v22.22.3`, npm `10.9.8`.
 
-- `npm run build` — **passed**: Ink compile, 7/7 Node tests, ESLint, strict `tsc --noEmit`, and Vite production build.
+- `npm run build` — **passed**: Ink compile, 31/31 Node tests, ESLint, strict `tsc --noEmit`, and Vite production build.
 - Domain tests cover separate tap currency/affection, frame-rate-independent active income, the eight-hour offline cap, clock rollback/high-water behavior, upgrade affordability/unlock, migration normalization, and Ink choices/state restoration.
 - Vite HTTP smoke check — **passed** for `/`, transformed `/src/main.ts` and `MainScene`, compiled Ink JSON, and `/style.css`; a representative `*.e2b.app` Host was accepted and an unlisted host returned 403.
 - Production dependency audit (`npm audit --omit=dev`) — **0 findings**. Full audit — **7 moderate findings**, all in the development lint/parser dependency chain (`typescript-eslint` / `minimatch`); 0 high and 0 critical. These dev-tool findings remain unresolved.
@@ -72,5 +72,5 @@ Environment: Node.js `v22.22.3`, npm `10.9.8`.
 - `ProductionHeroineRig` replaces the placeholder in `MainScene`; all 20 approved slots keep their `pivotAbsolute` and draw order inside a nested PixiJS hierarchy. Slots 13–16 are hidden because the approved full-frame state plates supply the face.
 - The 10 approved E2-V2 full-frame states are flattened RGB references with the original background. A rounded face mask (`374,98,116,200`, radius `40`) isolates only approved face pixels; no background patch or new expression art is introduced. The 4 approved transparent expression overlays and the `+9 px` right-eye B decision remain preserved in the runtime asset set.
 - Deterministic 12-second idle loop covers breathing, head/hair motion, arms/legs, skirt inertia, blinking and smooth expression cross-fades. Tap reactions restart from fixed impulses and decay without drift.
-- `npm run build` passes: 29/29 Node tests, ESLint, strict `tsc --noEmit`, Vite production build. A Vite dev server is exposed on `0.0.0.0:5173` for the Arena live preview; representative `*.e2b.app` Host and PNG/TS/JSON asset responses return HTTP 200.
+- `npm run build` passes: 31/31 Node tests, ESLint, strict `tsc --noEmit`, Vite production build. A Vite dev server is exposed on `0.0.0.0:5173` for the Arena live preview; representative `*.e2b.app` Host and PNG/TS/JSON asset responses return HTTP 200.
 - No Vercel Preview/Production, Production Deployment, PR Merge, Live2D/Cubism/Spine, Phaser/Unity/Godot, AI art or new expressions. Browser/device visual QA and mobile Vercel Preview remain BLOCK 3 work.

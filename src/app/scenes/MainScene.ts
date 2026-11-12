@@ -47,6 +47,10 @@ export class MainScene extends Container {
   private openingStory = false;
   private screenWidth = 320;
   private screenHeight = 568;
+  /** Empty dark band above the heroine's head, used for reward toasts. */
+  private rewardToastY = 118;
+  /** Empty dark band below the approved artwork, used for long status messages. */
+  private statusToastY = 628;
   private uiAccumulatorMs = 0;
   private autosaveAccumulatorMs = 0;
   private paused = false;
@@ -177,6 +181,18 @@ export class MainScene extends Container {
       this.floatingPanel.resize(8, Math.max(90, heroineCenterY - 44));
       this.interactionHint.position.set(heroineCenterX, areaBottom - 12);
     }
+    // Reward toasts used to spawn exactly at the touch point, on top of the
+    // light hair/skin, with a thick dark outline. On a 3x iPhone that read as
+    // black dots and lines on tap. Keep every toast in the empty dark band
+    // above the approved artwork instead.
+    this.rewardToastY = Math.max(
+      96,
+      heroineCenterY - heroineScale * (1264 / 2) - 34,
+    );
+    this.statusToastY = Math.min(
+      heightSafe - 96,
+      heroineCenterY + heroineScale * (1264 / 2) + 26,
+    );
     this.heroine.position.set(heroineCenterX, heroineCenterY);
     this.heroine.setScaleForViewport(heroineScale);
     // The production rig has no placeholder caption; the method is retained as
@@ -230,15 +246,16 @@ export class MainScene extends Container {
     const outcome = this.session.tap(zone);
     const global = this.heroine.toGlobal({ x: localX, y: localY });
     const previousLevel = outcome.previousLevel;
+    const toastX = Math.max(110, Math.min(this.screenWidth - 110, global.x));
     this.feedback.show(
       `+${outcome.currencyDelta} credits`,
-      global.x,
-      global.y - 8,
+      toastX,
+      this.rewardToastY - 12,
     );
     this.feedback.show(
       `+${outcome.affectionDelta} affection`,
-      global.x,
-      global.y + 18,
+      toastX,
+      this.rewardToastY + 14,
     );
     if (outcome.leveledUp)
       this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
@@ -267,7 +284,7 @@ export class MainScene extends Container {
     this.feedback.show(
       `PASSIVE ${rate.toFixed(2)} / SEC`,
       this.screenWidth / 2,
-      this.screenHeight * 0.42,
+      this.rewardToastY + 14,
       "milestone",
     );
     this.renderState();
@@ -334,7 +351,7 @@ export class MainScene extends Container {
           this.feedback.show(
             `+${result.affectionDelta} AFFECTION`,
             this.screenWidth / 2,
-            this.screenHeight * 0.36,
+            this.rewardToastY + 14,
             "milestone",
           );
         }
@@ -381,7 +398,7 @@ export class MainScene extends Container {
     this.feedback.show(
       message,
       this.screenWidth / 2,
-      Math.max(95, this.screenHeight * 0.28),
+      this.statusToastY,
       "milestone",
     );
   }

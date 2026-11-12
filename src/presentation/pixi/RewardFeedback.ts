@@ -49,12 +49,12 @@ export class RewardFeedback {
       Action.sequence([
         Action.group([
           Action.fadeIn(0.14).easeOut(),
-          Action.moveByY(-24, 0.14).easeOut(),
+          Action.moveByY(-12, 0.14).easeOut(),
         ]),
         Action.waitForDuration(0.35),
         Action.group([
           Action.fadeOut(0.28).easeIn(),
-          Action.moveByY(-16, 0.28).easeIn(),
+          Action.moveByY(-8, 0.28).easeIn(),
         ]),
         Action.run(() => this.release(message)),
       ]),
@@ -85,6 +85,7 @@ export class RewardFeedback {
   private createNode(tone: FeedbackTone): Text {
     const node = new Text({ text: "", style: this.styleFor(tone) });
     node.anchor.set(0.5);
+    node.roundPixels = true;
     node.eventMode = "none";
     node.visible = false;
     return node;
@@ -98,7 +99,11 @@ export class RewardFeedback {
       fontSize: tone === "milestone" ? 18 : 16,
       fontWeight: "700",
       fill: tone === "milestone" ? "#ffd7fa" : "#ffffff",
-      stroke: { color: "#321844", width: 4 },
+      // A dark 4px outline drawn directly on the light hair/skin was read as
+      // "black dots and lines" on tap. A soft light halo keeps the toast
+      // legible on the dark page background without painting dark pixels onto
+      // the approved artwork.
+      stroke: { color: "#efe3ff", width: 2, alpha: 0.55 },
     });
     this.styleCache.set(tone, style);
     return style;

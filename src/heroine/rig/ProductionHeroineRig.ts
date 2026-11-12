@@ -280,6 +280,9 @@ export class ProductionHeroineRig extends Container {
     const underlayTexture = textures.get(UNDERLAY_UNION_URL);
     if (!underlayTexture) throw new Error("Missing UNDERLAY-UNION texture.");
     this.underlay = new Sprite(underlayTexture);
+    // Snap sprite vertices to whole physical pixels. Fractional vertices make
+    // the GPU resample the approved one-pixel dark contours into speckles.
+    this.underlay.roundPixels = true;
     this.underlay.label = "z0 coverage support";
     this.underlay.position.set(0, 0);
     this.underlay.alpha = 0;
@@ -322,6 +325,7 @@ export class ProductionHeroineRig extends Container {
       );
       holder.label = `z${String(slot.z).padStart(2, "0")} ${slot.slot}`;
       const sprite = new Sprite(texture);
+      sprite.roundPixels = true;
       sprite.label = `${slot.slot} art`;
       sprite.position.set(0, 0);
       sprite.eventMode = "none";
@@ -397,6 +401,7 @@ export class ProductionHeroineRig extends Container {
       )
       .fill({ color: 0xffffff, alpha: 1 });
     mask.eventMode = "none";
+    mask.roundPixels = true;
     faceGroup.addChild(mask);
 
     for (const state of EXPRESSION_STATES) {
@@ -413,6 +418,7 @@ export class ProductionHeroineRig extends Container {
         ),
       });
       const sprite = new Sprite(cropped);
+      sprite.roundPixels = true;
       sprite.label = `approved state ${state}`;
       sprite.position.set(FACE_PLATE_RECT.x, FACE_PLATE_RECT.y);
       sprite.alpha = state === "00-neutral" ? 1 : 0;
@@ -459,6 +465,7 @@ export class ProductionHeroineRig extends Container {
     for (const shape of shapes) {
       const g = new Graphics();
       g.label = `touch zone ${shape.zone}`;
+      g.roundPixels = true;
       shape.draw(g);
       g.eventMode = "static";
       g.cursor = "pointer";

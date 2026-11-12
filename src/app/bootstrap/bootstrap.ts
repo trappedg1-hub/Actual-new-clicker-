@@ -24,7 +24,14 @@ export async function bootstrapGame(): Promise<void> {
     background: "#100b20",
     antialias: true,
     autoDensity: true,
-    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    // iPhone renders at devicePixelRatio 3. Capping the backing store at 2
+    // forced the browser to stretch the canvas by 1.5x, which broke the thin
+    // dark line-art into visible black dots. Render at native density instead.
+    resolution: Math.min(window.devicePixelRatio || 1, 3),
+    // Rounding vertices to whole pixels keeps the 20 approved cut-out layers
+    // on one sampling grid; without it, sub-pixel drift makes their dark
+    // semi-alpha edges reappear as dots, lines and dark trails.
+    roundPixels: true,
     resizeTo: host,
     preference: "webgl",
   });
