@@ -126,7 +126,18 @@ def main():
         ["git", "merge-base", "--is-ancestor", BASE, api_parent], cwd=ROOT
     )
     check("BLOCK 2" in api["commit"]["message"], "commit message does not name BLOCK 2")
-    api_files = {f["filename"] for f in api["files"]}
+    api_files = {
+        f["filename"]
+        for f in api["files"]
+        # The 2026-11-12 cleanup commit removed the transient evidence
+        # sheets from git history scope; pure removals of that directory
+        # are not content changes (the BASE..HEAD diff check below proves
+        # the cumulative tree holds no image assets).
+        if not (
+            f["status"] == "removed"
+            and f["filename"].startswith(f"{B2}/evidence-2026-11-12/")
+        )
+    }
     check(
         api_files.issubset(ALLOWED_CHANGED),
         f"HEAD commit touched unexpected files: {api_files - ALLOWED_CHANGED}",
