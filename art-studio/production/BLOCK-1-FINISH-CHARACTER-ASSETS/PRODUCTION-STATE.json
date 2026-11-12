@@ -102,11 +102,11 @@
     "userApprovalStatement": "approved, начинай block 2",
     "startedByUser": true,
     "noSeparateProposalApprovalRequired": true,
-    "status": "VISUAL_REJECTED_CRITICAL_REPAIR_APPLIED_AWAITING_IPHONE_RECHECK",
+    "status": "TECHNICAL_PASS_AND_VISUAL_APPROVED_BY_USER",
     "executionStarted": true,
     "executionCompleted": true,
     "technicalPass": true,
-    "artisticApproval": false,
+    "artisticApproval": true,
     "technicalPassEqualsArtisticApproval": false,
     "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
     "featureCommit": "8f5ada9072d8e5db4e792483cbaf335af31dcded",
@@ -261,7 +261,9 @@
         "no visible leg motion",
         "dotted semi-transparent contours on hair, arms, thighs and shoes",
         "overlapping +5 credits and +1 affection toasts"
-      ]
+      ],
+      "finalResult": "VISUALLY_APPROVED",
+      "finalUserStatement": "BLOCK 2 VISUALLY APPROVED (физический iPhone, 2026-11-12)"
     },
     "fixNotes": [
       "root cause: static full-canvas coverage sprite was added after bodyRoot and covered all animated groups; it is removed entirely",
@@ -284,6 +286,13 @@
       "contextForNextAgent": "Do not restore static full-canvas coverage or rest-pose limb copies; do not call technical PASS visual acceptance; do not start BLOCK 3 or edit approved art without separate consent.",
       "bakedArtifactAttribution": "qa-animation/critical-final/baked_artifact_regions.json",
       "bakedArtifactSourceFileCount": 15
+    },
+    "userFinalAcceptance": {
+      "date": "2026-11-12",
+      "statement": "ФИНАЛЬНАЯ ВИЗУАЛЬНАЯ ПРИЁМКА BLOCK 2 — APPROVED. Дыхание плавное и естественное, движение выглядит хорошо, видимых чёрных точек, разрезов и артефактов между слоями нет, результат устраивает, отдельное движение рук не требуется.",
+      "device": "physical iPhone",
+      "approvedCommit": "1184b0627390501e8a0f90b34657fdbe6f815458",
+      "approvedPreviewDeployment": "dpl_9N82spsaNQ3Ab88ADtSHgCdvj1aH"
     }
   },
   "gates": {
@@ -302,8 +311,8 @@
     "originalsModified": false,
     "approvedArtAssetsModified": false,
     "block2Started": true,
-    "block2Completed": false,
-    "block2ArtisticallyAccepted": false,
+    "block2Completed": true,
+    "block2ArtisticallyAccepted": true,
     "block2NeedsSeparateConsolidatedProposalApproval": false,
     "block3Started": false,
     "block3NeedsSeparateConsolidatedProposalApproval": true,
@@ -314,7 +323,8 @@
     "noNewExpressions": true,
     "noNewAnatomicalSlots": true,
     "noAtlas": true,
-    "physicalIPhoneAutomaticAccess": false
+    "physicalIPhoneAutomaticAccess": false,
+    "block2AnimationFrozen": true
   },
   "documents": {
     "proposal": "BLOCK-1-PROPOSAL.md",

@@ -1,6 +1,6 @@
 {
   "stage": "BLOCK 2 / PIXIJS RIG + ANIMATION",
-  "status": "TECHNICAL_PASS / NOT_ARTISTICALLY_APPROVED",
+  "status": "TECHNICAL_PASS / VISUAL_APPROVED",
   "branch": "arena/02869c32-actual-new-clicker",
   "baseMain": "371bd6a1603069f528b8e0aa4789dafa95f07852",
   "parentCommit": "54a876287ec6053a5681c3cf68aeffa6278c5901",
@@ -402,7 +402,7 @@
       "CRITICAL_SOURCE_ARTIFACTS_EXTRA.png"
     ]
   },
-  "result": "BLOCK2_EXTERNAL_VALIDATION_OK_AFTER_CRITICAL_REPAIR_AWAITING_IPHONE",
+  "result": "BLOCK2_APPROVED_BY_USER_ON_PHYSICAL_IPHONE",
   "artifactRepair": {
     "trigger": "IMG_4053/4054/4055.png — physical iPhone: animation smooth and overlap fixed, but black dots/cut lines rejected",
     "confirmedRuntimeCauses": [
@@ -471,6 +471,17 @@
     "tests": "47/47, tsc=0, eslint=0",
     "approvedPngsModified": false,
     "requiresUserPermission": "optional permanent baking of category-A fixes into layer PNGs (see DEFECT-MAP.md)",
-    "status": "REJECTED / NOT ARTISTICALLY APPROVED pending physical iPhone recheck"
+    "status": "TECHNICAL_PASS / VISUAL_APPROVED (accepted by user on physical iPhone, 2026-11-12)"
+  },
+  "finalVisualAcceptance": {
+    "date": "2026-11-12",
+    "performedOnPhysicalIPhone": true,
+    "result": "VISUALLY APPROVED",
+    "userStatement": "Дыхание героини работает плавно и естественно. Движение выглядит хорошо. Видимых чёрных точек, разрезов и артефактов между слоями больше нет. Текущий результат меня устраивает. Отдельное движение рук на данном этапе не требуется. МОЁ РЕШЕНИЕ: BLOCK 2 VISUALLY APPROVED.",
+    "approvedPreviewCommit": "1184b0627390501e8a0f90b34657fdbe6f815458",
+    "approvedPreviewDeployment": "dpl_9N82spsaNQ3Ab88ADtSHgCdvj1aH",
+    "approvedPreviewUrl": "https://actual-new-clicker-heroine01-kuh5l8f7z-trappedg1-hub.vercel.app",
+    "separateArmMotionRequired": false,
+    "workingImagesAnimationRigFrozen": true
   }
 }
