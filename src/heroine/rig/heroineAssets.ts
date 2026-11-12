@@ -42,6 +42,10 @@ import expr0Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-AS
 import expr1Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-eye_r_closed-B.png?url";
 import expr2Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_open-A.png?url";
 import expr3Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_smile-A.png?url";
+import naturalHairBackUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-hair-back.png?url";
+import naturalBlouseUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-blouse.png?url";
+import naturalArmLUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-l.png?url";
+import naturalArmRUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-r.png?url";
 
 export interface SlotDefinition {
   z: number;
@@ -126,6 +130,21 @@ export const EXPRESSION_OVERLAY_URLS: Readonly<Record<ExpressionName, string>> =
  * runtime cache even though the 10 state plates directly encode their B/B/A/A
  * decisions and the approved right-eye +9 px registration.
  */
+/**
+ * BLOCK C natural-pose overlays (user-approved variant B, 2026-11-12):
+ * relaxed arms with hanging sleeves cut from the approved-identity variant-B
+ * render, the full repainted back hair behind the new arm positions and a
+ * blouse copy with the old outward sleeves cleared.  Loaded ONLY in the
+ * natural pose; `?pose=classic` never requests these URLs and keeps the
+ * accepted BLOCK 2 build byte-identical.
+ */
+export const NATURAL_POSE_URLS = {
+  hairBack: naturalHairBackUrl,
+  blouse: naturalBlouseUrl,
+  armL: naturalArmLUrl,
+  armR: naturalArmRUrl,
+} as const;
+
 export const ALL_RUNTIME_TEXTURE_URLS: readonly string[] = [
   UNDERLAY_UNION_URL,
   ...Object.values(LAYER_URLS),

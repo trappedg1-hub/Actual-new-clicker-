@@ -49,6 +49,7 @@ import {
   ORIGINAL_ART_URL,
   EXPRESSION_OVERLAY_URLS,
   LAYER_URLS,
+  NATURAL_POSE_URLS,
   SLOT_DEFINITIONS,
   STATE_PLATE_URLS,
   SWITCH_MATRIX,
@@ -476,6 +477,12 @@ export class ProductionHeroineRig extends Container {
    * of frontHairGroup and the side locks inside headGroup.
    */
   private readonly eyePatchPlates = new Map<ExpressionStateName, Sprite>();
+  /**
+   * BLOCK C: holder for the natural-pose relaxed arms (variant B), parented
+   * between outfitGroup and headGroup so the hands rest in front of the
+   * skirt edge as painted.  Stays empty in the classic variant.
+   */
+  private readonly naturalArmsGroup = new Container();
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
   private loadingText: Text | null = null;
@@ -588,17 +595,36 @@ export class ProductionHeroineRig extends Container {
     };
   }
 
+  /**
+   * Layer URL for one slot in the active pose variant.  The natural pose
+   * (BLOCK C, user-approved arm variant B) swaps ONLY the blouse: the copy
+   * with the old outward sleeves cleared.  No approved PNG changes on disk
+   * and `?pose=classic` resolves every slot to the approved BLOCK 1 file.
+   */
+  private layerUrlForSlot(z: number): string | undefined {
+    if (this.poseVariant === "natural" && z === 8) {
+      return NATURAL_POSE_URLS.blouse;
+    }
+    return LAYER_URLS[z];
+  }
+
   private async loadAssets(): Promise<void> {
     try {
+      const urls = [
+        ...ALL_RUNTIME_TEXTURE_URLS,
+        ...(this.poseVariant === "natural"
+          ? Object.values(NATURAL_POSE_URLS)
+          : []),
+      ];
       const entries: Array<readonly [string, Texture]> = await Promise.all(
-        ALL_RUNTIME_TEXTURE_URLS.map(
+        urls.map(
           async (url): Promise<readonly [string, Texture]> =>
             [url, await Assets.load<Texture>(url)] as const,
         ),
       );
       const textures = new Map<string, Texture>(entries);
       const straightSlotPixels = await decodeStraightSlotPixels([
-        ...SLOT_DEFINITIONS.map((slot) => LAYER_URLS[slot.z]).filter(
+        ...SLOT_DEFINITIONS.map((slot) => this.layerUrlForSlot(slot.z)).filter(
           (url): url is string => typeof url === "string",
         ),
         // Approved pre-separation original: read-only restoration source
@@ -677,6 +703,7 @@ export class ProductionHeroineRig extends Container {
       this.groups.armGroupL,
       this.groups.armGroupR,
       this.groups.outfitGroup,
+      this.naturalArmsGroup,
       this.groups.headGroup,
     );
     this.groups.headGroup.addChild(
@@ -686,7 +713,7 @@ export class ProductionHeroineRig extends Container {
     this.addChild(bodyRoot);
 
     for (const slot of SLOT_DEFINITIONS) {
-      const url = LAYER_URLS[slot.z];
+      const url = this.layerUrlForSlot(slot.z);
       const original = url ? textures.get(url) : undefined;
       if (!url || !original)
         throw new Error(`Missing RGBA slot z${slot.z}: ${slot.slot}.`);
@@ -725,9 +752,46 @@ export class ProductionHeroineRig extends Container {
       this.parentSlot(holder, slot);
     }
 
+    this.buildNaturalPoseOverlays(textures);
     this.buildFacePlates(textures);
     this.assertVisibleSlotGraph();
     this.buildHitZones();
+  }
+
+  /**
+   * BLOCK C natural-pose overlays (user-approved arm variant B).  The
+   * approved splayed arms (z06/z07) and the approved back hair (z01/z02) are
+   * hidden in the natural variant and replaced by cuts from the registered
+   * variant-B render: the full repainted back hair (inside backHairGroup,
+   * behind legs/torso exactly like the approved hair) and the two relaxed
+   * arms with hanging sleeves (above the outfit, so the hands rest in front
+   * of the skirt edge as painted).  Classic builds none of this.
+   */
+  private buildNaturalPoseOverlays(textures: Map<string, Texture>): void {
+    if (this.poseVariant !== "natural") return;
+    const hairTexture = textures.get(NATURAL_POSE_URLS.hairBack);
+    const armLTexture = textures.get(NATURAL_POSE_URLS.armL);
+    const armRTexture = textures.get(NATURAL_POSE_URLS.armR);
+    if (!hairTexture || !armLTexture || !armRTexture) {
+      throw new Error("Missing natural-pose overlay textures.");
+    }
+    const hair = new Sprite(hairTexture);
+    hair.roundPixels = false;
+    hair.label = "natural back hair (variant B)";
+    hair.position.set(0, 0);
+    hair.eventMode = "none";
+    this.groups.backHairGroup.addChild(hair);
+    for (const [label, texture] of [
+      ["natural arm L (variant B)", armLTexture],
+      ["natural arm R (variant B)", armRTexture],
+    ] as const) {
+      const sprite = new Sprite(texture);
+      sprite.roundPixels = false;
+      sprite.label = label;
+      sprite.position.set(0, 0);
+      sprite.eventMode = "none";
+      this.naturalArmsGroup.addChild(sprite);
+    }
   }
 
   private createLegMesh(
@@ -927,6 +991,12 @@ export class ProductionHeroineRig extends Container {
    */
   private assertVisibleSlotGraph(): void {
     const hidden = new Set<number>(HIDDEN_FACE_BASE_SLOTS);
+    if (this.poseVariant === "natural") {
+      // BLOCK C: the approved splayed arms and the approved back hair are
+      // replaced by the user-approved variant-B overlays in the natural
+      // pose.  Classic keeps every approved slot visible.
+      hidden.add(1).add(2).add(6).add(7);
+    }
     for (const [z, holder] of this.slotContainers) {
       holder.visible = !hidden.has(z);
     }
@@ -1085,8 +1155,17 @@ export class ProductionHeroineRig extends Container {
       {
         zone: "arms",
         draw: (g) => {
-          filledRect(g, 95, 315, 220, 350);
-          filledRect(g, 533, 315, 220, 350);
+          if (this.poseVariant === "natural") {
+            // BLOCK C: the relaxed variant-B arms hang along the body
+            // (measured art bounds L x216-392, R x452-640, y318-790), so
+            // the touch zones follow them.  Classic keeps the accepted
+            // zones over the approved splayed arms.
+            filledRect(g, 205, 320, 165, 465);
+            filledRect(g, 478, 320, 165, 465);
+          } else {
+            filledRect(g, 95, 315, 220, 350);
+            filledRect(g, 533, 315, 220, 350);
+          }
         },
       },
       {
