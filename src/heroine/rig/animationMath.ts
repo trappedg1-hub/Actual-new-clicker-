@@ -62,6 +62,33 @@ export const EXPRESSION_COMBOS: Record<
   "09-eye_r_closed-mouth_open": ["eye_r_closed-B", "mouth_open-A"],
 };
 
+/**
+ * Tap reactions must switch BOTH eyes together.  The earlier head mapping used
+ * `01-eye_l_closed-B` (a one-eye wink), which is why a tap closed only one eye.
+ * Auto-blink keeps its own `blinkStateFor()` path unchanged.
+ */
+export const TAP_EXPRESSION_STATES: Record<TouchZone, ExpressionStateName> = {
+  head: "05-both-eyes-closed",
+  hair: "06-both-eyes-closed-smile",
+  body: "07-mouth_open-both-eyes-closed",
+  arms: "05-both-eyes-closed",
+};
+
+export function dominantExpressionState(
+  targets: Record<ExpressionStateName, number>,
+): ExpressionStateName {
+  let best: ExpressionStateName = "00-neutral";
+  let bestAlpha = -1;
+  for (const state of EXPRESSION_STATES) {
+    const alpha = targets[state] ?? 0;
+    if (alpha > bestAlpha) {
+      bestAlpha = alpha;
+      best = state;
+    }
+  }
+  return best;
+}
+
 export type RigGroupId =
   | "bodyRoot"
   | "headGroup"
@@ -284,39 +311,106 @@ export function isBlinkClosed(timeMs: number): boolean {
   );
 }
 
+/** Quantize a translation to whole art pixels: no sub-pixel GPU resampling. */
+function px(value: number): number {
+  // `+ 0` normalizes -0 so snapshot equality is exact across cycles.
+  return Math.round(value) + 0;
+}
+
+/** Small bounded rotation in degrees; translation stays integer-only. */
+function deg(value: number): number {
+  // `+ 0` normalizes -0 before clamping; rotations are bounded to +/-3 deg.
+  return clamp(value + 0, -3, 3);
+}
+
+/**
+ * Full idle pose.  The master loop is 12 000 ms; every period below divides it,
+ * so frame 0 and frame 12 000 (and every further cycle) are bit-identical.
+ *
+ * The approved cut-outs have ZERO overlap by construction: each pixel belongs
+ * to exactly one of the 20 slots.  Independent motion therefore needs the
+ * runtime coverage composite behind them (built in ProductionHeroineRig from
+ * the same 20 approved textures).  That composite fills the sub-pixel seams
+ * with approved rest pixels instead of the near-black page background.
+ *
+ * No global scale, no global rotation, no whole-figure stretch.  All breathing
+ * is distributed across chest, shoulders, waist, head compensation, hair and
+ * fabric inertia.  Every translation is an integer; rotations are tiny and
+ * happen around each slot's own approved pivot.
+ */
 export function rigFrameAt(
   timeMs: number,
   override: ExpressionOverride | null = null,
 ): RigFrame {
   const loopMs = ((timeMs % RIG_LOOP_MS) + RIG_LOOP_MS) % RIG_LOOP_MS;
-  // Breathing lives ONLY on the root and ONLY as a WHOLE-PIXEL translation.
-  // Scaling or rotating the root resamples all 20 approved cut-outs; their
-  // dark semi-alpha contour pixels then break into "black dots" and leave
-  // dark trails on a 3x iPhone screen. Integer motion keeps every layer on the
-  // exact same sampling grid, so no seam can ever expose the near-black page
-  // background and no contour can shimmer.
-  const breath = wave(loopMs, 4_000, 0, 1);
+
+  // Shared drivers.  Different phases keep limbs independent but phase-locked
+  // to the same breath, so the pose always returns to rest without drift.
+  const breath = wave(loopMs, 4_000, 0, 1); // -1 .. 1, seamless
+  const slow = wave(loopMs, 12_000, 0.6, 1);
+  const hairWave = wave(loopMs, 3_000, 0.9, 1);
+  const armL = wave(loopMs, 6_000, 0.35, 1);
+  const armR = wave(loopMs, 6_000, 0.35 + Math.PI, 1);
+  const legL = wave(loopMs, 6_000, 1.15, 1);
+  const legR = wave(loopMs, 6_000, 1.15 + Math.PI, 1);
+  const skirt = wave(loopMs, 4_000, 1.25, 1);
+
+  // Breathing: chest rises, shoulders follow with a slight left/right delay,
+  // waist/skirt answers in counter-phase, head compensates by 1 px.
+  const chestY = px(breath * 2);
+  const shoulderYL = px(breath + slow * 0.6);
+  const shoulderYR = px(breath - slow * 0.6);
+  const headY = px(-breath);
+  const waistY = px(-breath * 0.5);
+
+  // Hair and fabric lag behind the body (secondary inertia).
+  const backHairY = px(hairWave * 2);
+  const frontHairY = px(wave(loopMs, 3_000, 1.7, 1) * 2);
 
   const groups: Record<RigGroupId, Transform2D> = {
-    bodyRoot: {
+    // The root is welded: no scale, no rotation, no vertical bounce.
+    bodyRoot: identityTransform(),
+    headGroup: { ...identityTransform(), y: headY },
+    backHairGroup: {
       ...identityTransform(),
-      rotationDeg: 0,
-      y: Math.round(-8 * breath),
-      scaleX: 1,
-      scaleY: 1,
+      y: backHairY,
+      rotationDeg: deg(hairWave * 0.35),
     },
-    headGroup: identityTransform(),
-    backHairGroup: identityTransform(),
-    frontHairGroup: identityTransform(),
-    legGroup: identityTransform(),
-    armGroupL: identityTransform(),
-    armGroupR: identityTransform(),
-    outfitGroup: identityTransform(),
+    frontHairGroup: {
+      ...identityTransform(),
+      y: frontHairY,
+      rotationDeg: deg(-hairWave * 0.25),
+    },
+    legGroup: { ...identityTransform(), y: waistY },
+    armGroupL: {
+      ...identityTransform(),
+      y: shoulderYL,
+      rotationDeg: deg(armL * 0.8),
+    },
+    armGroupR: {
+      ...identityTransform(),
+      y: shoulderYR,
+      rotationDeg: deg(armR * 0.8),
+    },
+    outfitGroup: { ...identityTransform(), y: chestY },
     faceGroup: identityTransform(),
   };
 
   const slots: Record<number, number> = {};
   for (let z = 1; z <= 20; z += 1) slots[z] = 0;
+  // Independent pivots come from the approved layer-map `pivotAbsolute`.
+  slots[1] = deg(hairWave * 0.25); // back hair left mass
+  slots[2] = deg(-hairWave * 0.2); // back hair right mass
+  slots[3] = deg(legL * 0.55); // left leg, hip pivot (370, 675)
+  slots[4] = deg(legR * 0.55); // right leg, hip pivot (478, 675)
+  slots[6] = deg(armL * 0.35); // left arm, shoulder pivot (300, 335)
+  slots[7] = deg(armR * 0.35); // right arm, shoulder pivot (548, 335)
+  slots[11] = deg(skirt * 0.4); // upper skirt inertia
+  slots[12] = deg(-skirt * 0.45); // lower skirt counter-sway
+  slots[17] = deg(hairWave * 0.3); // left side lock
+  slots[18] = deg(-hairWave * 0.25); // right side lock
+  slots[19] = deg(hairWave * 0.2); // front fringe 01
+  slots[20] = deg(-hairWave * 0.22); // front fringe 02
 
   return {
     timeMs,
@@ -367,26 +461,55 @@ export function reactionEnergy(reaction: ReactionState): number {
   );
 }
 
+/**
+ * Tap feedback is distributed over the SAME channels as the idle pose instead
+ * of lifting/scaling the whole figure.  The root stays welded; the runtime
+ * coverage composite closes any transient seam.  Integer translations only.
+ */
 export function applyReaction(
   frame: RigFrame,
   reaction: ReactionState,
 ): RigFrame {
-  // A tap must never peel one layer away from another and must never rescale
-  // the artwork. The only animated channel is a whole-pixel lift of the root,
-  // shared by every layer, so the cut-outs stay welded AND stay on the same
-  // sampling grid. No sub-pixel geometry means no dotted contours, no seam
-  // lines and no dark residue behind moving parts.
-  const energy = reactionEnergy(reaction);
   const groups = {} as Record<RigGroupId, Transform2D>;
   for (const id of Object.keys(frame.groups) as RigGroupId[]) {
     groups[id] = { ...frame.groups[id] };
   }
-  groups.bodyRoot.y -= Math.round(energy * 8);
+
+  groups.headGroup.y += px(reaction.head * 0.25);
+  groups.headGroup.rotationDeg = deg(
+    groups.headGroup.rotationDeg + reaction.head * 0.08,
+  );
+  groups.armGroupL.y += px(reaction.armL * 0.18);
+  groups.armGroupR.y += px(reaction.armR * 0.18);
+  groups.armGroupL.rotationDeg = deg(
+    groups.armGroupL.rotationDeg + reaction.armL * 0.18,
+  );
+  groups.armGroupR.rotationDeg = deg(
+    groups.armGroupR.rotationDeg + reaction.armR * 0.18,
+  );
+  groups.backHairGroup.rotationDeg = deg(
+    groups.backHairGroup.rotationDeg + reaction.hair * 0.12,
+  );
+  groups.frontHairGroup.rotationDeg = deg(
+    groups.frontHairGroup.rotationDeg + reaction.hair * 0.08,
+  );
+  groups.outfitGroup.y += px(reaction.body * 0.4);
+  groups.legGroup.y += px(-reaction.body * 0.15);
+
+  const slots: Record<number, number> = { ...frame.slots };
+  slots[3] = deg((slots[3] ?? 0) + reaction.body * 0.04);
+  slots[4] = deg((slots[4] ?? 0) - reaction.body * 0.04);
+  slots[6] = deg((slots[6] ?? 0) + reaction.armL * 0.08);
+  slots[7] = deg((slots[7] ?? 0) + reaction.armR * 0.08);
+  slots[11] = deg((slots[11] ?? 0) + reaction.body * 0.06);
+  slots[12] = deg((slots[12] ?? 0) - reaction.body * 0.06);
+  slots[17] = deg((slots[17] ?? 0) + reaction.hair * 0.05);
+  slots[18] = deg((slots[18] ?? 0) - reaction.hair * 0.05);
 
   return {
     ...frame,
     groups,
-    slots: { ...frame.slots },
+    slots,
     underlayAlpha: 0,
   };
 }

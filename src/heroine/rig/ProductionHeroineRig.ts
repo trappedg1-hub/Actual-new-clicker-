@@ -15,6 +15,7 @@ import {
   EXPRESSION_COMBOS,
   EXPRESSION_STATES,
   FACE_PLATE_RECT,
+  TAP_EXPRESSION_STATES,
   NO_REACTION,
   reactionEnergy,
   RIG_CANVAS,
@@ -52,13 +53,6 @@ const GROUP_PIVOTS: Record<RigGroupId, { x: number; y: number }> = {
   armGroupR: { x: 548, y: 335 },
   outfitGroup: { x: 424, y: 490 },
   faceGroup: { x: 424, y: 180 },
-};
-
-const TOUCH_EXPRESSION: Record<TouchZone, ExpressionStateName> = {
-  head: "01-eye_l_closed-B",
-  hair: "04-mouth_smile-A",
-  body: "03-mouth_open-A",
-  arms: "05-both-eyes-closed",
 };
 
 interface TouchOverride {
@@ -123,6 +117,8 @@ export class ProductionHeroineRig extends Container {
   private readonly facePlates = new Map<ExpressionStateName, Sprite>();
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
+  /** Clean runtime composite of the 20 approved slots; fills motion seams. */
+  private coverage: Sprite | null = null;
   private loadingText: Text | null = null;
   private ready = false;
   private timeMs = 0;
@@ -169,7 +165,7 @@ export class ProductionHeroineRig extends Container {
   reactToTap(zone: HeroineTouchZone): void {
     this.reaction = triggerReaction(zone as TouchZone);
     this.touchOverride = {
-      state: TOUCH_EXPRESSION[zone as TouchZone],
+      state: TAP_EXPRESSION_STATES[zone as TouchZone],
       remainingMs: 900,
       totalMs: 900,
     };
@@ -188,15 +184,12 @@ export class ProductionHeroineRig extends Container {
       if (this.touchOverride.remainingMs <= 0) {
         this.touchOverride = null;
       } else {
+        // One opaque, approved both-eye plate stays dominant for the whole
+        // 900 ms reaction.  A fading weight below 0.5 let the neutral plate
+        // win mid-reaction and made later-zone taps look open-eyed again.
         override = {
           state: this.touchOverride.state,
-          weight: Math.max(
-            0,
-            Math.min(
-              1,
-              this.touchOverride.remainingMs / this.touchOverride.totalMs,
-            ),
-          ),
+          weight: 1,
         };
       }
     }
@@ -289,6 +282,7 @@ export class ProductionHeroineRig extends Container {
     this.underlay.visible = false;
     this.underlay.eventMode = "none";
     this.addChild(this.underlay);
+    this.buildCoverage(textures);
 
     for (const id of Object.keys(GROUP_PIVOTS) as RigGroupId[]) {
       const pivot = GROUP_PIVOTS[id];
@@ -385,6 +379,44 @@ export class ProductionHeroineRig extends Container {
       default:
         throw new Error(`Unexpected slot z${slot.z}.`);
     }
+  }
+
+  /**
+   * Builds a CLEAN coverage support from the 20 approved RGBA slots.
+   *
+   * The slots have zero overlap by construction, so independent limb motion
+   * can open a 1px transparent seam.  The approved UNDERLAY-UNION PNG carried
+   * dotted contour strokes and is kept hidden.  Instead we composite the same
+   * approved layer images into an offscreen canvas at rest, 1:1, in z-order.
+   * This is a deterministic runtime copy of approved pixels only: no AI, no
+   * inpainting, no generative fill, no pixel deletion, no disk art changes.
+   * It sits behind every animated group, so a seam shows approved rest art
+   * rather than the near-black page background.
+   */
+  private buildCoverage(textures: Map<string, Texture>): void {
+    const canvas = document.createElement("canvas");
+    canvas.width = RIG_CANVAS.width;
+    canvas.height = RIG_CANVAS.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("2D context unavailable for coverage composite.");
+    ctx.imageSmoothingEnabled = false;
+    for (let z = 1; z <= 20; z += 1) {
+      const url = LAYER_URLS[z];
+      const texture = url ? textures.get(url) : undefined;
+      if (!texture)
+        throw new Error(`Missing approved slot z${z} for coverage.`);
+      const resource = texture.source.resource as CanvasImageSource;
+      ctx.drawImage(resource, 0, 0);
+    }
+    const coverageTexture = Texture.from(canvas);
+    const sprite = new Sprite(coverageTexture);
+    sprite.roundPixels = true;
+    sprite.label = "runtime approved-pixel coverage composite";
+    sprite.position.set(0, 0);
+    sprite.alpha = 1;
+    sprite.eventMode = "none";
+    this.coverage = sprite;
+    this.addChild(sprite);
   }
 
   private buildFacePlates(textures: Map<string, Texture>): void {
@@ -492,9 +524,11 @@ export class ProductionHeroineRig extends Container {
     for (const [z, holder] of this.slotContainers) {
       holder.rotation = (frame.slots[z] ?? 0) * DEG_TO_RAD;
     }
-    // The coverage underlay carried thin dotted contours; keep it disabled so
-    // taps and idle motion cannot reveal those artifacts on a real device.
+    // The approved dotted UNDERLAY-UNION stays hidden.  The clean runtime
+    // composite of the same 20 approved slots is always visible behind the
+    // animated groups, so independent motion cannot expose the dark page.
     if (this.underlay) this.underlay.visible = false;
+    if (this.coverage) this.coverage.visible = true;
 
     // Render exactly one approved face plate at full opacity. Sequential
     // alpha-blending of several plates let the dark plate background leak

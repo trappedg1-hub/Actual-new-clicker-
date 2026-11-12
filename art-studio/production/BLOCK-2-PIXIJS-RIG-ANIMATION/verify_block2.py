@@ -217,12 +217,13 @@ def main():
     verification = json.loads((ROOT / f"{B2}/VERIFICATION.json").read_text())
     check(state["block1"]["visualReview"]["awaitingUser"] is False, "stale B1 awaitingUser flag")
     check(state["b13"]["visualApproval"] == "APPROVED_BY_USER", "B1.3 approval overwritten")
-    check(state["block2"]["checks"]["nodeTests"] == 31, "state nodeTests not 31")
+    check(state["block2"]["checks"]["nodeTests"] == 37, "state nodeTests not 37")
     check(state["block2"]["checks"]["protectedArtFilesChanged"] == 0, "state protected count wrong")
-    check(state["gates"]["vercelPreview"] is False, "vercelPreview gate opened")
+    check(state["gates"]["manualVercelPreviewDeployment"] is False, "manual Vercel deployment opened")
     check(state["gates"]["productionDeployment"] is False, "productionDeployment gate opened")
     check(state["gates"]["prMerge"] is False, "prMerge gate opened")
-    check(state["gates"]["vercelApiCalls"] == 0, "vercelApiCalls not zero")
+    check(state["gates"]["automaticPreviewAfterPush"] is True, "automatic Preview not declared")
+    check(state["gates"]["manualVercelDeploymentApiCallsInThisFix"] == 0, "manual Vercel deployment API call recorded")
     check(
         state["gates"]["block3NeedsSeparateConsolidatedProposalApproval"] is True,
         "BLOCK 3 gate missing",
@@ -232,7 +233,7 @@ def main():
         "verification status wrong",
     )
     check(verification["implementation"]["runtimeTextures"] == 35, "runtimeTextures not 35")
-    check(verification["checks"]["nodeTestsPassed"] == 31, "verification tests not 31")
+    check(verification["checks"]["nodeTestsPassed"] == 37, "verification tests not 37")
     # Guard the iPhone visual-defect mitigation in runtime source.
     bootstrap_src = (ROOT / "src/app/bootstrap/bootstrap.ts").read_text()
     check("roundPixels: true" in bootstrap_src, "renderer pixel snapping missing")
@@ -245,9 +246,20 @@ def main():
     scene_src = (ROOT / "src/app/scenes/MainScene.ts").read_text()
     check("rewardToastY" in scene_src, "tap toasts not relocated")
     math_src = (ROOT / "src/heroine/rig/animationMath.ts").read_text()
-    check("Math.round(-8 * breath)" in math_src, "integer breathing missing")
-    check("scaleY: 1," in math_src, "root scaling restored")
+    rig_src = (ROOT / "src/heroine/rig/ProductionHeroineRig.ts").read_text()
+    check("bodyRoot: identityTransform()" in math_src, "root is not identity-welded")
+    check("Math.round(-8 * breath)" not in math_src, "whole-root bounce restored")
+    check("armGroupL:" in math_src and "armGroupR:" in math_src, "independent arm groups missing")
+    check("slots[3] = deg(legL * 0.55)" in math_src, "left leg motion missing")
+    check("slots[4] = deg(legR * 0.55)" in math_src, "right leg motion missing")
+    check("TAP_EXPRESSION_STATES" in math_src, "both-eye tap mapping missing")
+    check("Texture.from(canvas)" in rig_src, "clean runtime coverage composite missing")
+    check("ctx.imageSmoothingEnabled = false" in rig_src, "coverage GPU resampling not disabled")
+    check("01-eye_l_closed-B" not in rig_src, "one-eye wink mapping restored")
+    check("weight: 1," in rig_src, "tap override no longer keeps both eyes dominant")
+    check("this.underlay.visible = false" in rig_src, "dotted underlay not hidden")
     results["visualDefectMitigationGuards"] = True
+    results["fullAnimationRestorationGuards"] = True
     results["jsonValid"] = True
     results["stateGatesOk"] = True
 

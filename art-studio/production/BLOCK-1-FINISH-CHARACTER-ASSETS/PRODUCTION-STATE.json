@@ -156,8 +156,8 @@
       "previewHostAccepted": true
     },
     "checks": {
-      "nodeTests": 31,
-      "nodeTestsPassed": 31,
+      "nodeTests": 37,
+      "nodeTestsPassed": 37,
       "eslint": true,
       "strictTypecheck": true,
       "viteProductionBuild": true,
@@ -183,7 +183,16 @@
       "rendererRoundPixels": true,
       "nativeResolutionCap": 3,
       "tapToastDarkStrokeRemoved": true,
-      "integerRootMotionOnly": true
+      "integerRootMotionOnly": false,
+      "rootTransformIdentity": true,
+      "distributedNonRootMotion": true,
+      "armsAnimated": true,
+      "legsAnimated": true,
+      "hairIndependent": true,
+      "breathingDistributed": true,
+      "tapBothEyes": true,
+      "multiCycleNoDrift": true,
+      "cleanCoverageComposite": true
     },
     "documents": {
       "proposal": "../BLOCK-2-PIXIJS-RIG-ANIMATION/BLOCK-2-PROPOSAL.md",
@@ -199,7 +208,8 @@
       "10 flattened E2-V2 state references are loaded as approved full-frame PNGs; a rounded face mask isolates only face pixels at runtime, so their purple background never enters the transparent rig",
       "full-frame state references add roughly 5.4 MB of image payload; no new cropped or derived art assets were generated in BLOCK 2",
       "coverage support may show thin ghost contours at extreme rotations; hidden anatomy is not artistically restored",
-      "published E3 translation proxies are not real rotation or deformation"
+      "published E3 translation proxies are not real rotation or deformation",
+      "only one approved RGBA slot exists per arm and per leg, so elbow/knee articulation cannot be represented without new separately approved layers; current motion is bounded shoulder/hip rotation"
     ],
     "visualReview": {
       "performedOnPhysicalIPhone": true,
@@ -207,6 +217,8 @@
       "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
       "latestUserStatement": "Уже лучше, но при нажатии появляются точки черные, так же видны линии, когда тапаю на нее, так же при движении частей тела они как бы оставляют черный цвет, исправляй",
       "latestResult": "IMPROVED_NOT_APPROVED",
+      "animationRegressionStatement": "После последних исправлений визуальных артефактов появились проблемы с анимацией. Нужна полноценная анимация персонажа, а не неподвижная картинка с небольшим вертикальным смещением.",
+      "animationRegressionResult": "ANIMATION_RESTORED_NOT_APPROVED",
       "screenshots": [
         "IMG_4045.png",
         "IMG_4046.png"
@@ -217,29 +229,34 @@
         "face darkening on tap",
         "no visible breathing",
         "black dots and lines appearing at the tap point",
-        "dark residue trailing behind moving body parts"
+        "dark residue trailing behind moving body parts",
+        "arms and legs frozen in identity after the artifact fix",
+        "breathing reduced to a whole-figure vertical bounce",
+        "tap closed only one eye instead of a coordinated both-eye blink"
       ],
       "fixApplied": true,
-      "fixScope": "runtime renderer, rig, scene and feedback code only, no approved art changed"
+      "fixScope": "runtime renderer, rig, scene, feedback and animation code only, no approved art changed"
     },
     "fixNotes": [
-      "coverage underlay disabled to remove dotted contours",
-      "all 20 slots and 8 child groups welded to identity so no seam can expose the near-black background",
-      "breathing and tap reaction reduced to an integer whole-root translation; root scaling and rotation removed to stop dark contour resampling",
-      "renderer now uses native devicePixelRatio up to 3 and global roundPixels, with per-sprite roundPixels on rig views",
-      "tap reward toasts moved from the touch point into the empty dark band above the artwork; dark stroke replaced by a soft light halo",
-      "long status toasts moved to the empty dark band below the artwork",
-      "one opaque face plate rendered at a time to stop tap darkening"
+      "dotted UNDERLAY-UNION stays hidden; a clean runtime composite of the 20 approved slots fills motion seams with approved rest pixels",
+      "root is welded: no scale, no rotation, no whole-figure bounce; all translations are integer art pixels",
+      "distributed breathing: chest, shoulders, waist counter-motion, head compensation, hair and skirt inertia",
+      "independent arms and legs restored through each slot's approved shoulder/hip pivot; side locks and fringe move independently",
+      "tap reaction distributed over head, arms, legs, hair and fabric instead of lifting the root",
+      "tap expressions mapped to both-eye E2-V2 states; auto-blink path unchanged",
+      "native devicePixelRatio up to 3, global roundPixels, relocated toasts and light toast halo preserved",
+      "one opaque face plate rendered at a time; no new expressions and no approved PNG edits"
     ]
   },
   "gates": {
     "productionDeployment": false,
     "prMerge": false,
-    "vercelPreview": false,
-    "vercelPreviewAllowedOnlyAfter": "BLOCK-3-QA-MOBILE-PREVIEW",
+    "manualVercelPreviewDeployment": false,
+    "automaticPreviewAfterPush": true,
+    "automaticPreviewAuthorization": "explicit-user-request-for-this-BLOCK-2-fix",
     "vercelConnectorEnabled": true,
     "vercelConnectorIsDeploymentAuthorization": false,
-    "vercelApiCalls": 0,
+    "manualVercelDeploymentApiCallsInThisFix": 0,
     "srcChanges": true,
     "publicDistTrackedChanges": false,
     "distIgnored": true,
@@ -247,7 +264,8 @@
     "originalsModified": false,
     "approvedArtAssetsModified": false,
     "block2Started": true,
-    "block2Completed": true,
+    "block2Completed": false,
+    "block2ArtisticallyAccepted": false,
     "block2NeedsSeparateConsolidatedProposalApproval": false,
     "block3Started": false,
     "block3NeedsSeparateConsolidatedProposalApproval": true,
