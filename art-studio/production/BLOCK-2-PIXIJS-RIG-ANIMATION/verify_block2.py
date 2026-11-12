@@ -265,8 +265,12 @@ def main():
     check("bodyRoot: identityTransform()" in math_src, "root is not identity-welded")
     check("Math.round(-8 * breath)" not in math_src, "whole-root bounce restored")
     check("armGroupL:" in math_src and "armGroupR:" in math_src, "independent arm groups missing")
-    check("slots[3] = deg(legL * LEG_POSE.rotationDeg)" in math_src, "left leg motion missing")
+    # 2026-11-12 Category-D weld: hip rotation retired (tore skirt/hip
+    # contours); leg life is the row warp alone, which must stay present.
+    check("slotWarp[3] = px(legL * LEG_POSE.warpPx)" in math_src, "left leg row warp missing")
     check("slotWarp[4] = px(legR * LEG_POSE.warpPx)" in math_src, "right leg row warp missing")
+    check("rotationDeg: 0" in (ROOT / "src/heroine/rig/renderConfig.ts").read_text(), "hip rotation not retired")
+    check("solidifyInteriorHoles" in rig_src, "interior hole repair missing")
     check("TAP_EXPRESSION_STATES" in math_src, "both-eye tap mapping missing")
     check("clampedAnimationDeltaMs" in math_src, "bounded WebKit frame delta missing")
     check("COVERAGE_STATIC_SLOTS" not in rig_src, "topmost static coverage restored")
