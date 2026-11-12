@@ -3,7 +3,7 @@
  * HEROINE-01 rig.  No PixiJS imports here, so Node tests can verify the loop
  * seam and reaction restart rules without a browser.
  */
-import { LEG_POSE } from "./renderConfig.ts";
+import { LEG_POSE, MOTION } from "./renderConfig.ts";
 
 export const RIG_CANVAS = { width: 848, height: 1264 } as const;
 export const RIG_LOOP_MS = 12_000;
@@ -322,8 +322,19 @@ function px(value: number): number {
 
 /** Small bounded rotation in degrees; translation stays integer-only. */
 function deg(value: number): number {
-  // `+ 0` normalizes -0 before clamping; rotations are bounded to +/-3 deg.
-  return clamp(value + 0, -3, 3);
+  // `+ 0` normalizes -0 before clamping; rotations stay below the 3.5 deg
+  // regression limit even after a tap reaction is applied.
+  return clamp(value + 0, -3.5, 3.5);
+}
+
+/**
+ * A delayed WebKit/Safari frame must not teleport the pose. The visible phase
+ * itself is derived from wall-clock time, while reactions and overrides consume
+ * only a bounded delta so they decay smoothly after a long renderer stall.
+ */
+export function clampedAnimationDeltaMs(elapsedMs: number): number {
+  if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return 0;
+  return Math.min(elapsedMs, 100);
 }
 
 /**
@@ -360,22 +371,25 @@ export function rigFrameAt(
   // one-sided: one leg barely reached its outward pose.  This driver gives
   // each leg a visible max left, rest and max right within one cycle.
   const legBase = Math.sin((2 * Math.PI * loopMs) / 6_000);
-  const legShared = slow * 0.12;
+  // The shared sway uses a zero-phase 12s wave so both legs return exactly to
+  // rest at 0, 6 000 and 12 000 ms; the old phase-shifted slow driver left a
+  // visible offset at half cycle once the mobile-scale warp was enlarged.
+  const legShared = wave(loopMs, 12_000, 0, 0.12);
   const legL = clamp(legBase + legShared, -1, 1);
   const legR = clamp(-legBase + legShared, -1, 1);
   const skirt = wave(loopMs, 4_000, 1.25, 1);
 
   // Breathing: chest rises, shoulders follow with a slight left/right delay,
   // waist/skirt answers in counter-phase, head compensates by 1 px.
-  const chestY = px(breath * 2);
-  const shoulderYL = px(breath + slow * 0.6);
-  const shoulderYR = px(breath - slow * 0.6);
-  const headY = px(-breath);
-  const waistY = px(-breath * 0.5);
+  const chestY = px(breath * MOTION.breathingPx);
+  const shoulderYL = px(breath * MOTION.shoulderPx + slow * 2);
+  const shoulderYR = px(breath * MOTION.shoulderPx - slow * 2);
+  const headY = px(-breath * MOTION.headCounterPx);
+  const waistY = px(-breath * MOTION.waistCounterPx);
 
   // Hair and fabric lag behind the body (secondary inertia).
-  const backHairY = px(hairWave * 2);
-  const frontHairY = px(wave(loopMs, 3_000, 1.7, 1) * 2);
+  const backHairY = px(hairWave * MOTION.hairSwayPx);
+  const frontHairY = px(wave(loopMs, 3_000, 1.7, 1) * MOTION.hairLagPx);
 
   const groups: Record<RigGroupId, Transform2D> = {
     // The root is welded: no scale, no rotation, no vertical bounce.
@@ -384,23 +398,23 @@ export function rigFrameAt(
     backHairGroup: {
       ...identityTransform(),
       y: backHairY,
-      rotationDeg: deg(hairWave * 0.35),
+      rotationDeg: deg(hairWave * MOTION.hairGroupRotationDeg),
     },
     frontHairGroup: {
       ...identityTransform(),
       y: frontHairY,
-      rotationDeg: deg(-hairWave * 0.25),
+      rotationDeg: deg(-hairWave * MOTION.hairGroupRotationDeg * 0.75),
     },
     legGroup: { ...identityTransform(), y: waistY },
     armGroupL: {
       ...identityTransform(),
       y: shoulderYL,
-      rotationDeg: deg(armL * 0.8),
+      rotationDeg: deg(armL * MOTION.armGroupRotationDeg),
     },
     armGroupR: {
       ...identityTransform(),
       y: shoulderYR,
-      rotationDeg: deg(armR * 0.8),
+      rotationDeg: deg(armR * MOTION.armGroupRotationDeg),
     },
     outfitGroup: { ...identityTransform(), y: chestY },
     faceGroup: identityTransform(),
@@ -413,8 +427,8 @@ export function rigFrameAt(
     slotWarp[z] = 0;
   }
   // Independent pivots come from the approved layer-map `pivotAbsolute`.
-  slots[1] = deg(hairWave * 0.25); // back hair left mass
-  slots[2] = deg(-hairWave * 0.2); // back hair right mass
+  slots[1] = deg(hairWave * MOTION.hairSlotRotationDeg); // back hair left mass
+  slots[2] = deg(-hairWave * MOTION.hairSlotRotationDeg); // back hair right mass
   // Each leg stays ONE approved slot.  A bounded hip rotation plus a graded
   // knee-area mesh warp makes the pose visible; it is not anatomical knee or
   // ankle articulation and needs no new art layer or hidden anatomy.
@@ -422,14 +436,14 @@ export function rigFrameAt(
   slots[4] = deg(legR * LEG_POSE.rotationDeg); // right leg, hip pivot (478, 675)
   slotWarp[3] = px(legL * LEG_POSE.warpPx);
   slotWarp[4] = px(legR * LEG_POSE.warpPx);
-  slots[6] = deg(armL * 0.35); // left arm, shoulder pivot (300, 335)
-  slots[7] = deg(armR * 0.35); // right arm, shoulder pivot (548, 335)
-  slots[11] = deg(skirt * 0.4); // upper skirt inertia
-  slots[12] = deg(-skirt * 0.45); // lower skirt counter-sway
-  slots[17] = deg(hairWave * 0.3); // left side lock
-  slots[18] = deg(-hairWave * 0.25); // right side lock
-  slots[19] = deg(hairWave * 0.2); // front fringe 01
-  slots[20] = deg(-hairWave * 0.22); // front fringe 02
+  slots[6] = deg(armL * MOTION.armSlotRotationDeg); // left shoulder pivot
+  slots[7] = deg(armR * MOTION.armSlotRotationDeg); // right shoulder pivot
+  slots[11] = deg(skirt * MOTION.skirtRotationDeg); // upper skirt inertia
+  slots[12] = deg(-skirt * MOTION.skirtRotationDeg); // lower skirt counter-sway
+  slots[17] = deg(hairWave * MOTION.hairSlotRotationDeg); // left side lock
+  slots[18] = deg(-hairWave * MOTION.hairSlotRotationDeg); // right side lock
+  slots[19] = deg(hairWave * MOTION.hairSlotRotationDeg * 0.7); // fringe 01
+  slots[20] = deg(-hairWave * MOTION.hairSlotRotationDeg * 0.7); // fringe 02
 
   return {
     timeMs,
@@ -513,15 +527,15 @@ export function applyReaction(
   groups.frontHairGroup.rotationDeg = deg(
     groups.frontHairGroup.rotationDeg + reaction.hair * 0.08,
   );
-  groups.outfitGroup.y += px(reaction.body * 0.4);
+  groups.outfitGroup.y += px(reaction.body * 0.8);
   groups.legGroup.y += px(-reaction.body * 0.15);
 
   const slots: Record<number, number> = { ...frame.slots };
   const slotWarp: Record<number, number> = { ...frame.slotWarp };
-  slots[3] = deg((slots[3] ?? 0) + reaction.body * 0.04);
-  slots[4] = deg((slots[4] ?? 0) - reaction.body * 0.04);
-  slotWarp[3] = px((slotWarp[3] ?? 0) + reaction.body * 0.25);
-  slotWarp[4] = px((slotWarp[4] ?? 0) - reaction.body * 0.25);
+  slots[3] = deg((slots[3] ?? 0) + reaction.body * 0.08);
+  slots[4] = deg((slots[4] ?? 0) - reaction.body * 0.08);
+  slotWarp[3] = px((slotWarp[3] ?? 0) + reaction.body * 0.8);
+  slotWarp[4] = px((slotWarp[4] ?? 0) - reaction.body * 0.8);
   slots[6] = deg((slots[6] ?? 0) + reaction.armL * 0.08);
   slots[7] = deg((slots[7] ?? 0) + reaction.armR * 0.08);
   slots[11] = deg((slots[11] ?? 0) + reaction.body * 0.06);

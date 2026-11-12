@@ -6,8 +6,9 @@ import { RIG_CANVAS, rigFrameAt } from "../src/heroine/rig/animationMath.ts";
 import type { RigFrame } from "../src/heroine/rig/animationMath.ts";
 import {
   ANIMATED_LIMB_SLOTS,
-  COVERAGE_STATIC_SLOTS,
+  HIDDEN_FACE_BASE_SLOTS,
   LEG_POSE,
+  MOTION,
   RUNTIME_TEXTURE,
 } from "../src/heroine/rig/renderConfig.ts";
 
@@ -164,19 +165,13 @@ function changedPixels(a: Uint8Array, b: Uint8Array): number {
   return count;
 }
 
-test("BLOCK 2 render architecture: only static slots are covered, never a rest-pose limb duplicate", () => {
-  const staticSet = new Set<number>(COVERAGE_STATIC_SLOTS);
+test("critical repair render architecture: every visible slot is one animated copy", () => {
   const limbSet = new Set<number>(ANIMATED_LIMB_SLOTS);
-  assert.equal(staticSet.size + limbSet.size, 20);
+  const hiddenFaceSet = new Set<number>(HIDDEN_FACE_BASE_SLOTS);
   assert.equal(limbSet.size, 4);
-  for (const z of ANIMATED_LIMB_SLOTS) {
-    assert.ok(!staticSet.has(z), `animated limb z${z} duplicated in coverage`);
-  }
+  assert.equal(hiddenFaceSet.size, 4);
   for (let z = 1; z <= 20; z += 1) {
-    assert.ok(
-      staticSet.has(z) || limbSet.has(z),
-      `slot z${z} is neither animated nor covered`,
-    );
+    assert.ok(!hiddenFaceSet.has(z) || z >= 13, `unexpected hidden slot z${z}`);
   }
   assert.equal(RUNTIME_TEXTURE.alphaMode, "no-premultiply-alpha");
   assert.equal(RUNTIME_TEXTURE.alphaBleedRadius, 2);
@@ -184,8 +179,22 @@ test("BLOCK 2 render architecture: only static slots are covered, never a rest-p
   assert.equal(LEG_POSE.hipAnchorY, 720);
   assert.equal(LEG_POSE.kneeY, 960);
   assert.equal(LEG_POSE.ankleY, 1210);
-  assert.equal(LEG_POSE.warpPx, 9);
-  assert.equal(LEG_POSE.rotationDeg, 1);
+  assert.equal(LEG_POSE.warpPx, 28);
+  assert.equal(LEG_POSE.rotationDeg, 2.8);
+  assert.ok(MOTION.breathingPx >= 6, "breathing below visible mobile scale");
+  assert.ok(MOTION.hairSwayPx >= 7, "hair inertia below visible mobile scale");
+  const rigSource = readFileSync(
+    "src/heroine/rig/ProductionHeroineRig.ts",
+    "utf8",
+  );
+  assert.ok(
+    !rigSource.includes("this.addChild(sprite)"),
+    "a full-canvas sprite is still added above the animated bodyRoot",
+  );
+  assert.ok(
+    rigSource.includes("this.addChild(bodyRoot)"),
+    "animated bodyRoot missing from final display list",
+  );
 });
 
 test("BLOCK 2 rendered frames: both legs visibly move to both sides and return without drift", () => {
@@ -238,8 +247,8 @@ test("BLOCK 2 rendered frames: both legs visibly move to both sides and return w
     0,
     "right leg second-cycle drift",
   );
-  assert.ok(maxLeft.slotWarp[3] > 5 && maxLeft.slotWarp[4] < -5);
-  assert.ok(maxRight.slotWarp[3] < -5 && maxRight.slotWarp[4] > 5);
+  assert.ok(maxLeft.slotWarp[3] > 20 && maxLeft.slotWarp[4] < -20);
+  assert.ok(maxRight.slotWarp[3] < -20 && maxRight.slotWarp[4] > 20);
 });
 
 test("BLOCK 2 alpha inspection: all 20 approved slots are valid straight RGBA cut-outs", () => {

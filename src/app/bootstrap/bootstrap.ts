@@ -17,6 +17,11 @@ function announceBootError(message: string): void {
 export async function bootstrapGame(): Promise<void> {
   const host = document.getElementById("pixi-container");
   if (!host) throw new Error("Missing #pixi-container mount point.");
+  const qaWindow = window as unknown as {
+    __pixiApp?: Application;
+    __heroineRig?: unknown;
+    __qaFreezeTicker?: boolean;
+  };
 
   registerPixiJSActionsMixin(Container);
   const app = new Application();
@@ -120,41 +125,92 @@ export async function bootstrapGame(): Promise<void> {
     });
   }
 
-  const handleVisibilityChange = (): void => {
-    if (document.visibilityState === "hidden") {
-      scene.setPaused(true);
-      app.ticker.stop();
+  // Safari/WebKit can fire pagehide or a WebKit visibility event without a
+  // subsequent standard visibilitychange.  The old one-way pause left both the
+  // scene and the PixiJS ticker stopped after a bfcache return, which made the
+  // heroine look frozen on a real iPhone.  All wake-up paths now converge on
+  // one idempotent resume; offline progress is applied at most once per
+  // actual background interval.
+  let backgroundedAtMs: number | null = null;
+
+  const saveInBackground = (): void => {
+    void saver
+      .request()
+      .catch((error: unknown) =>
+        console.error("Background save failed", error),
+      );
+  };
+
+  const pauseForBackground = (): void => {
+    backgroundedAtMs ??= Date.now();
+    scene.setPaused(true);
+    app.ticker.stop();
+    saveInBackground();
+  };
+
+  const resumeFromBackground = (): void => {
+    if (document.visibilityState === "hidden") return;
+    if (backgroundedAtMs !== null) {
+      const result = session.resumeOffline(Date.now());
+      scene.applyOfflineProgress(
+        result.currencyAwarded,
+        result.elapsedSeconds,
+        result.clockMovedBackwards,
+      );
+      backgroundedAtMs = null;
       void saver
         .request()
-        .catch((error: unknown) =>
-          console.error("Background save failed", error),
-        );
-      return;
+        .catch((error: unknown) => console.error("Resume save failed", error));
     }
-
-    if (!scene || !app.ticker) return;
-    const result = session.resumeOffline(Date.now());
-    scene.applyOfflineProgress(
-      result.currencyAwarded,
-      result.elapsedSeconds,
-      result.clockMovedBackwards,
-    );
     scene.setPaused(false);
-    app.ticker.start();
-    void saver
-      .request()
-      .catch((error: unknown) => console.error("Resume save failed", error));
+    if (!app.ticker.started) app.ticker.start();
+  };
+
+  const handleVisibilityChange = (): void => {
+    if (document.visibilityState === "hidden") pauseForBackground();
+    else resumeFromBackground();
   };
   document.addEventListener("visibilitychange", handleVisibilityChange);
-  window.addEventListener("pagehide", () => {
-    scene.setPaused(true);
-    void saver
-      .request()
-      .catch((error: unknown) => console.error("Pagehide save failed", error));
+  document.addEventListener(
+    "webkitvisibilitychange",
+    handleVisibilityChange as EventListener,
+  );
+  window.addEventListener("pagehide", pauseForBackground);
+  window.addEventListener("pageshow", resumeFromBackground);
+  window.addEventListener("focus", resumeFromBackground);
+  window.addEventListener("pointerdown", resumeFromBackground, {
+    passive: true,
   });
 
-  // Keep references alive for the current page lifetime and make resize cleanup explicit on unload.
-  window.addEventListener("pagehide", () => resizeObserver.disconnect(), {
-    once: true,
+  // Last-resort watchdog: if a WebKit lifecycle quirk stops the ticker while
+  // the page is visible, restart it on the next animation frame.  It never
+  // advances the economy or the pose itself, so no frame is double-counted.
+  const checkTickerLiveness = (): void => {
+    if (
+      document.visibilityState !== "hidden" &&
+      !qaWindow.__qaFreezeTicker &&
+      !app.ticker.started
+    ) {
+      scene.setPaused(false);
+      app.ticker.start();
+    }
+    window.requestAnimationFrame(checkTickerLiveness);
+  };
+  window.requestAnimationFrame(checkTickerLiveness);
+
+  // A bfcache `pagehide` is not an unload; disconnecting the observer there
+  // would leave the restored page with stale layout on iPhone Safari.
+  window.addEventListener("pagehide", (event) => {
+    if (!(event as PageTransitionEvent).persisted) {
+      resizeObserver.disconnect();
+    }
   });
+
+  // Dev-only QA bridge. Vite tree-shakes this block from the Preview build;
+  // it exposes no runtime handle in production and changes no game behaviour.
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("qa")) {
+    qaWindow.__pixiApp = app;
+    qaWindow.__heroineRig = (scene as unknown as { heroine: unknown }).heroine;
+    qaWindow.__qaFreezeTicker = false;
+  }
 }

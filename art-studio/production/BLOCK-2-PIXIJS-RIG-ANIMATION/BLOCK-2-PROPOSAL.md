@@ -1,3 +1,5 @@
+> **Актуализация после физического отказа `IMG_4052.png`:** разделы below are the original approved scope, not the current renderer implementation. The static coverage composite and animated underlay described in item 6 were removed. Current production draws every visible slot once in its animated group, keeps `UNDERLAY-UNION` fully hidden, resumes the PixiJS ticker on all WebKit lifecycle paths and uses compact cropped runtime textures. The approved assets and architectural boundaries in this proposal remain unchanged.
+
 # BLOCK 2 — PIXIJS RIG + ANIMATION / консолидированное предложение
 
 **Статус:** `APPROVED_BY_USER / EXECUTION_STARTED`.  

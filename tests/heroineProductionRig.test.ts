@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   applyReaction,
+  clampedAnimationDeltaMs,
   decayReaction,
   EXPRESSION_COMBOS,
   EXPRESSION_STATES,
@@ -186,7 +187,7 @@ function assertFiniteTransform(frame: RigFrame, label: string): void {
   for (const [z, dx] of Object.entries(frame.slotWarp)) {
     assert.ok(Number.isFinite(dx), `${label} slotWarp ${z} not finite`);
     assert.ok(Number.isInteger(dx), `${label} slotWarp ${z} not integer`);
-    assert.ok(Math.abs(dx) <= 12, `${label} slotWarp ${z} out of bounds`);
+    assert.ok(Math.abs(dx) <= 32, `${label} slotWarp ${z} out of bounds`);
   }
   assert.equal(frame.underlayAlpha, 0, `${label} underlay revived`);
 }
@@ -419,4 +420,59 @@ test("BLOCK 2 animation: dense transitions stay finite, bounded and drift-free",
       scaleY: 1,
     });
   }
+});
+
+test("critical repair: a suspended WebKit frame cannot teleport the pose", () => {
+  assert.equal(clampedAnimationDeltaMs(16.7), 16.7);
+  assert.equal(clampedAnimationDeltaMs(1_500), 100);
+  assert.equal(clampedAnimationDeltaMs(Number.POSITIVE_INFINITY), 0);
+  assert.equal(clampedAnimationDeltaMs(-1), 0);
+  assert.ok(
+    Math.abs(rigFrameAt(1_500).slots[3] ?? 0) > 1,
+    "mobile-scale leg pose is not visibly larger than the rejected build",
+  );
+});
+
+test("critical repair: lifecycle wake-up paths, one-copy graph and toast lanes exist", () => {
+  const bootstrap = readFileSync("src/app/bootstrap/bootstrap.ts", "utf8");
+  const rig = readFileSync("src/heroine/rig/ProductionHeroineRig.ts", "utf8");
+  const feedback = readFileSync(
+    "src/presentation/pixi/RewardFeedback.ts",
+    "utf8",
+  );
+  for (const wakeUp of [
+    "pageshow",
+    "focus",
+    "webkitvisibilitychange",
+    "pointerdown",
+    "checkTickerLiveness",
+  ]) {
+    assert.ok(bootstrap.includes(wakeUp), `missing wake-up path ${wakeUp}`);
+  }
+  assert.ok(
+    bootstrap.includes("__qaFreezeTicker"),
+    "dev-only deterministic QA bridge missing",
+  );
+  assert.ok(
+    !rig.includes("COVERAGE_STATIC_SLOTS"),
+    "static topmost overlay remains",
+  );
+  assert.ok(
+    !rig.includes("buildCoverage"),
+    "static full-canvas composite remains",
+  );
+  assert.ok(!rig.includes("this.coverage"), "coverage sprite remains");
+  assert.ok(
+    rig.includes("runtimeSlotTexture"),
+    "compact animated slot textures missing",
+  );
+  assert.ok(
+    rig.includes("assertVisibleSlotGraph"),
+    "one-copy graph assertion missing",
+  );
+  assert.ok(feedback.includes("activeLanes"), "toast lane allocator missing");
+  assert.ok(
+    feedback.includes("lane * 28"),
+    "toast lanes do not separate vertically",
+  );
 });

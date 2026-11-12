@@ -13,6 +13,7 @@ import type { FederatedPointerEvent } from "pixi.js";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import {
   applyReaction,
+  clampedAnimationDeltaMs,
   decayReaction,
   EXPRESSION_COMBOS,
   EXPRESSION_STATES,
@@ -44,7 +45,7 @@ import {
 import type { SlotDefinition } from "./heroineAssets.ts";
 import {
   ANIMATED_LIMB_SLOTS,
-  COVERAGE_STATIC_SLOTS,
+  HIDDEN_FACE_BASE_SLOTS,
   LEG_POSE,
   RUNTIME_TEXTURE,
 } from "./renderConfig.ts";
@@ -72,10 +73,24 @@ const LEG_MESH_ROWS = [
   0, 300, 600, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1210, 1264,
 ] as const;
 
+interface RuntimeSlotBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface RuntimeSlotTexture {
+  texture: Texture;
+  bounds: RuntimeSlotBounds;
+}
+
 interface LegMesh {
   geometry: MeshGeometry;
   positions: Float32Array;
   weights: readonly number[];
+  left: number;
+  right: number;
 }
 
 interface TouchOverride {
@@ -133,14 +148,20 @@ function legWarpWeight(y: number): number {
 }
 
 /**
- * Creates a runtime copy of one approved RGBA slot with its fully transparent
- * padding corrected.  The 20 original PNGs are straight RGBA with black RGB in
- * transparent pixels; linear WebGL sampling otherwise mixes that black into
- * thin dark/white contours and produces speckles.  Alpha bleed copies only
- * neighbouring approved edge RGB into alpha=0 padding.  No opaque pixel is
- * changed, no pixel is deleted, no PNG on disk is edited, no new art is drawn.
+ * Creates a compact runtime texture for one approved RGBA slot.
+ *
+ * The 20 original PNGs are straight RGBA with black RGB in transparent pixels;
+ * linear WebGL sampling otherwise mixes that black into thin dark/white
+ * contours.  Alpha bleed copies only neighbouring approved edge RGB into
+ * alpha=0 padding.  The texture is then cropped, with 2px of padded margin, to
+ * that slot's real alpha bounds: full-canvas transparent quads were expensive
+ * enough on a mobile GPU to make the ticker appear frozen.  No approved pixel
+ * is changed, scaled or deleted, no PNG on disk is edited, and no new art is
+ * drawn.  The returned absolute bounds keep every slot pivot/warp unchanged.
  */
-function alphaBleedCanvas(resource: CanvasImageSource): HTMLCanvasElement {
+function runtimeSlotTexture(
+  resource: ApprovedSlotResource,
+): RuntimeSlotTexture {
   const canvas = document.createElement("canvas");
   canvas.width = RIG_CANVAS.width;
   canvas.height = RIG_CANVAS.height;
@@ -152,6 +173,22 @@ function alphaBleedCanvas(resource: CanvasImageSource): HTMLCanvasElement {
   const data = image.data;
   const width = RIG_CANVAS.width;
   const height = RIG_CANVAS.height;
+  let minX: number = width;
+  let minY: number = height;
+  let maxX = 0;
+  let maxY = 0;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      if (data[(y * width + x) * 4 + 3] === 0) continue;
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x + 1 > maxX) maxX = x + 1;
+      if (y + 1 > maxY) maxY = y + 1;
+    }
+  }
+  if (maxX <= minX || maxY <= minY) {
+    throw new Error("Approved slot has no visible pixels.");
+  }
   for (let pass = 0; pass < RUNTIME_TEXTURE.alphaBleedRadius; pass += 1) {
     const previous = new Uint8ClampedArray(data);
     for (let y = 1; y < height - 1; y += 1) {
@@ -185,39 +222,51 @@ function alphaBleedCanvas(resource: CanvasImageSource): HTMLCanvasElement {
     }
   }
   ctx.putImageData(image, 0, 0);
-  return canvas;
-}
 
-function paddedTexture(resource: ApprovedSlotResource): Texture {
-  return Texture.from(
-    {
-      resource: alphaBleedCanvas(resource),
-      alphaMode: RUNTIME_TEXTURE.alphaMode,
-      scaleMode: RUNTIME_TEXTURE.scaleMode,
-      addressMode: RUNTIME_TEXTURE.addressMode,
-    },
-    true,
+  const pad = RUNTIME_TEXTURE.alphaBleedRadius;
+  const x = Math.max(0, minX - pad);
+  const y = Math.max(0, minY - pad);
+  const right = Math.min(width, maxX + pad);
+  const bottom = Math.min(height, maxY + pad);
+  const cropped = document.createElement("canvas");
+  cropped.width = right - x;
+  cropped.height = bottom - y;
+  const cropCtx = cropped.getContext("2d");
+  if (!cropCtx) throw new Error("2D context unavailable for slot crop.");
+  cropCtx.imageSmoothingEnabled = false;
+  cropCtx.drawImage(
+    canvas,
+    x,
+    y,
+    cropped.width,
+    cropped.height,
+    0,
+    0,
+    cropped.width,
+    cropped.height,
   );
-}
-
-function coverageTexture(resource: HTMLCanvasElement): Texture {
-  return Texture.from(
-    {
-      resource,
-      alphaMode: RUNTIME_TEXTURE.alphaMode,
-      scaleMode: RUNTIME_TEXTURE.scaleMode,
-      addressMode: RUNTIME_TEXTURE.addressMode,
-    },
-    true,
-  );
+  return {
+    texture: Texture.from(
+      {
+        resource: cropped,
+        alphaMode: RUNTIME_TEXTURE.alphaMode,
+        scaleMode: RUNTIME_TEXTURE.scaleMode,
+        addressMode: RUNTIME_TEXTURE.addressMode,
+      },
+      true,
+    ),
+    bounds: { x, y, width: cropped.width, height: cropped.height },
+  };
 }
 
 /**
  * Production HEROINE-01 rig built from the 20 approved BLOCK 1 RGBA slots.
  *
- * Static non-limb art is composited once behind the rig.  Animated limbs are
- * intentionally absent from that composite: a rest-pose duplicate of a moving
- * leg looked static and produced double shoe/ankle contours.  Both legs are
+ * Every visible slot is drawn once, by its own animated group.  The previous
+ * full-canvas "coverage" sprite was added AFTER bodyRoot, so it covered the
+ * moving hair, outfit, arms and face plates with an immutable copy: on iPhone
+ * the rig looked frozen even though its transforms changed.  There is no
+ * rest-pose limb duplicate and no topmost static overlay now.  Both legs are
  * one approved slot each, rendered as a bounded hip rotation plus a graded
  * knee-area mesh warp.  This is visible pose motion, not anatomical knee or
  * ankle articulation; separate joints would need new approved art and explicit
@@ -239,8 +288,6 @@ export class ProductionHeroineRig extends Container {
   private readonly facePlates = new Map<ExpressionStateName, Sprite>();
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
-  /** Static approved-pixel support; animated limbs are excluded. */
-  private coverage: Sprite | null = null;
   private loadingText: Text | null = null;
   private ready = false;
   private timeMs = 0;
@@ -295,14 +342,17 @@ export class ProductionHeroineRig extends Container {
 
   update(elapsedMs: number): void {
     if (!this.ready || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
+    // The visible pose uses wall-clock phase; only reaction/override decay is
+    // clamped so a suspended Safari tab does not teleport or drop a tap.
     this.timeMs += elapsedMs;
-    this.reaction = decayReaction(this.reaction, elapsedMs);
+    const animationDeltaMs = clampedAnimationDeltaMs(elapsedMs);
+    this.reaction = decayReaction(this.reaction, animationDeltaMs);
     if (reactionEnergy(this.reaction) < 0.002)
       this.reaction = { ...NO_REACTION };
 
     let override: ExpressionOverride | null = null;
     if (this.touchOverride) {
-      this.touchOverride.remainingMs -= elapsedMs;
+      this.touchOverride.remainingMs -= animationDeltaMs;
       if (this.touchOverride.remainingMs <= 0) {
         this.touchOverride = null;
       } else {
@@ -437,11 +487,11 @@ export class ProductionHeroineRig extends Container {
         slot.pivotAbsolute.y,
       );
       holder.label = `z${String(slot.z).padStart(2, "0")} ${slot.slot}`;
-      const texture = paddedTexture(
+      const { texture, bounds } = runtimeSlotTexture(
         original.source.resource as ApprovedSlotResource,
       );
       if (slot.z === 3 || slot.z === 4) {
-        const leg = this.createLegMesh(texture);
+        const leg = this.createLegMesh(texture, bounds);
         leg.mesh.label = `${slot.slot} pose mesh`;
         holder.addChild(leg.mesh);
         this.legMeshes.set(slot.z, leg.data);
@@ -449,7 +499,7 @@ export class ProductionHeroineRig extends Container {
         const sprite = new Sprite(texture);
         sprite.roundPixels = false;
         sprite.label = `${slot.slot} art`;
-        sprite.position.set(0, 0);
+        sprite.position.set(bounds.x, bounds.y);
         sprite.eventMode = "none";
         holder.addChild(sprite);
       }
@@ -457,25 +507,33 @@ export class ProductionHeroineRig extends Container {
       this.parentSlot(holder, slot);
     }
 
-    this.buildCoverage();
     this.buildFacePlates(textures);
+    this.assertVisibleSlotGraph();
     this.buildHitZones();
   }
 
-  private createLegMesh(texture: Texture): { mesh: Mesh; data: LegMesh } {
-    const width = RIG_CANVAS.width;
-    const height = RIG_CANVAS.height;
-    const rows = LEG_MESH_ROWS;
+  private createLegMesh(
+    texture: Texture,
+    bounds: RuntimeSlotBounds,
+  ): { mesh: Mesh; data: LegMesh } {
+    const left = bounds.x;
+    const right = bounds.x + bounds.width;
+    const bottom = bounds.y + bounds.height;
+    const rows = [
+      bounds.y,
+      ...LEG_MESH_ROWS.filter((y) => y > bounds.y && y < bottom),
+      bottom,
+    ].sort((a, b) => a - b);
     const positions = new Float32Array(rows.length * 4);
     const uvs = new Float32Array(rows.length * 4);
     const indices = new Uint32Array((rows.length - 1) * 6);
     const weights = rows.map(legWarpWeight);
     for (let r = 0; r < rows.length; r += 1) {
       const y = rows[r] ?? 0;
-      const v = y / height;
-      positions[r * 4 + 0] = 0;
+      const v = (y - bounds.y) / bounds.height;
+      positions[r * 4 + 0] = left;
       positions[r * 4 + 1] = y;
-      positions[r * 4 + 2] = width;
+      positions[r * 4 + 2] = right;
       positions[r * 4 + 3] = y;
       uvs[r * 4 + 0] = 0;
       uvs[r * 4 + 1] = v;
@@ -503,7 +561,7 @@ export class ProductionHeroineRig extends Container {
     mesh.position.set(0, 0);
     return {
       mesh,
-      data: { geometry, positions, weights },
+      data: { geometry, positions, weights, left, right },
     };
   }
 
@@ -557,36 +615,15 @@ export class ProductionHeroineRig extends Container {
   }
 
   /**
-   * Builds a static support from the approved slots that do NOT move as
-   * independent limbs.  Slots 3/4 (legs) and 6/7 (arms) are deliberately
-   * excluded: drawing their rest pose underneath the animated copy was the
-   * cause of the frozen-looking legs and double shoe/ankle contours.  The
-   * composite uses the same alpha-padded runtime copies, 1:1, in z-order.
+   * Assert the one-copy display list: hidden base face layers are replaced by
+   * one approved state plate, while every other slot remains visible in its
+   * animated group.  No static full-canvas sprite is added above bodyRoot.
    */
-  private buildCoverage(): void {
-    const canvas = document.createElement("canvas");
-    canvas.width = RIG_CANVAS.width;
-    canvas.height = RIG_CANVAS.height;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("2D context unavailable for coverage composite.");
-    ctx.imageSmoothingEnabled = false;
-    for (const z of COVERAGE_STATIC_SLOTS) {
-      const holder = this.slotContainers.get(z);
-      const view = holder?.children[0] as { texture?: Texture } | undefined;
-      const resource = view?.texture?.source.resource as
-        HTMLCanvasElement | undefined;
-      if (!resource)
-        throw new Error(`Missing alpha-padded slot z${z} for coverage.`);
-      ctx.drawImage(resource, 0, 0);
+  private assertVisibleSlotGraph(): void {
+    const hidden = new Set<number>(HIDDEN_FACE_BASE_SLOTS);
+    for (const [z, holder] of this.slotContainers) {
+      holder.visible = !hidden.has(z);
     }
-    const sprite = new Sprite(coverageTexture(canvas));
-    sprite.roundPixels = false;
-    sprite.label = "static approved-pixel support (no limbs)";
-    sprite.position.set(0, 0);
-    sprite.alpha = 1;
-    sprite.eventMode = "none";
-    this.coverage = sprite;
-    this.addChild(sprite);
   }
 
   private buildFacePlates(textures: Map<string, Texture>): void {
@@ -683,12 +720,11 @@ export class ProductionHeroineRig extends Container {
   }
 
   private applyLegWarp(leg: LegMesh, warpPx: number): void {
-    const { positions, weights, geometry } = leg;
-    const width = RIG_CANVAS.width;
+    const { positions, weights, geometry, left, right } = leg;
     for (let r = 0; r < weights.length; r += 1) {
       const dx = warpPx * (weights[r] ?? 0);
-      positions[r * 4 + 0] = dx;
-      positions[r * 4 + 2] = width + dx;
+      positions[r * 4 + 0] = left + dx;
+      positions[r * 4 + 2] = right + dx;
     }
     geometry.attributes.aPosition!.buffer.update();
   }
@@ -710,10 +746,10 @@ export class ProductionHeroineRig extends Container {
       const leg = this.legMeshes.get(z);
       if (leg) this.applyLegWarp(leg, frame.slotWarp[z] ?? 0);
     }
-    // The approved dotted UNDERLAY-UNION stays hidden.  The support behind
-    // animated groups contains static slots only, never a rest-pose limb copy.
+    // The approved dotted UNDERLAY-UNION stays hidden.  Every visible art
+    // pixel comes from one animated slot or one opaque state plate; no static
+    // rest-pose copy can cover a moving silhouette.
     if (this.underlay) this.underlay.visible = false;
-    if (this.coverage) this.coverage.visible = true;
 
     // Render exactly one approved face plate at full opacity. Sequential
     // alpha-blending of several plates let the dark plate background leak

@@ -24,6 +24,7 @@ const MAX_POOLED = 8;
 export class RewardFeedback {
   private readonly parent: Container;
   private readonly pool: PooledMessage[] = [];
+  private readonly activeLanes = new Map<PooledMessage, number>();
   private readonly styleCache = new Map<FeedbackTone, TextStyle>();
   private readonly releaseTimers = new Set<ReturnType<typeof setTimeout>>();
 
@@ -38,9 +39,17 @@ export class RewardFeedback {
     tone: FeedbackTone = "reward",
   ): void {
     const message = this.take(tone);
+    // Two reward messages from one tap used to land on the same baseline when
+    // a second tap reused a lane.  Assign the first free vertical lane to each
+    // live toast, so credits and affection never overlap each other.
+    const occupied = new Set(this.activeLanes.values());
+    let lane = 0;
+    while (occupied.has(lane)) lane += 1;
+    this.activeLanes.set(message, lane);
     message.node.text = text;
-    message.node.position.set(x, y);
+    message.node.position.set(x, y + lane * 28);
     // A pooled node was faded out by the previous toast; reset it before replaying.
+    message.node.removeAllActions();
     message.node.alpha = 0;
     message.node.visible = true;
     if (message.node.parent !== this.parent) this.parent.addChild(message.node);
@@ -70,6 +79,7 @@ export class RewardFeedback {
   destroy(): void {
     for (const timer of this.releaseTimers) clearTimeout(timer);
     this.releaseTimers.clear();
+    this.activeLanes.clear();
     for (const message of this.pool) message.node.destroy();
     this.pool.length = 0;
     this.styleCache.clear();
@@ -116,6 +126,7 @@ export class RewardFeedback {
    * cleared, otherwise the next toast would inherit a half-finished sequence.
    */
   private release(message: PooledMessage): void {
+    this.activeLanes.delete(message);
     message.node.alpha = 0;
     message.node.visible = false;
     message.node.position.set(0, 0);

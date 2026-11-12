@@ -219,7 +219,7 @@ def main():
     verification = json.loads((ROOT / f"{B2}/VERIFICATION.json").read_text())
     check(state["block1"]["visualReview"]["awaitingUser"] is False, "stale B1 awaitingUser flag")
     check(state["b13"]["visualApproval"] == "APPROVED_BY_USER", "B1.3 approval overwritten")
-    check(state["block2"]["checks"]["nodeTests"] == 40, "state nodeTests not 40")
+    check(state["block2"]["checks"]["nodeTests"] == 42, "state nodeTests not 42")
     check(state["block2"]["checks"]["protectedArtFilesChanged"] == 0, "state protected count wrong")
     check(state["gates"]["manualVercelPreviewDeployment"] is False, "manual Vercel deployment opened")
     check(state["gates"]["productionDeployment"] is False, "productionDeployment gate opened")
@@ -235,7 +235,7 @@ def main():
         "verification status wrong",
     )
     check(verification["implementation"]["runtimeTextures"] == 35, "runtimeTextures not 35")
-    check(verification["checks"]["nodeTestsPassed"] == 40, "verification tests not 40")
+    check(verification["checks"]["nodeTestsPassed"] == 42, "verification tests not 42")
     # Guard the iPhone visual-defect mitigation in runtime source.
     bootstrap_src = (ROOT / "src/app/bootstrap/bootstrap.ts").read_text()
     check("roundPixels: false" in bootstrap_src, "global pixel snapping not disabled")
@@ -255,16 +255,25 @@ def main():
     check("slots[3] = deg(legL * LEG_POSE.rotationDeg)" in math_src, "left leg motion missing")
     check("slotWarp[4] = px(legR * LEG_POSE.warpPx)" in math_src, "right leg row warp missing")
     check("TAP_EXPRESSION_STATES" in math_src, "both-eye tap mapping missing")
-    check("COVERAGE_STATIC_SLOTS" in rig_src, "static-only coverage missing")
-    check("alphaBleedCanvas" in rig_src, "straight-alpha bleed missing")
+    check("clampedAnimationDeltaMs" in math_src, "bounded WebKit frame delta missing")
+    check("COVERAGE_STATIC_SLOTS" not in rig_src, "topmost static coverage restored")
+    check("buildCoverage" not in rig_src, "static full-canvas composite restored")
+    check("this.addChild(sprite)" not in rig_src, "topmost full-canvas sprite restored")
+    check("runtimeSlotTexture" in rig_src, "compact animated slot textures missing")
+    check("assertVisibleSlotGraph" in rig_src, "one-copy display graph assertion missing")
     check("MeshGeometry" in rig_src, "leg row-warp mesh missing")
     check("RUNTIME_TEXTURE.alphaMode" in rig_src, "runtime texture options missing")
-    check("ctx.imageSmoothingEnabled = false" in rig_src, "coverage GPU resampling not disabled")
     check("01-eye_l_closed-B" not in rig_src, "one-eye wink mapping restored")
     check("weight: 1," in rig_src, "tap override no longer keeps both eyes dominant")
     check("this.underlay.visible = false" in rig_src, "dotted underlay not hidden")
+    for wake_up in ["pageshow", "focus", "webkitvisibilitychange", "pointerdown", "checkTickerLiveness"]:
+        check(wake_up in bootstrap_src, f"missing WebKit wake-up path: {wake_up}")
+    check("activeLanes" in feedback_src, "toast lane allocator missing")
+    check("lane * 28" in feedback_src, "toast lanes do not separate vertically")
     results["visualDefectMitigationGuards"] = True
-    results["staticCoverageAndLegMeshGuards"] = True
+    results["singleCopyAnimatedGraphAndLegMeshGuards"] = True
+    results["lifecycleResumeGuards"] = True
+    results["toastLanesNonOverlapping"] = True
     results["fullAnimationRestorationGuards"] = True
     results["jsonValid"] = True
     results["stateGatesOk"] = True

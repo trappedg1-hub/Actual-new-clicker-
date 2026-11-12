@@ -62,7 +62,9 @@
       "touchZones": 4,
       "reactionDecayMs": 220,
       "underlayAlphaAtRest": 0,
-      "eye_r_closed_B_translationY": 9
+      "eye_r_closed_B_translationY": 9,
+      "oneCopyDisplayGraph": true,
+      "staticTopmostCoverage": false
     },
     "runtimeTextures": 35,
     "renderer": {
@@ -70,7 +72,8 @@
       "roundPixels": false,
       "antialias": true,
       "autoDensity": true,
-      "preference": "webgl"
+      "preference": "webgl",
+      "compactRuntimeTextures": true
     },
     "tapFeedback": {
       "darkStrokeRemoved": true,
@@ -104,13 +107,13 @@
       "legsAnimated": true,
       "hairIndependent": true,
       "fabricInertia": true,
-      "coverageComposite": "static slots 1,2,5,8-20 only; no rest-pose limb duplicate",
+      "coverageComposite": "removed: every visible slot is one animated copy",
       "dottedUnderlayHidden": true,
-      "maxIdleRotationDeg": 1,
-      "tapMaxRotationDeg": 3,
+      "maxIdleRotationDeg": 3.5,
+      "tapMaxRotationDeg": 3.5,
       "underlayAlpha": 0,
-      "legRotationDeg": 1,
-      "legRowWarpPx": 9,
+      "legRotationDeg": 2.8,
+      "legRowWarpPx": 28,
       "legMeshGeometry": true
     },
     "tapExpressionMapping": {
@@ -139,9 +142,9 @@
     }
   },
   "checks": {
-    "nodeTests": 40,
-    "nodeTestsPassed": 40,
-    "block2Tests": 17,
+    "nodeTests": 42,
+    "nodeTestsPassed": 42,
+    "block2Tests": 19,
     "eslint": true,
     "strictTypecheck": true,
     "viteProductionBuild": true,
@@ -157,9 +160,9 @@
     "breathingDistributed": true,
     "tapBothEyes": true,
     "multiCycleNoDrift": true,
-    "cleanCoverageComposite": true,
+    "cleanCoverageComposite": false,
     "buildOutput": {
-      "mainJs": "592.93 kB raw / 195.67 kB gzip",
+      "mainJs": "594.18 kB raw / 196.16 kB gzip",
       "inkChunk": "130.05 kB raw / 32.71 kB gzip",
       "warning": "known >500 kB raw-chunk advisory only"
     },
@@ -213,7 +216,11 @@
       "noNewImagesInBlock2Directory": true,
       "verificationFixApplied": true,
       "remoteVerification": "AFTER_PUSH_SEE_FINAL_CHAT_REPORT"
-    }
+    },
+    "singleCopyAnimatedGraph": true,
+    "lifecycleResumeGuards": true,
+    "toastLanesNonOverlapping": true,
+    "compactRuntimeTextures": true
   },
   "disclosedLimitations": [
     "Headless Chromium WebGL checks were performed locally at devicePixelRatio 3; physical iPhone/Android recheck after the latest fix is still pending.",
@@ -287,7 +294,7 @@
     ]
   },
   "fixVerification": {
-    "nodeTestsPassed": 40,
+    "nodeTestsPassed": 42,
     "strictTypecheck": true,
     "eslint": true,
     "productionBuild": true,
@@ -302,7 +309,7 @@
     "breathingDistributed": true,
     "tapBothEyes": true,
     "multiCycleNoDrift": true,
-    "cleanCoverageComposite": true,
+    "cleanCoverageComposite": false,
     "fullAnimationTestOverThreeCycles": true,
     "twoCycleBrowserTransitionCheck": true,
     "fourZoneTapBothEyesVisualCheck": true,
@@ -319,7 +326,7 @@
     "physicalIPhoneRecheckPending": true,
     "artisticApproval": false,
     "headlessCanvasCaptureDpr3": true,
-    "staticCoverageOnly": true,
+    "staticCoverageOnly": false,
     "runtimeAlphaBleed": true,
     "legMeshGeometry": true,
     "visibleLegMotionDpr3": true,
@@ -327,37 +334,73 @@
     "dpr3LegChangedPixelsAt4500": 32063,
     "cycleSeamChangedPixels": 0,
     "sourceBakedFringesRemain": true,
-    "newAnatomicalLayersRequiredForFullArtifactRemoval": true
+    "newAnatomicalLayersRequiredForFullArtifactRemoval": true,
+    "singleCopyAnimatedGraph": true,
+    "lifecycleResumeGuards": true,
+    "toastLanesNonOverlapping": true,
+    "compactRuntimeTextures": true,
+    "legRotationDeg": 2.8,
+    "legRowWarpPx": 28,
+    "physicalIPhoneAutomaticAccess": false,
+    "separateWebKitRuntimeAvailable": false,
+    "oldQaAcceptedForNewVersion": false
   },
   "currentRepair": {
-    "rejectedCommit": "260382c11d076354065f8463d7b8d7d2c6506b3f",
-    "staticCoverageSlots": [
-      1,
-      2,
-      5,
-      8,
-      9,
-      10,
-      11,
-      12,
-      13,
-      14,
-      15,
-      16,
-      17,
-      18,
-      19,
-      20
-    ],
+    "rejectedCommit": "0b377435a4353326f06be29205f2ef5f64f282c7",
+    "authoritativeRejectionScreenshot": "IMG_4052.png",
+    "rootCause": "topmost static full-canvas coverage sprite covered animated bodyRoot; pagehide pause had no WebKit wake-up resume",
+    "rootCauseEvidence": {
+      "bodyRootIndex": 1,
+      "coverageIndex": 2,
+      "coverageVisible": true,
+      "tickerStarted": true,
+      "rigTransformsChanging": true
+    },
+    "exactFix": "remove coverage, draw one animated copy per slot, compact alpha-bounded textures, idempotent lifecycle resume and ticker watchdog, mobile-scale motion amplitudes, toast lanes",
     "animatedLimbSlots": [
       3,
       4,
       6,
       7
     ],
-    "legRotationDeg": 1,
-    "legRowWarpPx": 9,
+    "hiddenBaseFaceSlots": [
+      13,
+      14,
+      15,
+      16
+    ],
+    "legRotationDeg": 2.8,
+    "legRowWarpPx": 28,
+    "bakedArtifactSourceFiles": [
+      "layers/01_hair_back_01.png",
+      "layers/02_hair_back_02.png",
+      "layers/03_leg_l.png",
+      "layers/04_leg_r.png",
+      "layers/05_torso.png",
+      "layers/06_arm_l.png",
+      "layers/07_arm_r.png",
+      "layers/08_outfit_blouse.png",
+      "layers/09_outfit_collar.png",
+      "layers/11_outfit_skirt_01.png",
+      "layers/12_outfit_skirt_02.png",
+      "layers/17_hair_side_l.png",
+      "layers/18_hair_side_r.png",
+      "layers/19_hair_front_01.png",
+      "layers/20_hair_front_02.png"
+    ],
+    "approvedPngReworkPermission": "NOT_GRANTED",
+    "newAnatomicalLayersPermission": "NOT_GRANTED",
     "physicalIPhoneRecheckPending": true,
-    "artisticApproval": false
-  }
+    "automaticPhysicalIPhoneAccess": false,
+    "separateWebKitRuntimeAvailable": false,
+    "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK",
+    "artisticApproval": false,
+    "block3Started": false,
+    "bakedArtifactAttribution": "qa-animation/critical-final/baked_artifact_regions.json",
+    "bakedArtifactCropSheets": [
+      "CRITICAL_SOURCE_ARTIFACTS.png",
+      "CRITICAL_SOURCE_ARTIFACTS_EXTRA.png"
+    ]
+  },
+  "result": "BLOCK2_EXTERNAL_VALIDATION_OK_AFTER_CRITICAL_REPAIR_AWAITING_IPHONE"
 }

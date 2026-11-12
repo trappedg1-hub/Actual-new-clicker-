@@ -102,7 +102,7 @@
     "userApprovalStatement": "approved, начинай block 2",
     "startedByUser": true,
     "noSeparateProposalApprovalRequired": true,
-    "status": "TECHNICAL_PASS_VISUAL_REJECTED_FINAL_REPAIR_APPLIED",
+    "status": "VISUAL_REJECTED_CRITICAL_REPAIR_APPLIED_AWAITING_IPHONE_RECHECK",
     "executionStarted": true,
     "executionCompleted": true,
     "technicalPass": true,
@@ -158,7 +158,7 @@
       "renderedFrameTests": "tests/renderedFrames.test.ts"
     },
     "checks": {
-      "nodeTests": 40,
+      "nodeTests": 42,
       "nodeTestsPassed": 40,
       "eslint": true,
       "strictTypecheck": true,
@@ -194,12 +194,17 @@
       "breathingDistributed": true,
       "tapBothEyes": true,
       "multiCycleNoDrift": true,
-      "cleanCoverageComposite": true,
-      "staticCoverageOnly": true,
+      "cleanCoverageComposite": false,
+      "staticCoverageOnly": false,
       "runtimeAlphaBleed": true,
       "legMeshGeometry": true,
       "renderedFrameVisibleLegMotion": true,
-      "physicalIPhoneRecheckPending": true
+      "physicalIPhoneRecheckPending": true,
+      "singleCopyAnimatedGraph": true,
+      "compactRuntimeTextures": true,
+      "lifecycleResumeGuards": true,
+      "toastLanesNonOverlapping": true,
+      "separateWebKitRuntimeAvailable": false
     },
     "documents": {
       "proposal": "../BLOCK-2-PIXIJS-RIG-ANIMATION/BLOCK-2-PROPOSAL.md",
@@ -209,21 +214,19 @@
       "verificationScript": "../BLOCK-2-PIXIJS-RIG-ANIMATION/verify_block2.py"
     },
     "disclosedLimitations": [
-      "headless Chromium WebGL checks were performed locally at devicePixelRatio 3; physical iPhone/Android recheck after the latest fix is still pending",
-      "automatic Vercel Preview is allowed by later explicit user permission; Production Deployment and PR Merge remain forbidden",
-      "technical PASS is not artistic approval",
-      "10 flattened E2-V2 state references are loaded as approved full-frame PNGs; a rounded face mask isolates only face pixels at runtime, so their purple background never enters the transparent rig",
-      "full-frame state references add roughly 5.4 MB of image payload; no new cropped or derived art assets were generated in BLOCK 2",
-      "approved source PNGs contain baked semi-transparent dotted outer contours; runtime removed duplicate rest limbs and premultiply fringes, but complete contour cleanup requires newly approved layers or re-cut approved PNGs",
-      "published E3 translation proxies are not real rotation or deformation",
-      "only one approved RGBA slot exists per arm and per leg; current legs use bounded hip rotation plus MeshGeometry row warp, not true knee/ankle skeletal articulation"
+      "no automatic physical-iPhone access exists in the sandbox; headless Chromium and emulation are not physical-device QA",
+      "a separate Safari/WebKit runtime is unavailable because the Playwright WebKit binary download is blocked in this environment; only WebKit-compatible lifecycle paths and Chromium JS/WebGL errors were checked",
+      "technical PASS is not artistic approval; BLOCK 2 remains rejected until the user checks the new Preview on iPhone",
+      "approved source PNGs contain baked semi-transparent dotted outer contours; runtime removed duplicate rest limbs, topmost static overlay and overlapping toasts, but complete cleanup requires newly approved layers or approved-PNG rework with separate permission",
+      "only one approved RGBA slot exists per arm and per leg; current legs use bounded hip rotation plus MeshGeometry row warp, not true knee/ankle skeletal articulation",
+      "10 flattened E2-V2 state references are loaded as approved full-frame PNGs; a rounded face mask isolates only face pixels at runtime"
     ],
     "visualReview": {
       "performedOnPhysicalIPhone": true,
       "result": "REJECTED",
       "userStatement": "Артефакты точки, она двигается влево вправо, по слоям раздельно как то, при тапе темнеет, дыхания нету вот скриншоты",
       "latestUserStatement": "Уже лучше, но при нажатии появляются точки черные, так же видны линии, когда тапаю на нее, так же при движении частей тела они как бы оставляют черный цвет, исправляй",
-      "latestResult": "REJECTED_AFTER_260382C",
+      "latestResult": "REJECTED_AFTER_0B37743",
       "animationRegressionStatement": "После последних исправлений визуальных артефактов появились проблемы с анимацией. Нужна полноценная анимация персонажа, а не неподвижная картинка с небольшим вертикальным смещением.",
       "animationRegressionResult": "ANIMATION_RESTORED_NOT_APPROVED",
       "screenshots": [
@@ -244,27 +247,44 @@
       "fixApplied": true,
       "fixScope": "runtime renderer, rig, scene, feedback and animation code only, no approved art changed",
       "currentRejectionScreenshots": [
-        "IMG_4048.png",
-        "IMG_4049.png",
-        "IMG_4050.png"
+        "IMG_4052.png"
       ],
       "currentRejectionDefects": [
-        "legs visually static on physical iPhone",
-        "pixel artifacts and contour defects remain",
-        "layer-edge mismatches remain"
+        "static heroine on physical iPhone",
+        "no visible leg motion",
+        "dotted semi-transparent contours on hair, arms, thighs and shoes",
+        "overlapping +5 credits and +1 affection toasts"
+      ],
+      "authoritativeScreenshot": "IMG_4052.png",
+      "authoritativeDefects": [
+        "static heroine on physical iPhone",
+        "no visible leg motion",
+        "dotted semi-transparent contours on hair, arms, thighs and shoes",
+        "overlapping +5 credits and +1 affection toasts"
       ]
     },
     "fixNotes": [
-      "dotted UNDERLAY-UNION stays hidden; static-only coverage uses slots 1,2,5,8-20 and never duplicates animated limbs in rest pose",
-      "root is welded: no scale, no rotation, no whole-figure bounce; all translations are integer art pixels",
-      "distributed breathing: chest, shoulders, waist counter-motion, head compensation, hair and skirt inertia",
-      "independent arms and legs restored through approved shoulder/hip pivots; legs add bipolar MeshGeometry row warp up to 9 px",
-      "straight-RGBA runtime textures use no-premultiply-alpha, 2 px alpha bleed, linear filtering and clamp-to-edge",
-      "global roundPixels is disabled so rotated/mesh-warped contours do not jump between DPR3 sampling grids",
-      "tap reaction distributed over head, arms, legs, hair and fabric instead of lifting the root",
-      "tap expressions mapped to both-eye E2-V2 states; auto-blink path unchanged",
-      "one opaque face plate rendered at a time; no new expressions, no approved PNG edits and no DEV QA handles"
-    ]
+      "root cause: static full-canvas coverage sprite was added after bodyRoot and covered all animated groups; it is removed entirely",
+      "every visible slot is drawn once by its own animated group; hidden base face slots 13-16 are replaced by one opaque approved state plate",
+      "compact runtime textures are cropped to alpha bounds with 2 px padding, straight-alpha bleed, linear filtering and clamp-to-edge; no approved pixels are edited",
+      "WebKit/iOS lifecycle resume: visibilitychange, webkitvisibilitychange, pageshow, focus, pointerdown, ticker watchdog and bounded reaction delta",
+      "mobile-scale distributed breathing, hair inertia, skirt sway, arms and both legs use LEG_POSE 2.8 degrees / 28 px MeshGeometry row warp",
+      "toasts use first-free vertical lanes so credits and affection cannot overlap",
+      "auto-blink, both-eye reactions, four touch zones, identity root and no global scale/rotation/bounce are preserved",
+      "no approved PNG edits, no AI/inpainting/generative fill, no new anatomy, no DEV QA handle in production Preview"
+    ],
+    "criticalRepair": {
+      "rejectedCommit": "0b377435a4353326f06be29205f2ef5f64f282c7",
+      "rootCause": "topmost static coverage plus one-way pagehide pause",
+      "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK",
+      "physicalIPhoneAutomaticAccess": false,
+      "approvedPngReworkPermission": "NOT_GRANTED",
+      "newAnatomicalLayersPermission": "NOT_GRANTED",
+      "oldQaAcceptedForNewVersion": false,
+      "contextForNextAgent": "Do not restore static full-canvas coverage or rest-pose limb copies; do not call technical PASS visual acceptance; do not start BLOCK 3 or edit approved art without separate consent.",
+      "bakedArtifactAttribution": "qa-animation/critical-final/baked_artifact_regions.json",
+      "bakedArtifactSourceFileCount": 15
+    }
   },
   "gates": {
     "productionDeployment": false,
@@ -293,7 +313,8 @@
     "noDoubtfulPixelDeletion": true,
     "noNewExpressions": true,
     "noNewAnatomicalSlots": true,
-    "noAtlas": true
+    "noAtlas": true,
+    "physicalIPhoneAutomaticAccess": false
   },
   "documents": {
     "proposal": "BLOCK-1-PROPOSAL.md",

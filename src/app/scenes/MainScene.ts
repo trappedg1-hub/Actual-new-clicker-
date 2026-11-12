@@ -250,12 +250,12 @@ export class MainScene extends Container {
     this.feedback.show(
       `+${outcome.currencyDelta} credits`,
       toastX,
-      this.rewardToastY - 12,
+      this.rewardToastY,
     );
     this.feedback.show(
       `+${outcome.affectionDelta} affection`,
       toastX,
-      this.rewardToastY + 14,
+      this.rewardToastY,
     );
     if (outcome.leveledUp)
       this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
