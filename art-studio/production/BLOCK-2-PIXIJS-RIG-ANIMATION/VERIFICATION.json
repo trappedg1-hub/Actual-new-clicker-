@@ -402,5 +402,25 @@
       "CRITICAL_SOURCE_ARTIFACTS_EXTRA.png"
     ]
   },
-  "result": "BLOCK2_EXTERNAL_VALIDATION_OK_AFTER_CRITICAL_REPAIR_AWAITING_IPHONE"
+  "result": "BLOCK2_EXTERNAL_VALIDATION_OK_AFTER_CRITICAL_REPAIR_AWAITING_IPHONE",
+  "artifactRepair": {
+    "trigger": "IMG_4053/4054/4055.png — physical iPhone: animation smooth and overlap fixed, but black dots/cut lines rejected",
+    "confirmedRuntimeCauses": [
+      "canvas premultiply round-trip erased the 2px alpha-bleed RGB in all 1,449,158 transparent runtime-slot pixels",
+      "browser gAMA/cHRM colour-managed canvas decode changed 287,910 visible approved pixels (up to 9 levels)"
+    ],
+    "fix": [
+      "straight-RGBA BufferImageSource upload (rgba8unorm, no-premultiply-alpha), no canvas output round-trip",
+      "byte-exact decode via createImageBitmap(premultiplyAlpha:none, colorSpaceConversion:none) + scratch WebGL readback with legacy canvas fallback"
+    ],
+    "postFix": {
+      "visibleRuntimePixelsChangedVsApproved": 0,
+      "transparentNonBlackBleedPixels": 45835,
+      "regionsDarkerAfterFix": 0,
+      "comparisonSheets": "qa-animation/artifact-repair/comparison/"
+    },
+    "bakedDefectsUntouched": "15 approved PNGs in qa-animation/critical-final/baked_artifact_regions.json — not edited, permission required",
+    "animationPreserved": true,
+    "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK"
+  }
 }

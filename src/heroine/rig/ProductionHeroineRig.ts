@@ -56,6 +56,101 @@ const DEG_TO_RAD = Math.PI / 180;
 type ApprovedSlotResource =
   HTMLImageElement | ImageBitmap | HTMLCanvasElement | OffscreenCanvas;
 
+/**
+ * Decodes the approved slot PNGs to byte-exact straight RGBA.
+ *
+ * The approved PNGs carry gAMA/cHRM chunks.  A browser decode into a 2D
+ * canvas colour-manages those chunks (shifting even fully opaque approved
+ * RGB by several levels) and premultiplies, so `getImageData` returned
+ * drifted colours on every semi-transparent contour pixel — exactly the
+ * pixels that form the approved 1px outlines.  Decoding via
+ * `createImageBitmap(premultiplyAlpha:"none", colorSpaceConversion:"none")`
+ * and reading the texels back through a scratch WebGL framebuffer returns
+ * the PNG bytes unchanged.  Browsers without those options fall back to the
+ * legacy canvas decode (`null` entries) rather than failing to boot.
+ */
+async function decodeStraightSlotPixels(
+  urls: readonly string[],
+): Promise<Map<string, Uint8ClampedArray>> {
+  const result = new Map<string, Uint8ClampedArray>();
+  if (typeof createImageBitmap !== "function") return result;
+  const scratch = document.createElement("canvas");
+  scratch.width = 1;
+  scratch.height = 1;
+  const gl = scratch.getContext("webgl", {
+    alpha: true,
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: false,
+    antialias: false,
+    depth: false,
+    stencil: false,
+  });
+  if (!gl) return result;
+  const texture = gl.createTexture();
+  const framebuffer = gl.createFramebuffer();
+  try {
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+    gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+    for (const url of urls) {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) continue;
+        const bitmap = await createImageBitmap(await response.blob(), {
+          premultiplyAlpha: "none",
+          colorSpaceConversion: "none",
+        });
+        const { width, height } = bitmap;
+        if (width !== RIG_CANVAS.width || height !== RIG_CANVAS.height) {
+          bitmap.close();
+          continue;
+        }
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          bitmap,
+        );
+        bitmap.close();
+        gl.framebufferTexture2D(
+          gl.FRAMEBUFFER,
+          gl.COLOR_ATTACHMENT0,
+          gl.TEXTURE_2D,
+          texture,
+          0,
+        );
+        if (
+          gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE
+        ) {
+          continue;
+        }
+        const bytes = new Uint8ClampedArray(width * height * 4);
+        gl.readPixels(
+          0,
+          0,
+          width,
+          height,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          new Uint8Array(bytes.buffer),
+        );
+        result.set(url, bytes);
+      } catch {
+        // Fall back to the legacy canvas decode for this slot.
+      }
+    }
+  } finally {
+    gl.deleteFramebuffer(framebuffer);
+    gl.deleteTexture(texture);
+    gl.getExtension("WEBGL_lose_context")?.loseContext();
+  }
+  return result;
+}
+
 const GROUP_PIVOTS: Record<RigGroupId, { x: number; y: number }> = {
   bodyRoot: { x: 424, y: 490 },
   headGroup: { x: 424, y: 262 },
@@ -155,22 +250,36 @@ function legWarpWeight(y: number): number {
  * contours.  Alpha bleed copies only neighbouring approved edge RGB into
  * alpha=0 padding.  The texture is then cropped, with 2px of padded margin, to
  * that slot's real alpha bounds: full-canvas transparent quads were expensive
- * enough on a mobile GPU to make the ticker appear frozen.  No approved pixel
- * is changed, scaled or deleted, no PNG on disk is edited, and no new art is
- * drawn.  The returned absolute bounds keep every slot pivot/warp unchanged.
+ * enough on a mobile GPU to make the ticker appear frozen.
+ *
+ * The bleed MUST NOT be round-tripped through another HTMLCanvasElement.  A
+ * 2D canvas is premultiplied internally: `putImageData` discards RGB wherever
+ * alpha is 0, so every padded edge colour became transparent black again.  The
+ * cropped bytes are therefore handed to PixiJS as a straight RGBA
+ * BufferImageSource.  WebGL uploads ArrayBufferView texels verbatim with
+ * `UNPACK_PREMULTIPLY_ALPHA_WEBGL=false`, and PixiJS pairs
+ * `no-premultiply-alpha` with its `normal-npm` blend.  This preserves padded
+ * edge colours during rotation/mesh sampling without changing any approved
+ * pixel, scaling or masking the art, editing a PNG on disk or drawing new art.
+ * The returned absolute bounds keep every slot pivot/warp unchanged.
  */
 function runtimeSlotTexture(
   resource: ApprovedSlotResource,
+  straightPixels?: Uint8ClampedArray,
 ): RuntimeSlotTexture {
-  const canvas = document.createElement("canvas");
-  canvas.width = RIG_CANVAS.width;
-  canvas.height = RIG_CANVAS.height;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) throw new Error("2D context unavailable for alpha bleed.");
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(resource, 0, 0, RIG_CANVAS.width, RIG_CANVAS.height);
-  const image = ctx.getImageData(0, 0, RIG_CANVAS.width, RIG_CANVAS.height);
-  const data = image.data;
+  let data: Uint8ClampedArray;
+  if (straightPixels) {
+    data = straightPixels;
+  } else {
+    const canvas = document.createElement("canvas");
+    canvas.width = RIG_CANVAS.width;
+    canvas.height = RIG_CANVAS.height;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) throw new Error("2D context unavailable for alpha bleed.");
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(resource, 0, 0, RIG_CANVAS.width, RIG_CANVAS.height);
+    data = ctx.getImageData(0, 0, RIG_CANVAS.width, RIG_CANVAS.height).data;
+  }
   const width = RIG_CANVAS.width;
   const height = RIG_CANVAS.height;
   let minX: number = width;
@@ -221,41 +330,35 @@ function runtimeSlotTexture(
       }
     }
   }
-  ctx.putImageData(image, 0, 0);
-
   const pad = RUNTIME_TEXTURE.alphaBleedRadius;
   const x = Math.max(0, minX - pad);
   const y = Math.max(0, minY - pad);
   const right = Math.min(width, maxX + pad);
   const bottom = Math.min(height, maxY + pad);
-  const cropped = document.createElement("canvas");
-  cropped.width = right - x;
-  cropped.height = bottom - y;
-  const cropCtx = cropped.getContext("2d");
-  if (!cropCtx) throw new Error("2D context unavailable for slot crop.");
-  cropCtx.imageSmoothingEnabled = false;
-  cropCtx.drawImage(
-    canvas,
-    x,
-    y,
-    cropped.width,
-    cropped.height,
-    0,
-    0,
-    cropped.width,
-    cropped.height,
-  );
+  const croppedWidth = right - x;
+  const croppedHeight = bottom - y;
+  const straightRgba = new Uint8Array(croppedWidth * croppedHeight * 4);
+  for (let row = 0; row < croppedHeight; row += 1) {
+    const src = ((y + row) * width + x) * 4;
+    straightRgba.set(
+      data.subarray(src, src + croppedWidth * 4),
+      row * croppedWidth * 4,
+    );
+  }
   return {
     texture: Texture.from(
       {
-        resource: cropped,
+        resource: straightRgba,
+        width: croppedWidth,
+        height: croppedHeight,
+        format: "rgba8unorm",
         alphaMode: RUNTIME_TEXTURE.alphaMode,
         scaleMode: RUNTIME_TEXTURE.scaleMode,
         addressMode: RUNTIME_TEXTURE.addressMode,
       },
       true,
     ),
-    bounds: { x, y, width: cropped.width, height: cropped.height },
+    bounds: { x, y, width: croppedWidth, height: croppedHeight },
   };
 }
 
@@ -399,8 +502,13 @@ export class ProductionHeroineRig extends Container {
         ),
       );
       const textures = new Map<string, Texture>(entries);
+      const straightSlotPixels = await decodeStraightSlotPixels(
+        SLOT_DEFINITIONS.map((slot) => LAYER_URLS[slot.z]).filter(
+          (url): url is string => typeof url === "string",
+        ),
+      );
       this.validateSwitchMatrix();
-      this.build(textures);
+      this.build(textures, straightSlotPixels);
       if (this.loadingText) {
         this.removeChild(this.loadingText);
         this.loadingText.destroy();
@@ -441,7 +549,10 @@ export class ProductionHeroineRig extends Container {
     }
   }
 
-  private build(textures: Map<string, Texture>): void {
+  private build(
+    textures: Map<string, Texture>,
+    straightSlotPixels: Map<string, Uint8ClampedArray>,
+  ): void {
     const underlayTexture = textures.get(UNDERLAY_UNION_URL);
     if (!underlayTexture) throw new Error("Missing UNDERLAY-UNION texture.");
     this.underlay = new Sprite(underlayTexture);
@@ -479,7 +590,7 @@ export class ProductionHeroineRig extends Container {
     for (const slot of SLOT_DEFINITIONS) {
       const url = LAYER_URLS[slot.z];
       const original = url ? textures.get(url) : undefined;
-      if (!original)
+      if (!url || !original)
         throw new Error(`Missing RGBA slot z${slot.z}: ${slot.slot}.`);
       const holder = shiftContainer(
         new Container(),
@@ -489,6 +600,7 @@ export class ProductionHeroineRig extends Container {
       holder.label = `z${String(slot.z).padStart(2, "0")} ${slot.slot}`;
       const { texture, bounds } = runtimeSlotTexture(
         original.source.resource as ApprovedSlotResource,
+        straightSlotPixels.get(url),
       );
       if (slot.z === 3 || slot.z === 4) {
         const leg = this.createLegMesh(texture, bounds);
