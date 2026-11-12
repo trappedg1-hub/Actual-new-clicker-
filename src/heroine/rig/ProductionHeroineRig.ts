@@ -36,6 +36,14 @@ import type {
 } from "./animationMath.ts";
 import { solidifyInteriorHoles } from "./alphaRepair.ts";
 import {
+  poseCleanupRects,
+  poseKneeEasePx,
+  poseStancePx,
+  poseStanceWeight,
+  resolvePoseVariant,
+} from "../poses/naturalBasePose.ts";
+import type { PoseCleanupRect, PoseVariant } from "../poses/naturalBasePose.ts";
+import {
   ALL_RUNTIME_TEXTURE_URLS,
   ORIGINAL_ART_URL,
   EXPRESSION_OVERLAY_URLS,
@@ -206,6 +214,12 @@ interface LegMesh {
   geometry: MeshGeometry;
   positions: Float32Array;
   weights: readonly number[];
+  /** Natural-base-pose stance weight per mesh row (0 in classic effect). */
+  poseWeights: readonly number[];
+  /** Static inward stance offset at full stance weight, px (0 in classic). */
+  poseStancePx: number;
+  /** Static relaxed-knee ease on the bounded knee weight, px (0 in classic). */
+  poseKneeEasePx: number;
   left: number;
   right: number;
 }
@@ -299,6 +313,7 @@ function runtimeSlotTexture(
   slotZ: number,
   straightPixels?: Uint8ClampedArray,
   originalArtPixels?: Uint8ClampedArray,
+  poseCleanup: readonly PoseCleanupRect[] = [],
 ): RuntimeSlotTexture {
   let data: Uint8ClampedArray;
   if (straightPixels) {
@@ -325,6 +340,23 @@ function runtimeSlotTexture(
     protectedRects: RUNTIME_TEXTURE.approvedOpenings[slotZ] ?? [],
     restoreRgb: originalArtPixels,
   });
+  // NATURAL BASE POSE only: clear the measured separation-debris fragments
+  // that the stance change would orphan as floating specks.  These isolated
+  // anti-aliasing pixels were nestled against the original leg contours and
+  // are surrounded by transparency, so no approved opening or interior art
+  // is affected; the classic variant passes an empty list and keeps every
+  // byte of the accepted build.
+  for (const [rx0, ry0, rx1, ry1] of poseCleanup) {
+    for (let ry = ry0; ry < ry1; ry += 1) {
+      for (let rx = rx0; rx < rx1; rx += 1) {
+        const ri = (ry * RIG_CANVAS.width + rx) * 4;
+        data[ri] = 0;
+        data[ri + 1] = 0;
+        data[ri + 2] = 0;
+        data[ri + 3] = 0;
+      }
+    }
+  }
   let minX: number = width;
   let minY: number = height;
   let maxX = 0;
@@ -440,13 +472,21 @@ export class ProductionHeroineRig extends Container {
   private timeMs = 0;
   private reaction: ReactionState = { ...NO_REACTION };
   private touchOverride: TouchOverride | null = null;
+  /** Natural base pose by default; `?pose=classic` restores the accepted BLOCK 2 stance. */
+  private readonly poseVariant: PoseVariant;
 
   constructor(
     onTap: (zone: HeroineTouchZone, localX: number, localY: number) => void,
+    poseVariant?: PoseVariant,
   ) {
     super();
     this.label = "HEROINE-01 production layered rig";
     this.onTap = onTap;
+    this.poseVariant =
+      poseVariant ??
+      resolvePoseVariant(
+        typeof window === "undefined" ? "" : window.location.search,
+      );
     this.pivot.set(RIG_CANVAS.width / 2, RIG_CANVAS.height / 2);
     this.position.set(0, 0);
 
@@ -650,9 +690,10 @@ export class ProductionHeroineRig extends Container {
         slot.z,
         straightSlotPixels.get(url),
         straightSlotPixels.get(ORIGINAL_ART_URL),
+        poseCleanupRects(slot.z, this.poseVariant),
       );
       if (slot.z === 3 || slot.z === 4) {
-        const leg = this.createLegMesh(texture, bounds);
+        const leg = this.createLegMesh(texture, bounds, slot.z);
         leg.mesh.label = `${slot.slot} pose mesh`;
         holder.addChild(leg.mesh);
         this.legMeshes.set(slot.z, leg.data);
@@ -681,6 +722,7 @@ export class ProductionHeroineRig extends Container {
   private createLegMesh(
     texture: Texture,
     bounds: RuntimeSlotBounds,
+    slotZ: number,
   ): { mesh: Mesh; data: LegMesh } {
     const left = bounds.x;
     const right = bounds.x + bounds.width;
@@ -725,10 +767,20 @@ export class ProductionHeroineRig extends Container {
     mesh.roundPixels = false;
     mesh.eventMode = "none";
     mesh.position.set(0, 0);
-    return {
-      mesh,
-      data: { geometry, positions, weights, left, right },
+    const data: LegMesh = {
+      geometry,
+      positions,
+      weights,
+      poseWeights: rows.map(poseStanceWeight),
+      poseStancePx: poseStancePx(slotZ, this.poseVariant),
+      poseKneeEasePx: poseKneeEasePx(slotZ, this.poseVariant),
+      left,
+      right,
     };
+    // Apply the static natural-base-pose stance immediately: the first
+    // rendered frame must already stand naturally, not snap on first update.
+    this.applyLegWarp(data, 0);
+    return { mesh, data };
   }
 
   /**
@@ -963,9 +1015,14 @@ export class ProductionHeroineRig extends Container {
   }
 
   private applyLegWarp(leg: LegMesh, warpPx: number): void {
-    const { positions, weights, geometry, left, right } = leg;
+    const { positions, weights, poseWeights, geometry, left, right } = leg;
     for (let r = 0; r < weights.length; r += 1) {
-      const dx = warpPx * (weights[r] ?? 0);
+      // Dynamic knee warp plus the static natural-base-pose stance: the
+      // relaxed-knee ease rides on the same bounded knee weight, and the
+      // stance offset is pinned to zero at the hip rows under the skirt.
+      const dx =
+        (warpPx + leg.poseKneeEasePx) * (weights[r] ?? 0) +
+        leg.poseStancePx * (poseWeights[r] ?? 0);
       positions[r * 4 + 0] = left + dx;
       positions[r * 4 + 2] = right + dx;
     }
