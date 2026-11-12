@@ -15,10 +15,12 @@ import {
   NO_REACTION,
   reactionEnergy,
   RIG_LOOP_MS,
+  breathWeight,
   rigFrameAt,
   triggerReaction,
 } from "../src/heroine/rig/animationMath.ts";
 import type { RigFrame } from "../src/heroine/rig/animationMath.ts";
+import { BREATH } from "../src/heroine/rig/renderConfig.ts";
 
 function round(value: number): number {
   return Math.round(value * 1_000_000_000) / 1_000_000_000;
@@ -225,8 +227,8 @@ test("BLOCK 2 animation: both arms, both legs, hair, fabric and head really move
     fringe2: frames.map((f) => f.slots[20] ?? 0),
     skirtUpper: frames.map((f) => f.slots[11] ?? 0),
     skirtLower: frames.map((f) => f.slots[12] ?? 0),
-    chest: frames.map((f) => f.groups.outfitGroup.y),
-    headCompensation: frames.map((f) => f.groups.headGroup.y),
+    chest: frames.map((f) => f.breathLift),
+    armFollow: frames.map((f) => f.groups.armGroupL.y),
     backHairInertia: frames.map((f) => f.groups.backHairGroup.y),
     frontHairInertia: frames.map((f) => f.groups.frontHairGroup.y),
   };
@@ -475,4 +477,68 @@ test("critical repair: lifecycle wake-up paths, one-copy graph and toast lanes e
     feedback.includes("lane * 28"),
     "toast lanes do not separate vertically",
   );
+});
+
+test("BODY COHESION: breathing cannot open a zero-overlap seam", () => {
+  // Field is pinned to exactly zero at the neck and hip junction rows, and
+  // beyond them, so the torso band stays welded to the head and the legs.
+  assert.equal(breathWeight(BREATH.topY), 0, "field moves the neck row");
+  assert.equal(breathWeight(BREATH.bottomY), 0, "field moves the hip row");
+  assert.equal(breathWeight(260), 0, "field reaches the head");
+  assert.equal(breathWeight(654), 0, "field reaches the legs' top row");
+  assert.equal(breathWeight(BREATH.peakY), 1, "chest peak is not full");
+  assert.ok(
+    breathWeight(360) > 0 && breathWeight(480) > 0,
+    "chest band does not breathe",
+  );
+
+  let maxLift = 0;
+  for (let t = 0; t <= 36_000; t += 125) {
+    const f = rigFrameAt(t);
+    maxLift = Math.max(maxLift, Math.abs(f.breathLift));
+    // No independent translations that previously opened the seams:
+    assert.equal(f.groups.outfitGroup.y, 0, `outfit translated at ${t}`);
+    assert.equal(f.groups.headGroup.y, 0, `head translated at ${t}`);
+    assert.equal(f.groups.legGroup.y, 0, `legs translated at ${t}`);
+    assert.equal(f.groups.outfitGroup.x, 0, `outfit shifted at ${t}`);
+    // Arms follow the SAME field value sampled at the shoulder anchor row.
+    const follow =
+      Math.round(-f.breathLift * breathWeight(BREATH.armAnchorY)) + 0;
+    assert.equal(f.groups.armGroupL.y, follow, `left arm detached at ${t}`);
+    assert.equal(f.groups.armGroupR.y, follow, `right arm detached at ${t}`);
+    // Skirt parts sway the same direction: no counter-rotation seam inside
+    // the skirt.
+    assert.ok(
+      (f.slots[11] ?? 0) * (f.slots[12] ?? 0) >= 0,
+      `skirt counter-rotation at ${t}`,
+    );
+    assert.ok(
+      Math.abs(f.breathLift) <= BREATH.liftPx + 1e-9,
+      `breath lift out of bounds at ${t}`,
+    );
+  }
+  // Breathing must stay visible: the chest band really moves.
+  assert.ok(maxLift >= 4, `breathing invisible (max lift ${maxLift}px)`);
+  assert.ok(BREATH.liftPx >= 6, "breathing amplitude below mobile scale");
+});
+
+test("BODY COHESION: tap reactions keep the same seam rules", () => {
+  for (const zone of ["head", "hair", "body", "arms"] as const) {
+    const reaction = triggerReaction(zone);
+    for (let t = 0; t <= 12_000; t += 500) {
+      const f = applyReaction(rigFrameAt(t), reaction);
+      assert.equal(f.groups.outfitGroup.y, 0, `outfit jumped on ${zone}`);
+      assert.equal(f.groups.headGroup.y, 0, `head jumped on ${zone}`);
+      assert.equal(f.groups.legGroup.y, 0, `legs jumped on ${zone}`);
+      assert.equal(
+        f.groups.armGroupL.y,
+        f.groups.armGroupR.y,
+        `arms detached vertically on ${zone}`,
+      );
+      assert.ok(
+        Math.abs(f.breathLift) <= BREATH.liftPx * 1.5 + 1e-9,
+        `reaction breath lift unbounded on ${zone}`,
+      );
+    }
+  }
 });

@@ -3,7 +3,7 @@
  * HEROINE-01 rig.  No PixiJS imports here, so Node tests can verify the loop
  * seam and reaction restart rules without a browser.
  */
-import { LEG_POSE, MOTION } from "./renderConfig.ts";
+import { BREATH, LEG_POSE, MOTION } from "./renderConfig.ts";
 
 export const RIG_CANVAS = { width: 848, height: 1264 } as const;
 export const RIG_LOOP_MS = 12_000;
@@ -121,6 +121,12 @@ export interface RigFrame {
   slots: Record<number, number>;
   /** Whole-pixel horizontal pose warp for the two one-slot leg meshes. */
   slotWarp: Record<number, number>;
+  /**
+   * Peak vertical lift of the shared breathing field in art pixels.  Every
+   * torso-band slot is row-mesh-warped by dy(y) = -breathLift * breathWeight(y),
+   * so adjacent layers displace identically and no seam can open.
+   */
+  breathLift: number;
   underlayAlpha: number;
   expressionTargets: Record<ExpressionStateName, number>;
   blinkClosed: boolean;
@@ -157,6 +163,20 @@ function clamp01(value: number): number {
 function smoothstep(value: number): number {
   const x = clamp01(value);
   return x * x * (3 - 2 * x);
+}
+
+/**
+ * Shared breathing weight of one art row.  Exactly 0 at and above the neck
+ * junction (BREATH.topY) and at and below the hip junction (BREATH.bottomY),
+ * smooth peak 1 at the chest row.  Both the renderer meshes and the Node
+ * tests use this single source of truth, so a seam can only stay closed.
+ */
+export function breathWeight(y: number): number {
+  if (y <= BREATH.topY || y >= BREATH.bottomY) return 0;
+  if (y < BREATH.peakY) {
+    return smoothstep((y - BREATH.topY) / (BREATH.peakY - BREATH.topY));
+  }
+  return smoothstep((BREATH.bottomY - y) / (BREATH.bottomY - BREATH.peakY));
 }
 
 /**
@@ -362,7 +382,6 @@ export function rigFrameAt(
   // Shared drivers.  Different phases keep limbs independent but phase-locked
   // to the same breath, so the pose always returns to rest without drift.
   const breath = wave(loopMs, 4_000, 0, 1); // -1 .. 1, seamless
-  const slow = wave(loopMs, 12_000, 0.6, 1);
   const hairWave = wave(loopMs, 3_000, 0.9, 1);
   const armL = wave(loopMs, 6_000, 0.35, 1);
   const armR = wave(loopMs, 6_000, 0.35 + Math.PI, 1);
@@ -379,13 +398,15 @@ export function rigFrameAt(
   const legR = clamp(-legBase + legShared, -1, 1);
   const skirt = wave(loopMs, 4_000, 1.25, 1);
 
-  // Breathing: chest rises, shoulders follow with a slight left/right delay,
-  // waist/skirt answers in counter-phase, head compensates by 1 px.
-  const chestY = px(breath * MOTION.breathingPx);
-  const shoulderYL = px(breath * MOTION.shoulderPx + slow * 2);
-  const shoulderYR = px(breath * MOTION.shoulderPx - slow * 2);
-  const headY = px(-breath * MOTION.headCounterPx);
-  const waistY = px(-breath * MOTION.waistCounterPx);
+  // COHESIVE BREATHING.  One shared field replaces the old independent
+  // translations of outfitGroup/headGroup/legGroup/armGroups whose relative
+  // motion opened transparent seams across the ZERO-overlap approved slots
+  // (up to 6px collar vs head, 4px blouse vs torso, 5px skirt vs legs).
+  // The torso band breathes via an identical row-mesh warp (breathLift),
+  // pinned to 0 at the neck and hip junction rows; the arms follow the field
+  // value at their shoulder anchor so they stay attached to the chest.
+  const breathLift = breath * BREATH.liftPx;
+  const armFollowY = px(-breathLift * breathWeight(BREATH.armAnchorY));
 
   // Hair and fabric lag behind the body (secondary inertia).
   const backHairY = px(hairWave * MOTION.hairSwayPx);
@@ -394,7 +415,9 @@ export function rigFrameAt(
   const groups: Record<RigGroupId, Transform2D> = {
     // The root is welded: no scale, no rotation, no vertical bounce.
     bodyRoot: identityTransform(),
-    headGroup: { ...identityTransform(), y: headY },
+    // The head is welded to the neck: the field is zero at the neck row, so
+    // any head translation would reopen the collar seam.
+    headGroup: identityTransform(),
     backHairGroup: {
       ...identityTransform(),
       y: backHairY,
@@ -405,18 +428,20 @@ export function rigFrameAt(
       y: frontHairY,
       rotationDeg: deg(-hairWave * MOTION.hairGroupRotationDeg * 0.75),
     },
-    legGroup: { ...identityTransform(), y: waistY },
+    // Legs are planted: the field is zero at their top rows, no counter-phase.
+    legGroup: identityTransform(),
     armGroupL: {
       ...identityTransform(),
-      y: shoulderYL,
+      y: armFollowY,
       rotationDeg: deg(armL * MOTION.armGroupRotationDeg),
     },
     armGroupR: {
       ...identityTransform(),
-      y: shoulderYR,
+      y: armFollowY,
       rotationDeg: deg(armR * MOTION.armGroupRotationDeg),
     },
-    outfitGroup: { ...identityTransform(), y: chestY },
+    // Outfit translation retired: the breathing lives in the shared mesh warp.
+    outfitGroup: identityTransform(),
     faceGroup: identityTransform(),
   };
 
@@ -438,8 +463,10 @@ export function rigFrameAt(
   slotWarp[4] = px(legR * LEG_POSE.warpPx);
   slots[6] = deg(armL * MOTION.armSlotRotationDeg); // left shoulder pivot
   slots[7] = deg(armR * MOTION.armSlotRotationDeg); // right shoulder pivot
+  // Both skirt parts sway the SAME direction (lower part lags with a smaller
+  // factor): the old counter-rotation opened a seam inside the skirt itself.
   slots[11] = deg(skirt * MOTION.skirtRotationDeg); // upper skirt inertia
-  slots[12] = deg(-skirt * MOTION.skirtRotationDeg); // lower skirt counter-sway
+  slots[12] = deg(skirt * MOTION.skirtRotationDeg * 0.65); // lower skirt lag
   slots[17] = deg(hairWave * MOTION.hairSlotRotationDeg); // left side lock
   slots[18] = deg(-hairWave * MOTION.hairSlotRotationDeg); // right side lock
   slots[19] = deg(hairWave * MOTION.hairSlotRotationDeg * 0.7); // fringe 01
@@ -451,6 +478,7 @@ export function rigFrameAt(
     groups,
     slots,
     slotWarp,
+    breathLift,
     underlayAlpha: 0,
     expressionTargets: expressionTargetsAt(loopMs, override),
     blinkClosed: isBlinkClosed(loopMs),
@@ -509,12 +537,15 @@ export function applyReaction(
     groups[id] = { ...frame.groups[id] };
   }
 
-  groups.headGroup.y += px(reaction.head * 0.25);
+  // Tap feedback must respect the same cohesion rules as idle breathing:
+  // no translation across a zero-overlap seam.  The head reacts with a tiny
+  // rotation only (a vertical head jump reopened the collar seam), the arms
+  // rotate around their shoulder pivots, and the body impulse feeds the
+  // SHARED breathing field instead of translating the outfit against the
+  // static torso and legs.
   groups.headGroup.rotationDeg = deg(
     groups.headGroup.rotationDeg + reaction.head * 0.08,
   );
-  groups.armGroupL.y += px(reaction.armL * 0.18);
-  groups.armGroupR.y += px(reaction.armR * 0.18);
   groups.armGroupL.rotationDeg = deg(
     groups.armGroupL.rotationDeg + reaction.armL * 0.18,
   );
@@ -527,8 +558,11 @@ export function applyReaction(
   groups.frontHairGroup.rotationDeg = deg(
     groups.frontHairGroup.rotationDeg + reaction.hair * 0.08,
   );
-  groups.outfitGroup.y += px(reaction.body * 0.8);
-  groups.legGroup.y += px(-reaction.body * 0.15);
+  const breathLift = clamp(
+    frame.breathLift + reaction.body * 1.2,
+    -BREATH.liftPx * 1.5,
+    BREATH.liftPx * 1.5,
+  );
 
   const slots: Record<number, number> = { ...frame.slots };
   const slotWarp: Record<number, number> = { ...frame.slotWarp };
@@ -548,6 +582,7 @@ export function applyReaction(
     groups,
     slots,
     slotWarp,
+    breathLift,
     underlayAlpha: 0,
   };
 }

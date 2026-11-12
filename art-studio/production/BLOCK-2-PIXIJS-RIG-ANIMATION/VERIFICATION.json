@@ -422,5 +422,23 @@
     "bakedDefectsUntouched": "15 approved PNGs in qa-animation/critical-final/baked_artifact_regions.json — not edited, permission required",
     "animationPreserved": true,
     "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK"
+  },
+  "breathingCohesion": {
+    "trigger": "user: body parts visually separate during inhale/exhale; black gaps at seams",
+    "rootCause": "breathing distributed over independent translations (outfit +6, head -2, legs -1, arm asymmetry) across ZERO-overlap slots; skirt counter-rotation",
+    "architecture": "single shared vertical field dy(y)=-breathLift*breathWeight(y); row-mesh warp of slots 5/8/9/10/11/12 on a 1px row grid with whole-pixel per-row displacement; field pinned to 0 at neck row 300 and hip row 540; arms follow field at shoulder anchor 340; head/legs welded; same-direction skirt sway; tap reactions routed into the shared field",
+    "amplitude": "BREATH.liftPx=8 >= previous 6px translation; breathing visible, not disabled",
+    "verification": {
+      "nodeTests": "44/44 incl. cohesion guards",
+      "alphaHoles": {
+        "neckMaxInhale": "618->205",
+        "hem": "503->232, 344->58"
+      },
+      "sheets": "qa-animation/breathing/comparison/"
+    },
+    "approvedPngUnchanged": true,
+    "noNewLayers": true,
+    "noStaticOverlay": true,
+    "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK"
   }
 }

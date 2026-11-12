@@ -39,6 +39,41 @@ export const LEG_POSE = {
   warpPx: 28,
 } as const;
 
+/**
+ * Cohesive breathing field.  Breathing previously translated outfitGroup,
+ * armGroups, headGroup and legGroup INDEPENDENTLY (chest +6, head -2,
+ * legs -1, shoulders +-slow asymmetry).  The 20 approved slots have ZERO
+ * overlap, so every pixel of relative motion across a seam opened a
+ * transparent gap of exactly that size: up to 6px at the collar/head seam,
+ * 4px blouse vs the static torso below it, and 5px at the skirt/leg hem.
+ *
+ * The repaired architecture drives ONE shared vertical displacement field
+ * dy(y) = -breathLift * weight(y) applied as an identical row-mesh warp to
+ * every torso-band slot (torso, blouse, collar, ribbon, both skirt parts).
+ * Identical rows get identical displacement, so those layers stay stitched
+ * to each other, and the weight is exactly 0 at the neck row and at the
+ * hip row, so the band stays welded to the head above and the legs below.
+ * Arms translate by the field value sampled at their shoulder anchor row,
+ * which keeps them pinned to the breathing chest; their seam against the
+ * torso is vertical, so the residual row-dependent slide cannot open a
+ * horizontal gap.
+ */
+export const BREATH = {
+  /** Field is zero at and above this art row (neck/collar junction). */
+  topY: 300,
+  /** Peak chest expansion row. */
+  peakY: 420,
+  /** Field is zero at and below this art row (above the legs' top, 654). */
+  bottomY: 540,
+  /** Peak vertical lift of the chest band in approved art pixels. */
+  liftPx: 8,
+  /** Arms follow the field sampled at this shoulder anchor row. */
+  armAnchorY: 340,
+} as const;
+
+/** Approved slots deformed by the shared breathing field row-mesh. */
+export const BREATH_MESH_SLOTS = [5, 8, 9, 10, 11, 12] as const;
+
 /** Visible mobile-scale idle amplitudes, all in approved art pixels/degrees. */
 export const MOTION = {
   breathingPx: 6,

@@ -13,6 +13,7 @@ import type { FederatedPointerEvent } from "pixi.js";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import {
   applyReaction,
+  breathWeight,
   clampedAnimationDeltaMs,
   decayReaction,
   EXPRESSION_COMBOS,
@@ -45,6 +46,8 @@ import {
 import type { SlotDefinition } from "./heroineAssets.ts";
 import {
   ANIMATED_LIMB_SLOTS,
+  BREATH,
+  BREATH_MESH_SLOTS,
   HIDDEN_FACE_BASE_SLOTS,
   LEG_POSE,
   RUNTIME_TEXTURE,
@@ -168,6 +171,23 @@ const LEG_MESH_ROWS = [
   0, 300, 600, 720, 780, 840, 900, 960, 1020, 1080, 1140, 1210, 1264,
 ] as const;
 
+/**
+ * Vertical subdivisions for the shared breathing field meshes: ONE row per
+ * art pixel inside the active band, whose displacement is rounded to whole
+ * pixels identically for every slot.  Fractional bilinear resampling of the
+ * approved 1px weak-alpha contours visibly broke them into dots, so the
+ * field must move the art only on the integer pixel grid.  Rows outside the
+ * band never move.
+ */
+const BREATH_MESH_ROWS: readonly number[] = (() => {
+  const rows: number[] = [0];
+  for (let y = BREATH.topY - 20; y <= BREATH.bottomY + 20; y += 1) {
+    rows.push(y);
+  }
+  rows.push(RIG_CANVAS.height);
+  return rows;
+})();
+
 interface RuntimeSlotBounds {
   x: number;
   y: number;
@@ -186,6 +206,15 @@ interface LegMesh {
   weights: readonly number[];
   left: number;
   right: number;
+}
+
+interface BreathMesh {
+  geometry: MeshGeometry;
+  positions: Float32Array;
+  /** Base (undeformed) y of every mesh row, in absolute art pixels. */
+  baseRows: readonly number[];
+  /** breathWeight() of every mesh row; identical rows across slots match. */
+  weights: readonly number[];
 }
 
 interface TouchOverride {
@@ -388,6 +417,7 @@ export class ProductionHeroineRig extends Container {
   >;
   private readonly slotContainers = new Map<number, Container>();
   private readonly legMeshes = new Map<number, LegMesh>();
+  private readonly breathMeshes = new Map<number, BreathMesh>();
   private readonly facePlates = new Map<ExpressionStateName, Sprite>();
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
@@ -607,6 +637,11 @@ export class ProductionHeroineRig extends Container {
         leg.mesh.label = `${slot.slot} pose mesh`;
         holder.addChild(leg.mesh);
         this.legMeshes.set(slot.z, leg.data);
+      } else if ((BREATH_MESH_SLOTS as readonly number[]).includes(slot.z)) {
+        const breathMesh = this.createBreathMesh(texture, bounds);
+        breathMesh.mesh.label = `${slot.slot} breath mesh`;
+        holder.addChild(breathMesh.mesh);
+        this.breathMeshes.set(slot.z, breathMesh.data);
       } else {
         const sprite = new Sprite(texture);
         sprite.roundPixels = false;
@@ -675,6 +710,78 @@ export class ProductionHeroineRig extends Container {
       mesh,
       data: { geometry, positions, weights, left, right },
     };
+  }
+
+  /**
+   * Row mesh for one torso-band slot deformed by the SHARED breathing field.
+   * Rows are absolute art pixels, so two different slots sharing a row get a
+   * bit-identical displacement and their zero-overlap seam stays closed; the
+   * field is exactly zero at the neck and hip junction rows.
+   */
+  private createBreathMesh(
+    texture: Texture,
+    bounds: RuntimeSlotBounds,
+  ): { mesh: Mesh; data: BreathMesh } {
+    const left = bounds.x;
+    const right = bounds.x + bounds.width;
+    const bottom = bounds.y + bounds.height;
+    const rows = [
+      bounds.y,
+      ...BREATH_MESH_ROWS.filter((y) => y > bounds.y && y < bottom),
+      bottom,
+    ].sort((a, b) => a - b);
+    const positions = new Float32Array(rows.length * 4);
+    const uvs = new Float32Array(rows.length * 4);
+    const indices = new Uint32Array((rows.length - 1) * 6);
+    const weights = rows.map(breathWeight);
+    for (let r = 0; r < rows.length; r += 1) {
+      const y = rows[r] ?? 0;
+      const v = (y - bounds.y) / bounds.height;
+      positions[r * 4 + 0] = left;
+      positions[r * 4 + 1] = y;
+      positions[r * 4 + 2] = right;
+      positions[r * 4 + 3] = y;
+      uvs[r * 4 + 0] = 0;
+      uvs[r * 4 + 1] = v;
+      uvs[r * 4 + 2] = 1;
+      uvs[r * 4 + 3] = v;
+      if (r < rows.length - 1) {
+        const i = r * 6;
+        const a = r * 2;
+        const b = a + 1;
+        const c = a + 2;
+        const d = a + 3;
+        indices[i] = a;
+        indices[i + 1] = c;
+        indices[i + 2] = b;
+        indices[i + 3] = b;
+        indices[i + 4] = c;
+        indices[i + 5] = d;
+      }
+    }
+    const geometry = new MeshGeometry({ positions, uvs, indices });
+    geometry.batchMode = "batch";
+    const mesh = new Mesh({ geometry, texture });
+    mesh.roundPixels = false;
+    mesh.eventMode = "none";
+    mesh.position.set(0, 0);
+    return {
+      mesh,
+      data: { geometry, positions, baseRows: rows, weights },
+    };
+  }
+
+  /** Applies the shared vertical breathing field to one torso-band mesh. */
+  private applyBreathWarp(data: BreathMesh, liftPx: number): void {
+    const { positions, baseRows, weights, geometry } = data;
+    for (let r = 0; r < baseRows.length; r += 1) {
+      // Whole-pixel per-row displacement: same row => same rounded value in
+      // every slot, and no fractional resampling of 1px approved contours.
+      const y = (baseRows[r] ?? 0) - Math.round(liftPx * (weights[r] ?? 0));
+      positions[r * 4 + 1] = y;
+      positions[r * 4 + 3] = y;
+    }
+    geometry.attributes.aPosition!.buffer.update();
   }
 
   private parentSlot(holder: Container, slot: SlotDefinition): void {
@@ -857,6 +964,11 @@ export class ProductionHeroineRig extends Container {
       if (z !== 3 && z !== 4) continue;
       const leg = this.legMeshes.get(z);
       if (leg) this.applyLegWarp(leg, frame.slotWarp[z] ?? 0);
+    }
+    // One shared breathing field for every torso-band slot: identical rows
+    // displace identically, so the zero-overlap seams cannot open.
+    for (const data of this.breathMeshes.values()) {
+      this.applyBreathWarp(data, frame.breathLift);
     }
     // The approved dotted UNDERLAY-UNION stays hidden.  Every visible art
     // pixel comes from one animated slot or one opaque state plate; no static
