@@ -3,7 +3,7 @@
  * HEROINE-01 rig.  No PixiJS imports here, so Node tests can verify the loop
  * seam and reaction restart rules without a browser.
  */
-import { BREATH, LEG_POSE, MOTION } from "./renderConfig.ts";
+import { BREATH, LEG_POSE } from "./renderConfig.ts";
 
 export const RIG_CANVAS = { width: 848, height: 1264 } as const;
 export const RIG_LOOP_MS = 12_000;
@@ -382,9 +382,6 @@ export function rigFrameAt(
   // Shared drivers.  Different phases keep limbs independent but phase-locked
   // to the same breath, so the pose always returns to rest without drift.
   const breath = wave(loopMs, 4_000, 0, 1); // -1 .. 1, seamless
-  const hairWave = wave(loopMs, 3_000, 0.9, 1);
-  const armL = wave(loopMs, 6_000, 0.35, 1);
-  const armR = wave(loopMs, 6_000, 0.35 + Math.PI, 1);
   // Leg pose is a true bipolar 6s sine (exactly zero at 0 and 12 000 ms),
   // with a small shared slow sway.  The earlier phase-shifted wave was almost
   // one-sided: one leg barely reached its outward pose.  This driver gives
@@ -396,21 +393,21 @@ export function rigFrameAt(
   const legShared = wave(loopMs, 12_000, 0, 0.12);
   const legL = clamp(legBase + legShared, -1, 1);
   const legR = clamp(-legBase + legShared, -1, 1);
-  const skirt = wave(loopMs, 4_000, 1.25, 1);
 
   // COHESIVE BREATHING.  One shared field replaces the old independent
   // translations of outfitGroup/headGroup/legGroup/armGroups whose relative
   // motion opened transparent seams across the ZERO-overlap approved slots
   // (up to 6px collar vs head, 4px blouse vs torso, 5px skirt vs legs).
   // The torso band breathes via an identical row-mesh warp (breathLift),
-  // pinned to 0 at the neck and hip junction rows; the arms follow the field
-  // value at their shoulder anchor so they stay attached to the chest.
+  // pinned to 0 at the neck and hip junction rows.  CATEGORY-D FIX: the
+  // arms, the back hair masses and both skirt parts are now row-mesh-warped
+  // by the SAME field instead of owning rigid pendulum transforms.  Every
+  // independent rigid motion of a slot that shares a zero-overlap cut
+  // contour with the body (arm pendulum, back-hair sway, side-lock sway,
+  // skirt rotation) measurably tore 1-6px black slits along those contours
+  // on the device; only the front fringe, which lies entirely over the
+  // opaque face/head interior, keeps its secondary sway.
   const breathLift = breath * BREATH.liftPx;
-  const armFollowY = px(-breathLift * breathWeight(BREATH.armAnchorY));
-
-  // Hair and fabric lag behind the body (secondary inertia).
-  const backHairY = px(hairWave * MOTION.hairSwayPx);
-  const frontHairY = px(wave(loopMs, 3_000, 1.7, 1) * MOTION.hairLagPx);
 
   const groups: Record<RigGroupId, Transform2D> = {
     // The root is welded: no scale, no rotation, no vertical bounce.
@@ -418,28 +415,25 @@ export function rigFrameAt(
     // The head is welded to the neck: the field is zero at the neck row, so
     // any head translation would reopen the collar seam.
     headGroup: identityTransform(),
-    backHairGroup: {
-      ...identityTransform(),
-      y: backHairY,
-      rotationDeg: deg(hairWave * MOTION.hairGroupRotationDeg),
-    },
-    frontHairGroup: {
-      ...identityTransform(),
-      y: frontHairY,
-      rotationDeg: deg(-hairWave * MOTION.hairGroupRotationDeg * 0.75),
-    },
+    // Back hair is welded: its strands share cut contours with the blouse,
+    // the skirt and the arms, so any independent sway tears them open.  The
+    // strands inside the torso band breathe via the shared field mesh.
+    backHairGroup: identityTransform(),
+    // The fringe is welded too: its sway slid the fringe strands against
+    // the static side locks and head crown and opened ~1px black cracks
+    // between interlocking strands at the parting (Category-D, measured
+    // 129px at every sway extreme).  Hair life now comes from the shared
+    // breathing field deforming the back-hair masses inside the torso band.
+    frontHairGroup: identityTransform(),
     // Legs are planted: the field is zero at their top rows, no counter-phase.
     legGroup: identityTransform(),
-    armGroupL: {
-      ...identityTransform(),
-      y: armFollowY,
-      rotationDeg: deg(armL * MOTION.armGroupRotationDeg),
-    },
-    armGroupR: {
-      ...identityTransform(),
-      y: armFollowY,
-      rotationDeg: deg(armR * MOTION.armGroupRotationDeg),
-    },
+    // Arms are welded to the shared breathing field: the old rigid follow
+    // translation plus pendulum rotation displaced the arm contours against
+    // the row-warped blouse/torso and opened 1-3px slits along the shared
+    // cuts (armpit and inner-arm contours).  The arm slots are row-meshed by
+    // the same field, so identical rows always displace identically.
+    armGroupL: identityTransform(),
+    armGroupR: identityTransform(),
     // Outfit translation retired: the breathing lives in the shared mesh warp.
     outfitGroup: identityTransform(),
     faceGroup: identityTransform(),
@@ -452,25 +446,25 @@ export function rigFrameAt(
     slotWarp[z] = 0;
   }
   // Independent pivots come from the approved layer-map `pivotAbsolute`.
-  slots[1] = deg(hairWave * MOTION.hairSlotRotationDeg); // back hair left mass
-  slots[2] = deg(-hairWave * MOTION.hairSlotRotationDeg); // back hair right mass
+  // Back hair slot rotations retired (Category-D): the masses share cut
+  // contours with blouse/skirt/arms; they breathe via the shared field.
   // Each leg stays ONE approved slot.  A bounded hip rotation plus a graded
   // knee-area mesh warp makes the pose visible; it is not anatomical knee or
   // ankle articulation and needs no new art layer or hidden anatomy.
-  slots[3] = deg(legL * LEG_POSE.rotationDeg); // left leg, hip pivot (370, 675)
-  slots[4] = deg(legR * LEG_POSE.rotationDeg); // right leg, hip pivot (478, 675)
+  // Hip rotation retired (Category-D): rotating a whole leg around the hip
+  // pivot slid its top contour horizontally under the sheer skirt openings
+  // and opened black slits at the hip/stocking rows (y656-689).  The
+  // graded knee-area warp is zero at the hip rows, so the visible leg pose
+  // stays while the hip junction remains welded.
   slotWarp[3] = px(legL * LEG_POSE.warpPx);
   slotWarp[4] = px(legR * LEG_POSE.warpPx);
-  slots[6] = deg(armL * MOTION.armSlotRotationDeg); // left shoulder pivot
-  slots[7] = deg(armR * MOTION.armSlotRotationDeg); // right shoulder pivot
-  // Both skirt parts sway the SAME direction (lower part lags with a smaller
-  // factor): the old counter-rotation opened a seam inside the skirt itself.
-  slots[11] = deg(skirt * MOTION.skirtRotationDeg); // upper skirt inertia
-  slots[12] = deg(skirt * MOTION.skirtRotationDeg * 0.65); // lower skirt lag
-  slots[17] = deg(hairWave * MOTION.hairSlotRotationDeg); // left side lock
-  slots[18] = deg(-hairWave * MOTION.hairSlotRotationDeg); // right side lock
-  slots[19] = deg(hairWave * MOTION.hairSlotRotationDeg * 0.7); // fringe 01
-  slots[20] = deg(-hairWave * MOTION.hairSlotRotationDeg * 0.7); // fringe 02
+  // Arm, skirt and side-lock slot rotations retired (Category-D): each one
+  // rotated a slot against a neighbour that shares its zero-overlap cut
+  // contour (arm vs torso/blouse, skirt vs blouse hem and back-hair strands,
+  // side locks vs collar) and opened black slits during motion.  Their
+  // visible movement now comes from the shared breathing field row-mesh.
+  // Fringe slot rotations retired (Category-D): any relative motion of the
+  // interlocking fringe/side-lock strand sets opens cracks at the parting.
 
   return {
     timeMs,
@@ -546,36 +540,27 @@ export function applyReaction(
   groups.headGroup.rotationDeg = deg(
     groups.headGroup.rotationDeg + reaction.head * 0.08,
   );
-  groups.armGroupL.rotationDeg = deg(
-    groups.armGroupL.rotationDeg + reaction.armL * 0.18,
-  );
-  groups.armGroupR.rotationDeg = deg(
-    groups.armGroupR.rotationDeg + reaction.armR * 0.18,
-  );
-  groups.backHairGroup.rotationDeg = deg(
-    groups.backHairGroup.rotationDeg + reaction.hair * 0.12,
-  );
-  groups.frontHairGroup.rotationDeg = deg(
-    groups.frontHairGroup.rotationDeg + reaction.hair * 0.08,
-  );
+  // CATEGORY-D: arm-group, back-hair and fringe rotations tore the shared
+  // cut contours and the interlocked strand partings open on every tap;
+  // the arm/hair impulse is routed into the SHARED breathing field
+  // (visible chest+arms+hair rise) instead.
   const breathLift = clamp(
-    frame.breathLift + reaction.body * 1.2,
+    frame.breathLift +
+      reaction.body * 1.2 +
+      (Math.abs(reaction.armL) + Math.abs(reaction.armR)) * 0.15 +
+      Math.abs(reaction.hair) * 0.1,
     -BREATH.liftPx * 1.5,
     BREATH.liftPx * 1.5,
   );
 
   const slots: Record<number, number> = { ...frame.slots };
   const slotWarp: Record<number, number> = { ...frame.slotWarp };
-  slots[3] = deg((slots[3] ?? 0) + reaction.body * 0.08);
-  slots[4] = deg((slots[4] ?? 0) - reaction.body * 0.08);
+  // Hip rotation retired (Category-D) — tap feedback uses the graded warp.
   slotWarp[3] = px((slotWarp[3] ?? 0) + reaction.body * 0.8);
   slotWarp[4] = px((slotWarp[4] ?? 0) - reaction.body * 0.8);
-  slots[6] = deg((slots[6] ?? 0) + reaction.armL * 0.08);
-  slots[7] = deg((slots[7] ?? 0) + reaction.armR * 0.08);
-  slots[11] = deg((slots[11] ?? 0) + reaction.body * 0.06);
-  slots[12] = deg((slots[12] ?? 0) - reaction.body * 0.06);
-  slots[17] = deg((slots[17] ?? 0) + reaction.hair * 0.05);
-  slots[18] = deg((slots[18] ?? 0) - reaction.hair * 0.05);
+  // Arm, skirt and side-lock reaction rotations retired (Category-D): they
+  // rotated slots against neighbours sharing their zero-overlap cut
+  // contours and flashed black slits on every tap.
 
   return {
     ...frame,

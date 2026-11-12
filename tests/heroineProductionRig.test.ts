@@ -20,7 +20,8 @@ import {
   triggerReaction,
 } from "../src/heroine/rig/animationMath.ts";
 import type { RigFrame } from "../src/heroine/rig/animationMath.ts";
-import { BREATH } from "../src/heroine/rig/renderConfig.ts";
+import { solidifyInteriorHoles } from "../src/heroine/rig/alphaRepair.ts";
+import { BREATH, BREATH_MESH_SLOTS } from "../src/heroine/rig/renderConfig.ts";
 
 function round(value: number): number {
   return Math.round(value * 1_000_000_000) / 1_000_000_000;
@@ -209,28 +210,9 @@ test("BLOCK 2 animation: root stays welded and every translation is integer over
 test("BLOCK 2 animation: both arms, both legs, hair, fabric and head really move", () => {
   const frames = IDLE_TIMES.map((t) => rigFrameAt(t));
   const channels: Record<string, number[]> = {
-    armGroupL: frames.map((f) => f.groups.armGroupL.rotationDeg),
-    armGroupR: frames.map((f) => f.groups.armGroupR.rotationDeg),
-    shoulderL: frames.map((f) => f.groups.armGroupL.y),
-    shoulderR: frames.map((f) => f.groups.armGroupR.y),
-    armSlotL: frames.map((f) => f.slots[6] ?? 0),
-    armSlotR: frames.map((f) => f.slots[7] ?? 0),
-    legSlotL: frames.map((f) => f.slots[3] ?? 0),
-    legSlotR: frames.map((f) => f.slots[4] ?? 0),
     legWarpL: frames.map((f) => f.slotWarp[3] ?? 0),
     legWarpR: frames.map((f) => f.slotWarp[4] ?? 0),
-    backHairL: frames.map((f) => f.slots[1] ?? 0),
-    backHairR: frames.map((f) => f.slots[2] ?? 0),
-    sideHairL: frames.map((f) => f.slots[17] ?? 0),
-    sideHairR: frames.map((f) => f.slots[18] ?? 0),
-    fringe1: frames.map((f) => f.slots[19] ?? 0),
-    fringe2: frames.map((f) => f.slots[20] ?? 0),
-    skirtUpper: frames.map((f) => f.slots[11] ?? 0),
-    skirtLower: frames.map((f) => f.slots[12] ?? 0),
     chest: frames.map((f) => f.breathLift),
-    armFollow: frames.map((f) => f.groups.armGroupL.y),
-    backHairInertia: frames.map((f) => f.groups.backHairGroup.y),
-    frontHairInertia: frames.map((f) => f.groups.frontHairGroup.y),
   };
   for (const [name, values] of Object.entries(channels)) {
     assert.ok(
@@ -238,29 +220,54 @@ test("BLOCK 2 animation: both arms, both legs, hair, fabric and head really move
       `${name} is static (${distinct(values)} states)`,
     );
   }
-  assert.ok(
-    channels.armGroupL.some((v, i) => v !== channels.armGroupR[i]),
-    "left and right arms move identically",
-  );
-  assert.ok(
-    channels.legSlotL.some((v, i) => v !== channels.legSlotR[i]),
-    "left and right legs move identically",
-  );
+  // CATEGORY-D GUARD: arms, back hair, side locks and skirt may NEVER move
+  // rigidly against the neighbours that share their zero-overlap cut
+  // contours — their visible motion comes from the shared breathing field
+  // row-mesh, which deforms them together with the torso band.
+  for (const f of frames) {
+    for (const g of [
+      f.groups.armGroupL,
+      f.groups.armGroupR,
+      f.groups.backHairGroup,
+      f.groups.frontHairGroup,
+    ]) {
+      assert.equal(g.rotationDeg, 0, "pendulum rotation reintroduced");
+      assert.equal(g.y, 0, "rigid follow translation reintroduced");
+      assert.equal(g.x, 0, "rigid horizontal shift reintroduced");
+    }
+    for (const z of [1, 2, 6, 7, 11, 12, 17, 18, 19, 20]) {
+      assert.equal(f.slots[z] ?? 0, 0, `slot ${z} pendulum reintroduced`);
+    }
+  }
+  // The field really covers arms, back hair and fabric: all of their slots
+  // are row-meshed and the band weight is positive at their anchor rows.
+  for (const z of [1, 2, 6, 7, 11, 12]) {
+    assert.ok(
+      (BREATH_MESH_SLOTS as readonly number[]).includes(z),
+      `slot ${z} not in the shared breathing field`,
+    );
+  }
+  for (const y of [340, 380, 460, 500]) {
+    assert.ok(breathWeight(y) > 0, `field dead at row ${y}`);
+  }
   assert.ok(
     channels.legWarpL.some((v, i) => v !== channels.legWarpR[i]),
     "left and right leg pose warps move identically",
   );
-  for (const name of ["legSlotL", "legSlotR", "legWarpL", "legWarpR"]) {
+  // Hip rotation retired (Category-D): leg slots must stay unrotated.
+  for (const f of frames) {
+    assert.equal(f.slots[3] ?? 0, 0, "left hip rotation reintroduced");
+    assert.equal(f.slots[4] ?? 0, 0, "right hip rotation reintroduced");
+  }
+  for (const name of ["legWarpL", "legWarpR"]) {
     const values = channels[name];
     assert.ok(
       Math.min(...values) < -0.5 && Math.max(...values) > 0.5,
       `${name} never reaches both sides of the pose`,
     );
   }
-  assert.ok(
-    channels.skirtUpper.some((v, i) => v !== channels.skirtLower[i]),
-    "skirt has no counter-motion",
-  );
+  // Skirt rotation retired (Category-D): both parts are welded into the
+  // shared breathing field; the guard above keeps slots 11/12 at zero.
 });
 
 test("BLOCK 2 animation: three full cycles are seam-exact and return to rest", () => {
@@ -357,28 +364,15 @@ test("BLOCK 2 animation: tap distributes motion without root lift, scale or rota
       `root changed on ${zone}`,
     );
     assertFiniteTransform(tapped, `tap ${zone}`);
-    assert.notEqual(
-      tapped.slots[3],
-      idle.slots[3],
-      `left leg frozen on ${zone}`,
-    );
-    assert.notEqual(
-      tapped.slots[4],
-      idle.slots[4],
-      `right leg frozen on ${zone}`,
-    );
-    // A head tap has only body=0.3; its integer knee warp can legitimately
-    // round to the same whole pixel while the hip rotation still changes.
-    // The combined rendered leg pose must move for every zone.
+    // Hip rotation retired (Category-D): tap feedback reaches the legs
+    // through the graded knee-area warp only, and the field pulse makes
+    // every zone visibly respond even when the integer warp rounds equal.
+    assert.equal(tapped.slots[3], idle.slots[3], `hip rotated on ${zone}`);
+    assert.equal(tapped.slots[4], idle.slots[4], `hip rotated on ${zone}`);
     assert.ok(
-      tapped.slots[3] !== idle.slots[3] ||
-        tapped.slotWarp[3] !== idle.slotWarp[3],
-      `left leg pose frozen on ${zone}`,
-    );
-    assert.ok(
-      tapped.slots[4] !== idle.slots[4] ||
-        tapped.slotWarp[4] !== idle.slotWarp[4],
-      `right leg pose frozen on ${zone}`,
+      tapped.slotWarp[3] !== idle.slotWarp[3] ||
+        tapped.breathLift !== idle.breathLift,
+      `no visible response on ${zone}`,
     );
     const headHeavy = zone === "head" || zone === "hair";
     if (headHeavy) {
@@ -390,21 +384,35 @@ test("BLOCK 2 animation: tap distributes motion without root lift, scale or rota
     }
     const armHeavy = zone === "body" || zone === "arms";
     if (armHeavy) {
-      assert.notDeepEqual(
-        tapped.groups.armGroupL,
-        idle.groups.armGroupL,
-        `left arm frozen on ${zone}`,
-      );
-      assert.notDeepEqual(
-        tapped.groups.armGroupR,
-        idle.groups.armGroupR,
-        `right arm frozen on ${zone}`,
+      // Arms respond through the SHARED breathing field (whole torso band
+      // plus arms rise together) — a rigid arm rotation tore the shared
+      // cut contours open on every tap (Category-D).
+      assert.notEqual(
+        tapped.breathLift,
+        idle.breathLift,
+        `field impulse missing on ${zone}`,
       );
     } else {
-      assert.notDeepEqual(
-        tapped.groups.backHairGroup,
-        idle.groups.backHairGroup,
-        `back hair frozen on ${zone}`,
+      // Head/hair taps answer through the head micro-rotation and the
+      // shared field pulse — never through a hair-group sway.
+      assert.ok(
+        tapped.breathLift !== idle.breathLift ||
+          tapped.groups.headGroup.rotationDeg !==
+            idle.groups.headGroup.rotationDeg,
+        `no visible response on ${zone}`,
+      );
+    }
+    // Welded groups must stay welded during taps too.
+    for (const g of [
+      "armGroupL",
+      "armGroupR",
+      "backHairGroup",
+      "frontHairGroup",
+    ] as const) {
+      assert.deepEqual(
+        tapped.groups[g],
+        idle.groups[g],
+        `${g} torn on ${zone}`,
       );
     }
   }
@@ -429,8 +437,10 @@ test("critical repair: a suspended WebKit frame cannot teleport the pose", () =>
   assert.equal(clampedAnimationDeltaMs(1_500), 100);
   assert.equal(clampedAnimationDeltaMs(Number.POSITIVE_INFINITY), 0);
   assert.equal(clampedAnimationDeltaMs(-1), 0);
+  // Hip rotation retired (Category-D): the visible mobile-scale leg pose
+  // lives in the graded knee-area warp instead.
   assert.ok(
-    Math.abs(rigFrameAt(1_500).slots[3] ?? 0) > 1,
+    Math.abs(rigFrameAt(1_500).slotWarp[3] ?? 0) > 10,
     "mobile-scale leg pose is not visibly larger than the rejected build",
   );
 });
@@ -501,11 +511,9 @@ test("BODY COHESION: breathing cannot open a zero-overlap seam", () => {
     assert.equal(f.groups.headGroup.y, 0, `head translated at ${t}`);
     assert.equal(f.groups.legGroup.y, 0, `legs translated at ${t}`);
     assert.equal(f.groups.outfitGroup.x, 0, `outfit shifted at ${t}`);
-    // Arms follow the SAME field value sampled at the shoulder anchor row.
-    const follow =
-      Math.round(-f.breathLift * breathWeight(BREATH.armAnchorY)) + 0;
-    assert.equal(f.groups.armGroupL.y, follow, `left arm detached at ${t}`);
-    assert.equal(f.groups.armGroupR.y, follow, `right arm detached at ${t}`);
+    // Arms are row-meshed by the shared field: their groups stay welded.
+    assert.equal(f.groups.armGroupL.y, 0, `left arm detached at ${t}`);
+    assert.equal(f.groups.armGroupR.y, 0, `right arm detached at ${t}`);
     // Skirt parts sway the same direction: no counter-rotation seam inside
     // the skirt.
     assert.ok(
@@ -541,4 +549,109 @@ test("BODY COHESION: tap reactions keep the same seam rules", () => {
       );
     }
   }
+});
+
+test("ALPHA REPAIR: small interior punch-holes close, real openings survive", () => {
+  const W = 40;
+  const H = 40;
+  const data = new Uint8ClampedArray(W * H * 4);
+  const set = (x: number, y: number, r: number, a: number): void => {
+    const i = (y * W + x) * 4;
+    data[i] = r;
+    data[i + 1] = 120;
+    data[i + 2] = 90;
+    data[i + 3] = a;
+  };
+  // Opaque body 4..35 x 4..35 with: AA edge at x=4, a 2x2 punch-hole at
+  // (10..11, 10..11), a semi-alpha dot at (20,20), and a big 12x12 opening
+  // at (22..33, 22..33) that must survive.
+  for (let y = 4; y < 36; y += 1)
+    for (let x = 4; x < 36; x += 1) set(x, y, 200, 255);
+  for (let y = 4; y < 36; y += 1) set(4, y, 200, 120); // silhouette AA
+  set(10, 10, 0, 0);
+  set(11, 10, 0, 0);
+  set(10, 11, 0, 0);
+  set(11, 11, 0, 0);
+  set(20, 20, 210, 90); // weak interior dot keeps its approved RGB
+  for (let y = 22; y < 34; y += 1)
+    for (let x = 22; x < 34; x += 1) set(x, y, 0, 0); // genuine opening
+  const result = solidifyInteriorHoles(data, W, H, {
+    alphaThreshold: 250,
+    maxHoleArea: 100,
+  });
+  assert.equal(result.filledPixels, 5, "filled wrong number of pixels");
+  assert.equal(result.preservedLargeComponents, 1, "big opening not kept");
+  const alphaAt = (x: number, y: number): number =>
+    data[(y * W + x) * 4 + 3] ?? 0;
+  const redAt = (x: number, y: number): number => data[(y * W + x) * 4] ?? 0;
+  assert.equal(alphaAt(10, 10), 255, "punch-hole still transparent");
+  assert.ok(redAt(10, 10) > 150, "hole RGB not rebuilt from neighbours");
+  assert.equal(alphaAt(20, 20), 255, "weak dot not solidified");
+  assert.equal(redAt(20, 20), 210, "weak dot approved RGB changed");
+  assert.equal(alphaAt(25, 25), 0, "genuine art opening was filled");
+  assert.equal(alphaAt(4, 10), 120, "silhouette AA edge was altered");
+  assert.equal(alphaAt(0, 0), 0, "background filled");
+});
+
+test("ALPHA REPAIR: approved openings are never closed", () => {
+  const W = 20;
+  const H = 20;
+  const data = new Uint8ClampedArray(W * H * 4);
+  for (let y = 2; y < 18; y += 1)
+    for (let x = 2; x < 18; x += 1) {
+      const i = (y * W + x) * 4;
+      data[i + 3] = 255;
+    }
+  const hole = (x: number, y: number): void => {
+    data[(y * W + x) * 4 + 3] = 0;
+  };
+  hole(5, 5); // protected approved opening
+  hole(12, 12); // genuine punch-hole defect
+  const result = solidifyInteriorHoles(data, W, H, {
+    alphaThreshold: 250,
+    maxHoleArea: 100,
+    protectedRects: [[5, 5, 5, 5]],
+  });
+  assert.equal(result.filledPixels, 1, "should fill only the defect");
+  assert.equal(result.preservedLargeComponents, 1, "opening not preserved");
+  assert.equal(data[(5 * W + 5) * 4 + 3], 0, "approved opening was closed");
+  assert.equal(data[(12 * W + 12) * 4 + 3], 255, "defect not closed");
+});
+
+test("ALPHA REPAIR: restoration source supplies the artist's original RGB", () => {
+  const W = 16;
+  const H = 16;
+  const data = new Uint8ClampedArray(W * H * 4);
+  const restore = new Uint8ClampedArray(W * H * 4);
+  for (let y = 2; y < 14; y += 1) {
+    for (let x = 2; x < 14; x += 1) {
+      const i = (y * W + x) * 4;
+      data[i] = 200;
+      data[i + 1] = 180;
+      data[i + 2] = 190;
+      data[i + 3] = 255;
+    }
+  }
+  for (let i = 0; i < W * H; i += 1) {
+    restore[i * 4] = 59; // flat painted shadow tone from the original art
+    restore[i * 4 + 1] = 36;
+    restore[i * 4 + 2] = 75;
+    restore[i * 4 + 3] = 255;
+  }
+  const hole = (7 * W + 7) * 4; // transparent punch-hole inside the body
+  data[hole] = 0;
+  data[hole + 1] = 0;
+  data[hole + 2] = 0;
+  data[hole + 3] = 0;
+  const result = solidifyInteriorHoles(data, W, H, {
+    alphaThreshold: 250,
+    maxHoleArea: 1500,
+    restoreRgb: restore,
+  });
+  assert.equal(result.filledPixels, 1);
+  assert.equal(result.rebuiltRgbPixels, 1);
+  assert.equal(data[hole + 3], 255, "hole not closed");
+  assert.equal(data[hole], 59, "original RGB not restored");
+  assert.equal(data[hole + 1], 36, "original RGB not restored");
+  assert.equal(data[hole + 2], 75, "original RGB not restored");
 });

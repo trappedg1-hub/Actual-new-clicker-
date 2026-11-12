@@ -440,5 +440,37 @@
     "noNewLayers": true,
     "noStaticOverlay": true,
     "status": "REJECTED_UNTIL_USER_IPHONE_RECHECK"
+  },
+  "defectMapRepair": {
+    "date": "2026-11-12",
+    "trigger": "IMG_4058/4059/4060 physical iPhone rejection",
+    "document": "DEFECT-MAP.md",
+    "classification": {
+      "A": "~4.8k interior weak-alpha px baked in 20 approved PNGs; two largest components proven painted shadow vs IMG_4038 original; runtime-restored 1:1 from approved original, no PNG modified",
+      "B": "ruled out: runtime slots byte-equal to approved PNGs outside repaired px (z01/z05/z08/z12, 0 diffs)",
+      "C": "residual 1px AA seams only, min alpha 182-191 (<=25% show-through), zero fully transparent interior px in all 16 phases",
+      "D": "eliminated: pendulum motions welded into shared breathing field; BREATH_MESH_SLOTS={1,2,5,6,7,8,9,10,11,12}; z17/z18 reparented to headGroup; interior metric constant 570±6 px across 16 phases + 16 consecutive 16ms frames",
+      "E": "ruled out by same byte-exact pipeline check"
+    },
+    "newModule": "src/heroine/rig/alphaRepair.ts",
+    "config": {
+      "interiorHoleMaxArea": 1500,
+      "interiorAlphaThreshold": 250,
+      "approvedOpenings": {
+        "17": [
+          [
+            326,
+            183,
+            339,
+            232
+          ]
+        ]
+      }
+    },
+    "evidence": "evidence-2026-11-12/ (11 PHASES sheets, 5 CONSEC sheets)",
+    "tests": "47/47, tsc=0, eslint=0",
+    "approvedPngsModified": false,
+    "requiresUserPermission": "optional permanent baking of category-A fixes into layer PNGs (see DEFECT-MAP.md)",
+    "status": "REJECTED / NOT ARTISTICALLY APPROVED pending physical iPhone recheck"
   }
 }

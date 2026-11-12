@@ -27,6 +27,7 @@ import layer18Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-
 import layer19Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/layers/19_hair_front_01.png?url";
 import layer20Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/layers/20_hair_front_02.png?url";
 import underlayUnionUrl from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/underlays/UNDERLAY-UNION.png?url";
+import originalArtUrl from "../../../art-studio/references/originals/IMG_4038_rig-pose.webp?url";
 import state00Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/assembly/state-00-neutral.png?url";
 import state01Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/assembly/state-01-eye_l_closed-B.png?url";
 import state02Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/assembly/state-02-eye_r_closed-B.png?url";
@@ -89,6 +90,13 @@ export const LAYER_URLS: Readonly<Record<number, string>> = {
 };
 
 export const UNDERLAY_UNION_URL: string = underlayUnionUrl;
+
+/**
+ * Approved pre-separation original (848x1264, same canvas as the slots).
+ * Used READ-ONLY at runtime as the restoration source for interior pixels
+ * the BLOCK 1 layer-separation cut erroneously punched out of the slots.
+ */
+export const ORIGINAL_ART_URL: string = originalArtUrl;
 
 export const STATE_PLATE_URLS: Readonly<Record<ExpressionStateName, string>> = {
   "00-neutral": state00Url,

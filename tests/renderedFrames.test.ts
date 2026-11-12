@@ -180,9 +180,14 @@ test("critical repair render architecture: every visible slot is one animated co
   assert.equal(LEG_POSE.kneeY, 960);
   assert.equal(LEG_POSE.ankleY, 1210);
   assert.equal(LEG_POSE.warpPx, 28);
-  assert.equal(LEG_POSE.rotationDeg, 2.8);
+  assert.equal(LEG_POSE.rotationDeg, 0, "hip rotation reintroduced");
   assert.ok(MOTION.breathingPx >= 6, "breathing below visible mobile scale");
-  assert.ok(MOTION.hairSwayPx >= 7, "hair inertia below visible mobile scale");
+  // Back-hair sway retired (Category-D): the strands share cut contours
+  // with blouse/skirt/arms; any rigid sway tears black slits along them.
+  assert.equal(MOTION.hairSwayPx, 0, "tearing back-hair sway reintroduced");
+  assert.equal(MOTION.armGroupRotationDeg, 0, "arm pendulum reintroduced");
+  assert.equal(MOTION.armSlotRotationDeg, 0, "arm slot pendulum reintroduced");
+  assert.equal(MOTION.skirtRotationDeg, 0, "skirt rotation reintroduced");
   const rigSource = readFileSync(
     "src/heroine/rig/ProductionHeroineRig.ts",
     "utf8",

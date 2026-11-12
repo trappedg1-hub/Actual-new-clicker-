@@ -34,8 +34,10 @@ import type {
   RigGroupId,
   TouchZone,
 } from "./animationMath.ts";
+import { solidifyInteriorHoles } from "./alphaRepair.ts";
 import {
   ALL_RUNTIME_TEXTURE_URLS,
+  ORIGINAL_ART_URL,
   EXPRESSION_OVERLAY_URLS,
   LAYER_URLS,
   SLOT_DEFINITIONS,
@@ -294,7 +296,9 @@ function legWarpWeight(y: number): number {
  */
 function runtimeSlotTexture(
   resource: ApprovedSlotResource,
+  slotZ: number,
   straightPixels?: Uint8ClampedArray,
+  originalArtPixels?: Uint8ClampedArray,
 ): RuntimeSlotTexture {
   let data: Uint8ClampedArray;
   if (straightPixels) {
@@ -311,6 +315,16 @@ function runtimeSlotTexture(
   }
   const width = RIG_CANVAS.width;
   const height = RIG_CANVAS.height;
+  // Close the small interior alpha punch-holes left by the BLOCK 1 layer
+  // separation BEFORE the bbox scan and edge bleed: the dark background
+  // showed through them as black blotches on the blouse/hair.  Large
+  // genuine openings are preserved; no PNG on disk changes.
+  solidifyInteriorHoles(data, width, height, {
+    alphaThreshold: RUNTIME_TEXTURE.interiorAlphaThreshold,
+    maxHoleArea: RUNTIME_TEXTURE.interiorHoleMaxArea,
+    protectedRects: RUNTIME_TEXTURE.approvedOpenings[slotZ] ?? [],
+    restoreRgb: originalArtPixels,
+  });
   let minX: number = width;
   let minY: number = height;
   let maxX = 0;
@@ -532,11 +546,14 @@ export class ProductionHeroineRig extends Container {
         ),
       );
       const textures = new Map<string, Texture>(entries);
-      const straightSlotPixels = await decodeStraightSlotPixels(
-        SLOT_DEFINITIONS.map((slot) => LAYER_URLS[slot.z]).filter(
+      const straightSlotPixels = await decodeStraightSlotPixels([
+        ...SLOT_DEFINITIONS.map((slot) => LAYER_URLS[slot.z]).filter(
           (url): url is string => typeof url === "string",
         ),
-      );
+        // Approved pre-separation original: read-only restoration source
+        // for the interior pixels the layer separation punched out.
+        ORIGINAL_ART_URL,
+      ]);
       this.validateSwitchMatrix();
       this.build(textures, straightSlotPixels);
       if (this.loadingText) {
@@ -630,7 +647,9 @@ export class ProductionHeroineRig extends Container {
       holder.label = `z${String(slot.z).padStart(2, "0")} ${slot.slot}`;
       const { texture, bounds } = runtimeSlotTexture(
         original.source.resource as ApprovedSlotResource,
+        slot.z,
         straightSlotPixels.get(url),
+        straightSlotPixels.get(ORIGINAL_ART_URL),
       );
       if (slot.z === 3 || slot.z === 4) {
         const leg = this.createLegMesh(texture, bounds);
@@ -824,6 +843,11 @@ export class ProductionHeroineRig extends Container {
       }
       case 17:
       case 18:
+        // Side locks share their cut contours with the collar: the front
+        // hair group's secondary sway tore 1-2px slits between lock and
+        // collar (Category-D).  The welded head group keeps them sealed.
+        this.groups.headGroup.addChild(holder);
+        break;
       case 19:
       case 20:
         this.groups.frontHairGroup.addChild(holder);

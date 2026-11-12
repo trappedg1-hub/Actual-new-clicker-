@@ -34,7 +34,11 @@ export const LEG_POSE = {
   kneeY: 960,
   ankleY: 1210,
   /** Whole-slot rotation around the approved hip pivot, degrees at max. */
-  rotationDeg: 2.8,
+  /**
+   * RETIRED (must stay 0): hip rotation slid the leg tops under the sheer
+   * skirt openings and opened black hip slits (Category-D defect map).
+   */
+  rotationDeg: 0,
   /** Horizontal pose warp at the knee, whole art pixels at max. */
   warpPx: 28,
 } as const;
@@ -71,8 +75,14 @@ export const BREATH = {
   armAnchorY: 340,
 } as const;
 
-/** Approved slots deformed by the shared breathing field row-mesh. */
-export const BREATH_MESH_SLOTS = [5, 8, 9, 10, 11, 12] as const;
+/**
+ * Approved slots deformed by the shared breathing field row-mesh.  Includes
+ * EVERY slot whose art crosses the breathing band y300-540 (torso, blouse,
+ * collar, ribbon, both skirt parts, both arms, both back-hair masses):
+ * identical rows displace identically, so no zero-overlap cut contour
+ * between any two of them can open during motion (Category-D fix).
+ */
+export const BREATH_MESH_SLOTS = [1, 2, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
 /** Visible mobile-scale idle amplitudes, all in approved art pixels/degrees. */
 export const MOTION = {
@@ -80,13 +90,22 @@ export const MOTION = {
   shoulderPx: 4,
   headCounterPx: 3,
   waistCounterPx: 2,
-  hairSwayPx: 7,
-  hairLagPx: 5,
-  armGroupRotationDeg: 1.3,
-  armSlotRotationDeg: 1.8,
-  hairGroupRotationDeg: 0.9,
-  hairSlotRotationDeg: 0.75,
-  skirtRotationDeg: 1.2,
+  /**
+   * RETIRED pendulum amplitudes (must stay 0): back-hair sway, arm group and
+   * arm slot rotation, back-hair/side-lock rotation and skirt rotation each
+   * moved a slot rigidly against a neighbour that shares its zero-overlap
+   * cut contour and tore 1-6px black slits open during motion (Category-D
+   * defect map, 2026-11-12).  Their visible movement now comes from the
+   * shared breathing field row-mesh; only the front fringe, which lies
+   * entirely over the opaque head/face interior, keeps secondary motion.
+   */
+  hairSwayPx: 0,
+  hairLagPx: 0,
+  armGroupRotationDeg: 0,
+  armSlotRotationDeg: 0,
+  hairGroupRotationDeg: 0,
+  hairSlotRotationDeg: 0,
+  skirtRotationDeg: 0,
 } as const;
 
 /** Runtime texture settings for the 20 approved slots and the static composite. */
@@ -99,6 +118,38 @@ export const RUNTIME_TEXTURE = {
    */
   alphaMode: "no-premultiply-alpha",
   alphaBleedRadius: 2,
+  /**
+   * Interior punch-holes up to this many pixels (per 4-connected component)
+   * are closed at runtime: the layer separation left tiny transparent holes
+   * INSIDE the opaque silhouettes (110 in the blouse alone) through which
+   * the dark background reads as black blotches.  Genuine art openings
+   * (hair strand gaps, neckline, between the legs) are larger or reach the
+   * exterior and are preserved bit-exactly.
+   */
+  /**
+   * Covers the two largest measured separation defects: the flat painted
+   * shadow slivers between the back-hair locks (712px at [260,535-284,609]
+   * and 582px at [565,533-588,608] in z01), verified against the approved
+   * original IMG_4038_rig-pose: the original holds a flat low-variance
+   * shadow tone (std ~10) there, NOT the high-variance background (std
+   * ~60), so the separation cut away painted art.  No approved layer has
+   * any other interior component above 300px (full 20-layer scan,
+   * 2026-11-12), so no genuine opening is affected by this threshold.
+   */
+  interiorHoleMaxArea: 1500,
+  interiorAlphaThreshold: 250,
+  /**
+   * Approved art openings per slot z, [x0, y0, x1, y1] inclusive, in the
+   * 848x1264 canvas space.  Each rect was verified TRANSPARENT in the
+   * approved BLOCK 1 full assembly (ASSEMBLY-REST-RGBA.png), i.e. the
+   * artist intended the background to show through — the hole repair must
+   * never close these.  z17 hair_side_l: strand gap near the face.
+   */
+  approvedOpenings: {
+    17: [[326, 183, 339, 232]],
+  } as Readonly<
+    Record<number, readonly (readonly [number, number, number, number])[]>
+  >,
   scaleMode: "linear",
   addressMode: "clamp-to-edge",
 } as const;
