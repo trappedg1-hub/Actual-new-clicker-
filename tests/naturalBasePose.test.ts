@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -102,4 +103,27 @@ test("NATURAL POSE: debris cleanup is tiny, leg-adjacent and never touches the f
   assert.ok(totalArea <= 400, `total cleanup area too large: ${totalArea}px`);
   // The approved z17 hair opening must never appear in the cleanup set.
   assert.ok(!(17 in POSE_DEBRIS_CLEANUP));
+});
+
+test("NATURAL POSE: legs are fully static and blink is an overlay (source guards)", () => {
+  const rig = readFileSync("src/heroine/rig/ProductionHeroineRig.ts", "utf8");
+  // No periodic/tap leg warp in the natural variant — legs never move.
+  assert.ok(
+    rig.includes('this.poseVariant === "natural" ? 0 : (frame.slotWarp[z]'),
+    "natural variant must zero the dynamic leg warp",
+  );
+  // Blink renders as a dedicated opaque overlay plate above the dominant
+  // plate; the base plate must not swap mid-blink.
+  assert.ok(rig.includes("blinkPlates"), "blink overlay plates missing");
+  assert.ok(
+    rig.includes("frame.blinkWeight"),
+    "blink overlay must use the envelope weight",
+  );
+  // The approved front-hair cuts carry baked-in OPEN-eye fragments above the
+  // face plates, so the visible closure must come from eye patches parented
+  // above the hair slots. Removing them makes the blink invisible again.
+  assert.ok(
+    rig.includes("eyePatchPlates"),
+    "closed-eye patches above the hair groups missing",
+  );
 });

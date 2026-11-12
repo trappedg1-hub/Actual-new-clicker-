@@ -20,6 +20,24 @@ export const FACE_PLATE_RECT = {
   radius: 40,
 } as const;
 
+/**
+ * Eye band of the approved state plates, rendered ABOVE the hair groups
+ * during a blink.  The approved front-hair cuts `19_hair_front_01` and
+ * `20_hair_front_02` carry baked-in fragments of the OPEN eyes (layer 20
+ * contains nearly the whole open right eye), so any closed-eye plate below
+ * the hair stays covered and the blink is invisible.  The assembly state
+ * plates are full composites (hair included), so this tight band shows the
+ * approved closed-eye look without editing any frozen PNG.
+ * Verified change extents vs `state-00-neutral`: eyes x377-470, y149-177.
+ */
+export const EYE_PATCH_RECT = {
+  x: 374,
+  y: 140,
+  width: 116,
+  height: 48,
+  radius: 10,
+} as const;
+
 export type TouchZone = "head" | "hair" | "body" | "arms";
 
 export const EXPRESSION_STATES = [
@@ -130,6 +148,10 @@ export interface RigFrame {
   underlayAlpha: number;
   expressionTargets: Record<ExpressionStateName, number>;
   blinkClosed: boolean;
+  /** Approved closed-eye plate cross-fading above the dominant plate. */
+  blinkState: ExpressionStateName;
+  /** 0..1 cross-fade weight of the blink overlay (1 = fully closed). */
+  blinkWeight: number;
 }
 
 export interface ReactionState {
@@ -290,21 +312,55 @@ function baseExpressionTargets(loopMs: number): {
   return { targets: neutral, dominant: "00-neutral" };
 }
 
+/**
+ * Natural blink envelope.  The original 140 ms window flipped the single
+ * dominant face plate for only ~6 frames; on iPhone Safari that swap fell
+ * between rendered frames and the eyes never visibly closed.  A real blink
+ * closes fast, HOLDS shut and reopens slower, and the runtime now renders
+ * it as a dedicated opaque closed-eye plate cross-fading ABOVE the dominant
+ * plate, so every phase of the envelope is visible.
+ */
+const BLINK_STARTS = [2_600, 6_600, 10_600] as const;
+const BLINK_CLOSE_MS = 90;
+const BLINK_HOLD_MS = 80;
+const BLINK_OPEN_MS = 130;
+const BLINK_TOTAL_MS = BLINK_CLOSE_MS + BLINK_HOLD_MS + BLINK_OPEN_MS;
+
 function blinkWeight(loopMs: number): number {
-  const windows: readonly (readonly [number, number])[] = [
-    [2_600, 2_740],
-    [6_600, 6_740],
-    [10_600, 10_740],
-  ];
-  for (const [start, end] of windows) {
-    if (loopMs >= start && loopMs <= end) {
-      const edge = 30;
-      const fadeIn = smoothstep((loopMs - start) / edge);
-      const fadeOut = 1 - smoothstep((loopMs - (end - edge)) / edge);
-      return Math.min(fadeIn, fadeOut);
+  for (const start of BLINK_STARTS) {
+    const t = loopMs - start;
+    if (t >= 0 && t <= BLINK_TOTAL_MS) {
+      if (t < BLINK_CLOSE_MS) return smoothstep(t / BLINK_CLOSE_MS);
+      if (t <= BLINK_CLOSE_MS + BLINK_HOLD_MS) return 1;
+      return (
+        1 - smoothstep((t - BLINK_CLOSE_MS - BLINK_HOLD_MS) / BLINK_OPEN_MS)
+      );
     }
   }
   return 0;
+}
+
+/** Cross-fade overlay that closes BOTH eyes above the dominant face plate. */
+export interface BlinkOverlay {
+  state: ExpressionStateName;
+  weight: number;
+}
+
+/**
+ * The blink is rendered as its own approved closed-eye plate cross-fading
+ * above the base expression, NOT by swapping the dominant plate: the swap
+ * was invisible between frames, and blending blink into the shared targets
+ * popped the base plate open/closed at weight 0.5 mid-fade.
+ */
+export function blinkOverlayAt(
+  timeMs: number,
+  override: ExpressionOverride | null = null,
+): BlinkOverlay {
+  const loopMs = ((timeMs % RIG_LOOP_MS) + RIG_LOOP_MS) % RIG_LOOP_MS;
+  const base = baseExpressionTargets(loopMs);
+  const dominant =
+    override && override.weight > 0.5 ? override.state : base.dominant;
+  return { state: blinkStateFor(dominant), weight: blinkWeight(loopMs) };
 }
 
 export function expressionTargetsAt(
@@ -319,12 +375,10 @@ export function expressionTargetsAt(
     replacement[override.state] = 1;
     targets = blendTargets(targets, replacement, override.weight);
   }
-  const weight = blinkWeight(loopMs);
-  if (weight > 0) {
-    const blink = zeroTargets();
-    blink[blinkStateFor(base.dominant)] = 1;
-    targets = blendTargets(targets, blink, weight);
-  }
+  // Blink is intentionally NOT blended into the shared targets any more:
+  // the single-dominant-plate renderer turned that blend into an invisible
+  // 1-frame swap.  The runtime reads blinkOverlayAt() instead and fades a
+  // dedicated opaque closed-eye plate above the stable dominant plate.
   return targets;
 }
 
@@ -466,6 +520,8 @@ export function rigFrameAt(
   // Fringe slot rotations retired (Category-D): any relative motion of the
   // interlocking fringe/side-lock strand sets opens cracks at the parting.
 
+  const blink = blinkOverlayAt(loopMs, override);
+
   return {
     timeMs,
     loopMs,
@@ -476,6 +532,8 @@ export function rigFrameAt(
     underlayAlpha: 0,
     expressionTargets: expressionTargetsAt(loopMs, override),
     blinkClosed: isBlinkClosed(loopMs),
+    blinkState: blink.state,
+    blinkWeight: blink.weight,
   };
 }
 

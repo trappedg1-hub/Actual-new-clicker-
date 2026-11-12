@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   applyReaction,
+  blinkOverlayAt,
   clampedAnimationDeltaMs,
   decayReaction,
   EXPRESSION_COMBOS,
@@ -307,11 +308,24 @@ test("BLOCK 2 animation: auto blink and every tap reaction close BOTH eyes", () 
     EXPRESSION_COMBOS[state].includes("eye_l_closed-B") &&
     EXPRESSION_COMBOS[state].includes("eye_r_closed-B");
 
-  // Auto blink uses blinkStateFor(base.dominant): neutral / smile / open.
-  for (const t of [2_670, 6_670, 10_670]) {
-    const state = dominantExpressionState(expressionTargetsAt(t));
-    assert.ok(bothEyes(state), `auto blink ${t} used ${state}`);
-    assert.equal(isBlinkClosed(t), true);
+  // Auto blink is a dedicated opaque overlay plate above the dominant
+  // plate: both eyes close fully (weight 1 during the hold phase) while
+  // the base expression underneath stays stable (no mid-blink plate swap).
+  for (const start of [2_600, 6_600, 10_600]) {
+    const hold = start + 120; // inside close(90) + hold(80) plateau
+    const overlay = blinkOverlayAt(hold);
+    assert.ok(bothEyes(overlay.state), `blink ${hold} used ${overlay.state}`);
+    assert.equal(overlay.weight, 1, `blink not fully closed at ${hold}`);
+    assert.equal(isBlinkClosed(hold), true);
+    const base = dominantExpressionState(expressionTargetsAt(hold));
+    assert.ok(!bothEyes(base), `base plate swapped mid-blink at ${hold}`);
+    // Smooth envelope: partially closed on the way in, reopening after.
+    const closing = blinkOverlayAt(start + 45).weight;
+    const reopening = blinkOverlayAt(start + 235).weight;
+    assert.ok(closing > 0 && closing < 1, `no smooth close at ${start}`);
+    assert.ok(reopening > 0 && reopening < 1, `no smooth reopen at ${start}`);
+    assert.equal(blinkOverlayAt(start - 10).weight, 0);
+    assert.equal(blinkOverlayAt(start + 310).weight, 0);
   }
 
   // Tap mapping: the runtime keeps one opaque both-eye plate dominant for the

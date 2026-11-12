@@ -18,6 +18,7 @@ import {
   decayReaction,
   EXPRESSION_COMBOS,
   EXPRESSION_STATES,
+  EYE_PATCH_RECT,
   FACE_PLATE_RECT,
   TAP_EXPRESSION_STATES,
   NO_REACTION,
@@ -465,6 +466,16 @@ export class ProductionHeroineRig extends Container {
   private readonly legMeshes = new Map<number, LegMesh>();
   private readonly breathMeshes = new Map<number, BreathMesh>();
   private readonly facePlates = new Map<ExpressionStateName, Sprite>();
+  /** Opaque closed-eye plates cross-fading above the dominant plate. */
+  private readonly blinkPlates = new Map<ExpressionStateName, Sprite>();
+  /**
+   * Closed-eye band rendered ABOVE the hair groups.  The approved front-hair
+   * layers carry baked-in open-eye fragments (layer 20 holds nearly the whole
+   * open right eye), so closed-eye plates below the hair stay covered.  These
+   * patches cut the same closed-eye states to EYE_PATCH_RECT and sit on top
+   * of frontHairGroup and the side locks inside headGroup.
+   */
+  private readonly eyePatchPlates = new Map<ExpressionStateName, Sprite>();
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
   private loadingText: Text | null = null;
@@ -961,6 +972,95 @@ export class ProductionHeroineRig extends Container {
       faceGroup.addChild(sprite);
       this.facePlates.set(state, sprite);
     }
+
+    // BLINK OVERLAY PLATES.  The auto blink previously swapped the single
+    // dominant plate for ~6 frames, which iPhone Safari dropped entirely —
+    // the eyes never visibly closed.  The blink now cross-fades a dedicated
+    // OPAQUE approved closed-eye plate ABOVE the stable dominant plate:
+    // opaque-over-opaque fading cannot leak the dark plate background that
+    // retired multi-plate alpha blending, and every envelope phase (fast
+    // close, hold, slower reopen) stays visible at any frame rate.
+    for (const state of [
+      "05-both-eyes-closed",
+      "06-both-eyes-closed-smile",
+      "07-mouth_open-both-eyes-closed",
+    ] as const) {
+      const url = STATE_PLATE_URLS[state];
+      const texture = textures.get(url);
+      if (!texture) throw new Error(`Missing approved blink state ${state}.`);
+      const cropped = new Texture({
+        source: texture.source,
+        frame: new Rectangle(
+          FACE_PLATE_RECT.x,
+          FACE_PLATE_RECT.y,
+          FACE_PLATE_RECT.width,
+          FACE_PLATE_RECT.height,
+        ),
+      });
+      const sprite = new Sprite(cropped);
+      sprite.roundPixels = false;
+      sprite.label = `blink overlay ${state}`;
+      sprite.position.set(FACE_PLATE_RECT.x, FACE_PLATE_RECT.y);
+      sprite.alpha = 0;
+      sprite.visible = false;
+      sprite.eventMode = "none";
+      sprite.mask = mask;
+      faceGroup.addChild(sprite);
+      this.blinkPlates.set(state, sprite);
+    }
+
+    // EYE PATCHES ABOVE THE HAIR.  Diagnosis on the approved cuts showed the
+    // in-face overlay alone can never close the right eye: `20_hair_front_02`
+    // (frontHairGroup, above faceGroup) carries the whole painted OPEN right
+    // eye and `19_hair_front_01` a fragment of the left one.  The assembly
+    // state plates are full composites (painted hair included), so a tight
+    // eye band cut from the SAME approved closed-eye plates, parented into
+    // headGroup after the hair slots, shows the approved closed-eye look
+    // above the baked fragments.  buildFacePlates runs after every slot is
+    // parented, so these land above z17-z20 in paint order.
+    const headGroup = this.groups.headGroup;
+    const patchMask = new Graphics();
+    patchMask.label = "blink eye-patch crop mask";
+    patchMask
+      .roundRect(
+        EYE_PATCH_RECT.x,
+        EYE_PATCH_RECT.y,
+        EYE_PATCH_RECT.width,
+        EYE_PATCH_RECT.height,
+        EYE_PATCH_RECT.radius,
+      )
+      .fill({ color: 0xffffff, alpha: 1 });
+    patchMask.eventMode = "none";
+    patchMask.roundPixels = false;
+    headGroup.addChild(patchMask);
+    for (const state of [
+      "05-both-eyes-closed",
+      "06-both-eyes-closed-smile",
+      "07-mouth_open-both-eyes-closed",
+    ] as const) {
+      const url = STATE_PLATE_URLS[state];
+      const texture = textures.get(url);
+      if (!texture) throw new Error(`Missing approved blink state ${state}.`);
+      const cropped = new Texture({
+        source: texture.source,
+        frame: new Rectangle(
+          EYE_PATCH_RECT.x,
+          EYE_PATCH_RECT.y,
+          EYE_PATCH_RECT.width,
+          EYE_PATCH_RECT.height,
+        ),
+      });
+      const sprite = new Sprite(cropped);
+      sprite.roundPixels = false;
+      sprite.label = `blink eye patch ${state}`;
+      sprite.position.set(EYE_PATCH_RECT.x, EYE_PATCH_RECT.y);
+      sprite.alpha = 0;
+      sprite.visible = false;
+      sprite.eventMode = "none";
+      sprite.mask = patchMask;
+      headGroup.addChild(sprite);
+      this.eyePatchPlates.set(state, sprite);
+    }
   }
 
   private buildHitZones(): void {
@@ -1044,7 +1144,14 @@ export class ProductionHeroineRig extends Container {
     for (const z of ANIMATED_LIMB_SLOTS) {
       if (z !== 3 && z !== 4) continue;
       const leg = this.legMeshes.get(z);
-      if (leg) this.applyLegWarp(leg, frame.slotWarp[z] ?? 0);
+      if (!leg) continue;
+      // NATURAL BASE POSE: the legs are fully static.  The periodic knee
+      // warp and the tap impulse stay zero in every idle phase; only the
+      // static relaxed stance (applied inside applyLegWarp) remains.  The
+      // classic variant keeps the accepted BLOCK 2 dynamics unchanged.
+      const dynamicWarpPx =
+        this.poseVariant === "natural" ? 0 : (frame.slotWarp[z] ?? 0);
+      this.applyLegWarp(leg, dynamicWarpPx);
     }
     // One shared breathing field for every torso-band slot: identical rows
     // displace identically, so the zero-overlap seams cannot open.
@@ -1074,6 +1181,32 @@ export class ProductionHeroineRig extends Container {
       const active = state === dominant;
       sprite.alpha = active ? 1 : 0;
       sprite.visible = active;
+    }
+
+    // Blink: fade the dedicated opaque closed-eye plate above the stable
+    // dominant plate.  The base plate never swaps during a blink, so the
+    // close -> hold -> reopen envelope is fully visible and cannot pop.
+    for (const [state, sprite] of this.blinkPlates) {
+      const weight =
+        state === frame.blinkState && dominant !== frame.blinkState
+          ? frame.blinkWeight
+          : 0;
+      sprite.alpha = weight;
+      sprite.visible = weight > 0;
+    }
+
+    // Closed-eye band ABOVE the hair groups.  The baked open-eye fragments in
+    // the approved front-hair cuts cover every plate below the hair, so the
+    // visible closure comes from these patches: full weight while a closed-eye
+    // state is dominant (tap reactions), blink-envelope weight during the auto
+    // blink on any other base.
+    for (const [state, sprite] of this.eyePatchPlates) {
+      let weight = state === dominant ? 1 : 0;
+      if (state === frame.blinkState) {
+        weight = Math.max(weight, frame.blinkWeight);
+      }
+      sprite.alpha = weight;
+      sprite.visible = weight > 0;
     }
   }
 }
