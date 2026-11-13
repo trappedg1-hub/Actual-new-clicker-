@@ -25,6 +25,10 @@ import { FloatingPanel } from "../../presentation/ui/FloatingPanel.ts";
 import { StatusHud } from "../../presentation/ui/StatusHud.ts";
 import { UpgradePanel } from "../../presentation/ui/UpgradePanel.ts";
 import { RewardFeedback } from "../../presentation/pixi/RewardFeedback.ts";
+import {
+  HeartBurst,
+  tapHaptic,
+} from "../../presentation/effects/HeartBurst.ts";
 import { LiveRegion } from "../../presentation/dom/LiveRegion.ts";
 
 export interface MainSceneCallbacks {
@@ -58,6 +62,7 @@ export class MainScene extends Container {
   private readonly floatingPanel: FloatingPanel;
   private readonly dialogue = new DialogueOverlay();
   private readonly feedback: RewardFeedback;
+  private readonly hearts = new HeartBurst();
   private readonly liveRegion = new LiveRegion();
   private readonly interactionHint = new Text({
     text: "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ",
@@ -146,12 +151,16 @@ export class MainScene extends Container {
       this.showPlaceholder(section),
     );
     this.feedback = new RewardFeedback(this);
+    void this.hearts.load().catch(() => {
+      // Hearts are cosmetic; the game keeps running without the texture.
+    });
 
     this.interactionHint.anchor.set(0.5, 0);
     this.interactionHint.alpha = 0.82;
     this.interactionHint.eventMode = "none";
 
     this.addChild(
+      this.hearts,
       this.floatingPanel,
       this.bedToggle.node,
       this.upgradePanel,
@@ -170,6 +179,7 @@ export class MainScene extends Container {
     } else {
       this.heroine.update(elapsedMs);
     }
+    this.hearts.update(elapsedMs);
     this.session.tick(elapsedMs);
     this.uiAccumulatorMs += elapsedMs;
     this.autosaveAccumulatorMs += elapsedMs;
@@ -400,7 +410,8 @@ export class MainScene extends Container {
   private onBedTap(zone: BedTouchZone, globalX: number, globalY: number): void {
     const outcome = this.session.tap(BED_ZONE_ECONOMY[zone]);
     const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
-    void globalY;
+    this.hearts.burst(globalX, globalY);
+    tapHaptic();
     this.feedback.show(
       `+${outcome.currencyDelta} credits`,
       toastX,
@@ -434,6 +445,8 @@ export class MainScene extends Container {
     const global = this.heroine.toGlobal({ x: localX, y: localY });
     const previousLevel = outcome.previousLevel;
     const toastX = Math.max(110, Math.min(this.screenWidth - 110, global.x));
+    this.hearts.burst(global.x, global.y);
+    tapHaptic();
     this.feedback.show(
       `+${outcome.currencyDelta} credits`,
       toastX,
