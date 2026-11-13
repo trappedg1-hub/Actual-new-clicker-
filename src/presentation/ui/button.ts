@@ -1,6 +1,5 @@
 import { ButtonContainer } from "@pixi/ui";
 import { Graphics, Rectangle, Text } from "pixi.js";
-import { chamferPoints } from "./nikkeKit.ts";
 
 export interface StyledButtonOptions {
   width: number;
@@ -54,29 +53,37 @@ export function createStyledButton(
     const fill = enabled ? (pressed ? 0x9c55d2 : baseFill) : 0x382c48;
     plate.clear();
     if (options.chamfer) {
-      const cut = Math.min(10, Math.floor(height * 0.22));
-      const pts = chamferPoints(width, height, { cutTL: cut, cutBR: cut });
-      plate.poly(pts).fill({ color: fill, alpha: enabled ? 0.92 : 0.6 });
-      plate.poly(pts).stroke({
-        color: enabled ? baseStroke : 0x665676,
-        width: 1,
-        alpha: 0.85,
+      // iOS Liquid-Glass button: nearly clear rounded pill, bright rim,
+      // soft specular highlight across the top half.
+      const r = Math.min(18, height / 2 - 2);
+      plate.roundRect(0, 0, width, height, r).fill({
+        color: 0xffffff,
+        alpha: enabled ? (pressed ? 0.32 : 0.15) : 0.06,
       });
-      // Thin luminous top edge, NIKKE-style.
+      plate.roundRect(0, 0, width, height, r).stroke({
+        color: enabled ? baseStroke : 0x8d7fa0,
+        width: 1.2,
+        alpha: enabled ? 0.85 : 0.4,
+      });
       plate
-        .rect(cut + 2, 1, Math.max(6, width - cut * 2 - 4), 1.5)
-        .fill({ color: enabled ? baseStroke : 0x665676, alpha: 0.5 });
+        .roundRect(
+          2.5,
+          2,
+          width - 5,
+          Math.max(6, height * 0.42),
+          Math.max(4, r - 3),
+        )
+        .fill({ color: 0xffffff, alpha: enabled ? 0.14 : 0.05 });
+      void fill;
     } else {
       plate
         .roundRect(0, 0, width, height, radius)
         .fill({ color: fill, alpha: enabled ? 1 : 0.76 });
-      plate
-        .roundRect(0, 0, width, height, radius)
-        .stroke({
-          color: enabled ? baseStroke : 0x665676,
-          width: 1,
-          alpha: 0.8,
-        });
+      plate.roundRect(0, 0, width, height, radius).stroke({
+        color: enabled ? baseStroke : 0x665676,
+        width: 1,
+        alpha: 0.8,
+      });
     }
     label.style.fill = enabled ? (options.textColor ?? "#fff7ff") : "#aaa0b7";
     label.position.set(width / 2, height / 2);

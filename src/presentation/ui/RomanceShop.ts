@@ -20,7 +20,6 @@ import {
   tapPowerBonus,
 } from "../../domain/upgrades/upgrades.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
-import { drawChamferPlate } from "./nikkeKit.ts";
 
 function makeText(
   text: string,
@@ -83,10 +82,7 @@ export class RomanceShop extends Container {
   private screenWidth = 320;
   private screenHeight = 568;
 
-  constructor(
-    onPurchase: (kind: UpgradeKind) => void,
-    onClose: () => void,
-  ) {
+  constructor(onPurchase: (kind: UpgradeKind) => void, onClose: () => void) {
     super();
     this.label = "romance upgrades shop";
     this.visible = false;
@@ -155,17 +151,18 @@ export class RomanceShop extends Container {
     const cardHeight = 92;
     let y = 168;
     for (const row of this.rows) {
+      // Liquid-Glass card: clear rounded pill with a bright rim and a
+      // soft specular highlight, tinted by the upgrade accent.
       row.card.clear();
-      drawChamferPlate(row.card, left, y, sheetWidth, cardHeight, {
-        cutTL: 14,
-        cutBR: 14,
-        fill: 0x1c1028,
-        fillAlpha: 0.85,
-        stroke: ACCENTS[row.kind],
-        strokeAlpha: 0.55,
-        accent: ACCENTS[row.kind],
-        accentSide: "left",
-      });
+      row.card
+        .roundRect(left, y, sheetWidth, cardHeight, 20)
+        .fill({ color: 0xffffff, alpha: 0.1 });
+      row.card
+        .roundRect(left, y, sheetWidth, cardHeight, 20)
+        .stroke({ color: ACCENTS[row.kind], alpha: 0.75, width: 1.3 });
+      row.card
+        .roundRect(left + 3, y + 2.5, sheetWidth - 6, cardHeight * 0.42, 16)
+        .fill({ color: 0xffffff, alpha: 0.08 });
       row.iconPlate
         .clear()
         .circle(left + 34, y + cardHeight / 2, 20)

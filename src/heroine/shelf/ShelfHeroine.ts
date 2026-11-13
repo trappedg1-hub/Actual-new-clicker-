@@ -21,10 +21,7 @@ import {
   type ShelfTouchZone,
 } from "./shelfScene.ts";
 
-export {
-  SHELF_ZONE_ECONOMY,
-  type ShelfTouchZone,
-} from "./shelfScene.ts";
+export { SHELF_ZONE_ECONOMY, type ShelfTouchZone } from "./shelfScene.ts";
 
 interface ShelfHitShape {
   zone: ShelfTouchZone;

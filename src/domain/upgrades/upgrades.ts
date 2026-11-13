@@ -74,9 +74,7 @@ export function purchaseUpgrade(
 
 /** Extra coins each tap earns from the tap upgrade. */
 export function tapPowerBonus(state: Readonly<GameState>): number {
-  return (
-    getUpgradeLevel(state, "tap") * GAME_BALANCE.tapPower.perUpgradeLevel
-  );
+  return getUpgradeLevel(state, "tap") * GAME_BALANCE.tapPower.perUpgradeLevel;
 }
 
 /** Extra hearts each tap earns from the charm upgrade. */

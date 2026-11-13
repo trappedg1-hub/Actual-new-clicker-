@@ -1,5 +1,10 @@
-import { Container, Graphics } from "pixi.js";
+import { Assets, Container, Sprite, Texture } from "pixi.js";
 import { createStyledButton, type StyledButton } from "./button.ts";
+
+const liquidDockUrl = new URL(
+  "../../assets/ui/liquid-dock.png",
+  import.meta.url,
+).href;
 
 const NAV_ITEMS = [
   "HOME",
@@ -11,7 +16,7 @@ const NAV_ITEMS = [
 ] as const;
 
 export class BottomNavigation extends Container {
-  private readonly background = new Graphics();
+  private readonly background = new Sprite(Texture.EMPTY);
   private readonly row = new Container({
     layout: {
       flexDirection: "row",
@@ -26,7 +31,15 @@ export class BottomNavigation extends Container {
   constructor(onPlaceholder: (section: string) => void) {
     super();
     this.label = "six-section bottom navigation placeholders";
+    this.background.alpha = 0.96;
     this.addChild(this.background, this.row);
+    void Assets.load<Texture>(liquidDockUrl)
+      .then((texture) => {
+        this.background.texture = texture;
+      })
+      .catch(() => {
+        // The dock stays usable without the glass art.
+      });
     // HOME and SHOP are live sections; the rest stay teased but disabled.
     const enabled = new Set(["HOME", "SHOP"]);
     for (const [index, label] of NAV_ITEMS.entries()) {
@@ -54,31 +67,11 @@ export class BottomNavigation extends Container {
     const x = Math.max(8, (width - this.currentWidth) / 2);
     const panelHeight = 60;
     this.position.set(x, height - panelHeight - 6);
-    // NIKKE-style dock: angular glass slab with a luminous top edge.
-    this.background.clear();
-    this.background
-      .poly([
-        { x: 14, y: 0 },
-        { x: this.currentWidth - 14, y: 0 },
-        { x: this.currentWidth, y: 14 },
-        { x: this.currentWidth, y: panelHeight },
-        { x: 0, y: panelHeight },
-        { x: 0, y: 14 },
-      ])
-      .fill({ color: 0x120b20, alpha: 0.55 });
-    this.background
-      .poly([
-        { x: 14, y: 0 },
-        { x: this.currentWidth - 14, y: 0 },
-        { x: this.currentWidth, y: 14 },
-        { x: this.currentWidth, y: panelHeight },
-        { x: 0, y: panelHeight },
-        { x: 0, y: 14 },
-      ])
-      .stroke({ color: 0x8a5cb8, alpha: 0.5, width: 1 });
-    this.background
-      .rect(20, 1, this.currentWidth - 40, 1.5)
-      .fill({ color: 0xb98ae0, alpha: 0.45 });
+    // Liquid-Glass dock: the AI-painted translucent slab stretches to
+    // the bar size; the glass interior lets the room show through.
+    this.background.position.set(0, 0);
+    this.background.width = this.currentWidth;
+    this.background.height = panelHeight;
     const innerWidth = this.currentWidth - 16;
     this.row.position.set(8, 5);
     this.row.layout = {

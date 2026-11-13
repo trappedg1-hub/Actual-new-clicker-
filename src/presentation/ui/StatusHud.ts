@@ -1,15 +1,21 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+const liquidHeartsUrl = new URL(
+  "../../assets/ui/liquid-hearts.png",
+  import.meta.url,
+).href;
+const liquidMoneyUrl = new URL(
+  "../../assets/ui/liquid-money.png",
+  import.meta.url,
+).href;
+const liquidLevelUrl = new URL(
+  "../../assets/ui/liquid-level.png",
+  import.meta.url,
+).href;
 import type { GameState } from "../../domain/economy/types.ts";
 import { affectionProgress } from "../../domain/progression/progression.ts";
 import { relationshipStage } from "../../content/relationship/relationship.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
-import {
-  drawChamferPlate,
-  drawCoinIcon,
-  drawHeartIcon,
-  drawSlantProgress,
-  drawTechTicks,
-} from "./nikkeKit.ts";
+import { drawCoinIcon, drawHeartIcon } from "./nikkeKit.ts";
 
 function makeText(
   text: string,
@@ -25,6 +31,13 @@ function makeText(
       fontWeight: weight,
       fill: color,
       letterSpacing: 0.4,
+      dropShadow: {
+        color: 0x2a1030,
+        alpha: 0.6,
+        blur: 3,
+        distance: 1,
+        angle: Math.PI / 2,
+      },
     },
   });
 }
@@ -36,30 +49,29 @@ function formatAmount(amount: number): string {
 }
 
 const PINK = 0xff6ec0;
-const LILAC = 0x9d7bff;
 const GOLD = 0xffc85c;
-const GLASS = 0x120b20;
 
 /**
- * Hand-drawn NIKKE-style status HUD: three floating angular glass
- * modules (hearts + relationship stage, level diamond, money) and a
- * settings button.  No outer panel — the modules sit directly over
- * the scene, vector-drawn via the nikkeKit so every edge stays crisp
- * on a 3x phone.
+ * Liquid-Glass status HUD: three AI-painted translucent glass plates
+ * (hearts + relationship stage, level badge, money) floating over the
+ * scene like iOS widgets, with vector icons, a rounded progress bar
+ * and shadowed white text for readability on any backdrop.
  */
 export class StatusHud extends Container {
-  private readonly plates = new Graphics();
+  private readonly heartsPlate = new Sprite(Texture.EMPTY);
+  private readonly moneyPlate = new Sprite(Texture.EMPTY);
+  private readonly levelPlate = new Sprite(Texture.EMPTY);
+  private readonly icons = new Graphics();
   private readonly progress = new Graphics();
-  private readonly heartsLabel = makeText("СЕРДЕЧКИ", 7, "#ff9ed4", "700");
+  private readonly heartsLabel = makeText("СЕРДЕЧКИ", 7, "#ffd3ec", "700");
   private readonly heartsValue = makeText("0", 13, "#fff7ff", "700");
-  private readonly stageValue = makeText("Незнакомец", 9, "#ffc9e8", "700");
-  private readonly levelLabel = makeText("LV", 7, "#c9b4ff", "700");
+  private readonly stageValue = makeText("Незнакомец", 9, "#ffe3f4", "700");
+  private readonly levelLabel = makeText("LV", 7, "#e3d8ff", "700");
   private readonly levelValue = makeText("1", 15, "#fff7ff", "700");
-  private readonly moneyLabel = makeText("ДЕНЬГИ", 7, "#ffd58a", "700");
-  private readonly moneyValue = makeText("0.0", 13, "#ffe9c4", "700");
+  private readonly moneyLabel = makeText("ДЕНЬГИ", 7, "#ffe2ad", "700");
+  private readonly moneyValue = makeText("0.0", 13, "#fff3dd", "700");
   private readonly settings: StyledButton;
   private heartsWidth = 150;
-  private layoutWidth = 320;
   private progressValue = 0;
 
   constructor(onBackup: () => void) {
@@ -70,12 +82,16 @@ export class StatusHud extends Container {
       height: 52,
       fontSize: 17,
       fill: 0x241733,
-      stroke: 0x8a5cb8,
+      stroke: 0xcfb4ff,
       chamfer: true,
       onPress: onBackup,
     });
-    this.addChild(this.plates, this.progress);
     this.addChild(
+      this.heartsPlate,
+      this.levelPlate,
+      this.moneyPlate,
+      this.icons,
+      this.progress,
       this.heartsLabel,
       this.heartsValue,
       this.stageValue,
@@ -85,82 +101,75 @@ export class StatusHud extends Container {
       this.moneyValue,
       this.settings.node,
     );
+    void Promise.all([
+      Assets.load<Texture>(liquidHeartsUrl),
+      Assets.load<Texture>(liquidMoneyUrl),
+      Assets.load<Texture>(liquidLevelUrl),
+    ])
+      .then(([hearts, money, level]) => {
+        this.heartsPlate.texture = hearts;
+        this.moneyPlate.texture = money;
+        this.levelPlate.texture = level;
+      })
+      .catch(() => {
+        // The HUD stays functional with text only if the art fails.
+      });
   }
 
   resize(width: number): void {
     const availableWidth = Math.max(260, width - 24);
     const x = Math.max(12, (width - availableWidth) / 2);
     this.position.set(x, 10);
-    this.layoutWidth = availableWidth;
 
     const gearW = 42;
-    const levelW = 46;
-    const moneyW = 92;
+    const levelW = 48;
+    const moneyW = 96;
     const gap = 7;
     this.heartsWidth = availableWidth - gearW - levelW - moneyW - gap * 3;
     const h = 56;
 
-    this.plates.clear();
-    // Hearts module: pink accent, cut bottom-right corner.
-    drawChamferPlate(this.plates, 0, 0, this.heartsWidth, h, {
-      cutBR: 12,
-      fill: GLASS,
-      fillAlpha: 0.52,
-      stroke: PINK,
-      strokeAlpha: 0.5,
-      accent: PINK,
-      accentSide: "left",
-    });
-    drawHeartIcon(this.plates, 17, 24, 13, PINK);
-    drawTechTicks(this.plates, this.heartsWidth - 34, 5, 3, PINK);
-    // Level diamond module.
+    this.heartsPlate.position.set(0, 0);
+    this.heartsPlate.width = this.heartsWidth;
+    this.heartsPlate.height = h;
     const lvX = this.heartsWidth + gap;
-    drawChamferPlate(this.plates, lvX, 0, levelW, h, {
-      cutTL: 12,
-      cutBR: 12,
-      fill: GLASS,
-      fillAlpha: 0.52,
-      stroke: LILAC,
-      strokeAlpha: 0.5,
-    });
-    // Money module: gold accent on the right, cut top-right corner.
+    this.levelPlate.position.set(lvX, 0);
+    this.levelPlate.width = levelW;
+    this.levelPlate.height = h;
     const moneyX = lvX + levelW + gap;
-    drawChamferPlate(this.plates, moneyX, 0, moneyW, h, {
-      cutTR: 12,
-      fill: GLASS,
-      fillAlpha: 0.52,
-      stroke: GOLD,
-      strokeAlpha: 0.45,
-      accent: GOLD,
-      accentSide: "right",
-    });
-    drawCoinIcon(this.plates, moneyX + 16, 24, 7, GOLD);
+    this.moneyPlate.position.set(moneyX, 0);
+    this.moneyPlate.width = moneyW;
+    this.moneyPlate.height = h;
 
-    this.heartsLabel.position.set(30, 7);
-    this.heartsValue.position.set(30, 17);
-    this.stageValue.position.set(30, 33);
+    this.icons.clear();
+    drawHeartIcon(this.icons, 17, 23, 12, PINK);
+    drawCoinIcon(this.icons, moneyX + 16, 24, 7, GOLD);
+
+    this.heartsLabel.position.set(31, 7);
+    this.heartsValue.position.set(31, 16);
+    this.stageValue.position.set(12, 39);
     this.levelLabel.anchor.set(0.5, 0);
     this.levelLabel.position.set(lvX + levelW / 2, 9);
     this.levelValue.anchor.set(0.5, 0);
-    this.levelValue.position.set(lvX + levelW / 2, 21);
-    this.moneyLabel.position.set(moneyX + 28, 9);
-    this.moneyValue.position.set(moneyX + 28, 22);
+    this.levelValue.position.set(lvX + levelW / 2, 20);
+    this.moneyLabel.position.set(moneyX + 28, 11);
+    this.moneyValue.position.set(moneyX + 28, 23);
     this.settings.setSize(gearW, h - 4);
     this.settings.node.position.set(moneyX + moneyW + gap, 2);
     this.redrawProgress();
   }
 
   private redrawProgress(): void {
+    const w = Math.max(60, this.heartsWidth - 110);
+    const x = this.heartsWidth - w - 14;
     this.progress.clear();
-    drawSlantProgress(
-      this.progress,
-      12,
-      47,
-      Math.max(60, this.heartsWidth - 24),
-      5,
-      this.progressValue,
-      { track: 0x2c1b3d, fill: PINK, glow: 0xff9ed4 },
-    );
+    this.progress
+      .roundRect(x, 24, w, 5, 2.5)
+      .fill({ color: 0x2a1030, alpha: 0.4 });
+    if (this.progressValue > 0.01) {
+      this.progress
+        .roundRect(x, 24, Math.max(5, w * this.progressValue), 5, 2.5)
+        .fill({ color: PINK, alpha: 0.95 });
+    }
   }
 
   render(state: Readonly<GameState>): void {
@@ -180,6 +189,5 @@ export class StatusHud extends Container {
       this.progressValue = relation.progress;
       this.redrawProgress();
     }
-    void this.layoutWidth;
   }
 }

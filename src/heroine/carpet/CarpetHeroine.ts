@@ -26,10 +26,7 @@ import {
   type CarpetTouchZone,
 } from "./carpetScene.ts";
 
-export {
-  CARPET_ZONE_ECONOMY,
-  type CarpetTouchZone,
-} from "./carpetScene.ts";
+export { CARPET_ZONE_ECONOMY, type CarpetTouchZone } from "./carpetScene.ts";
 
 interface CarpetHitShape {
   zone: CarpetTouchZone;

@@ -1,7 +1,4 @@
-import {
-  GAME_BALANCE,
-  type UpgradeKind,
-} from "../upgrades/balance.ts";
+import { GAME_BALANCE, type UpgradeKind } from "../upgrades/balance.ts";
 
 /**
  * DIALOGUE LOGIC (the writing bible of the ladder)
@@ -250,13 +247,21 @@ export const UPGRADE_ROMANTIC_FLAVOR: Record<UpgradeKind, string> = {
 } as const;
 
 /** Stage-aware display name of an upgrade. */
-export function upgradeRomanticName(
-  kind: UpgradeKind,
-  level: number,
-): string {
+export function upgradeRomanticName(kind: UpgradeKind, level: number): string {
   return UPGRADE_ROMANTIC_NAMES[kind][
     poseHeatBand(level) as 0 | 1 | 2
   ] as string;
+}
+
+/**
+ * HER title on the dialogue nameplate — who she is to you right now.
+ * Warms up with the ladder like everything else.
+ */
+export function heroineTitle(level: number): string {
+  if (level <= 4) return "Одноклассница";
+  if (level <= 7) return "Подруга";
+  if (level <= 9) return "Почти твоя";
+  return "Твоя девушка";
 }
 
 /** Stage record of a 1-based affection level, clamped to the ladder. */
@@ -280,8 +285,7 @@ export function pickTapLine(
 ): string {
   const poseBank = POSE_TAP_LINES[pose][poseHeatBand(level)] ?? [];
   const stageBank = relationshipStage(level).tapLines;
-  const lines =
-    poseBank.length > 0 && random() < 0.5 ? poseBank : stageBank;
+  const lines = poseBank.length > 0 && random() < 0.5 ? poseBank : stageBank;
   const index = Math.min(
     lines.length - 1,
     Math.max(0, Math.floor(random() * lines.length)),
@@ -295,7 +299,6 @@ export function pickTapLine(
  */
 export function relationshipLadderIsConsistent(): boolean {
   return (
-    GAME_BALANCE.affection.thresholds.length ===
-    RELATIONSHIP_STAGES.length - 1
+    GAME_BALANCE.affection.thresholds.length === RELATIONSHIP_STAGES.length - 1
   );
 }

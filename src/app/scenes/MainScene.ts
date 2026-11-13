@@ -19,10 +19,7 @@ import {
   ShelfHeroine,
   type ShelfTouchZone,
 } from "../../heroine/shelf/ShelfHeroine.ts";
-import {
-  SHELF_CAMERA,
-  SHELF_ROOM,
-} from "../../heroine/shelf/shelfScene.ts";
+import { SHELF_CAMERA, SHELF_ROOM } from "../../heroine/shelf/shelfScene.ts";
 import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
 import {
   createStyledButton,
@@ -98,7 +95,11 @@ export class MainScene extends Container {
   private readonly bottomNavigation: BottomNavigation;
   private readonly floatingPanel: FloatingPanel;
   private readonly dialogue = new DialogueOverlay();
-  private readonly speechBubble = new SpeechBubble();
+  private readonly speechBubble = new SpeechBubble((speaking) => {
+    // Her glass message card sits where the touch hint lives; the hint
+    // yields the floor while she is actually speaking.
+    this.interactionHint.visible = !speaking;
+  });
   /** Wall-clock time of her last spoken tap line (bubble spam guard). */
   private lastSpokenAtMs = 0;
   private readonly feedback: RewardFeedback;
@@ -416,7 +417,7 @@ export class MainScene extends Container {
     // a no-op for the existing scene layout contract.
     this.heroine.setTagBottomLimit(null);
     this.dialogue.resize(widthSafe, heightSafe);
-    this.speechBubble.resize(widthSafe);
+    this.speechBubble.resize(widthSafe, heightSafe);
     this.renderState();
   }
 
@@ -442,8 +443,7 @@ export class MainScene extends Container {
       const footMargin = portrait
         ? SHELF_CAMERA.footMarginPortrait
         : SHELF_CAMERA.footMarginLandscape;
-      const footY =
-        this.screenHeight - footMargin - SHELF_ROOM.footY * scale;
+      const footY = this.screenHeight - footMargin - SHELF_ROOM.footY * scale;
       const minY = this.screenHeight - texture.height * scale;
       this.roomBackdrop.scale.set(scale);
       this.roomBackdrop.position.set(
@@ -618,7 +618,7 @@ export class MainScene extends Container {
     if (outcome.leveledUp) {
       const stage = relationshipStage(outcome.nextLevel);
       this.showStatus(`💘 НОВАЯ СТАДИЯ: ${stage.name.toUpperCase()}`);
-      this.speechBubble.say(stage.unlockLine, globalX, globalY);
+      this.speechBubble.say(stage.unlockLine, outcome.nextLevel);
       this.lastSpokenAtMs = now;
       this.liveRegion.announce(
         `Новая стадия отношений: ${stage.name}. Она говорит: ${stage.unlockLine}`,
@@ -628,7 +628,7 @@ export class MainScene extends Container {
       (this.lastSpokenAtMs === 0 || Math.random() < 0.35)
     ) {
       const line = pickTapLine(outcome.nextLevel, pose, Math.random);
-      this.speechBubble.say(line, globalX, globalY);
+      this.speechBubble.say(line, outcome.nextLevel);
       this.lastSpokenAtMs = now;
       this.liveRegion.announce(`Она говорит: ${line}`);
     }
