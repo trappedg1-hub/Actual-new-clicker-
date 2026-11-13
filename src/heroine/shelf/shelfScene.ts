@@ -46,6 +46,28 @@ export const SHELF_PATCHES = {
 } as const;
 
 /**
+ * Soft contact shadows under the shoe tips (cutout pixel grid, anchor at
+ * the shadow center).  Without them the figure reads as floating above
+ * the floor boards; the lamp stands to her right, so every shadow is
+ * biased slightly left.  Sizes/alphas tuned on the composed mock at the
+ * approved placement.
+ */
+export const SHELF_SHADOWS: readonly {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  alpha: number;
+}[] = [
+  /** Broad faint pool under both feet, grounding the whole stance. */
+  { x: 330, y: 1247, w: 450, h: 110, alpha: 0.5 },
+  /** Near (left) shoe: toe planted on the closest floor board. */
+  { x: 218, y: 1241, w: 200, h: 66, alpha: 1 },
+  /** Far (right) shoe: one board deeper, kissing the sole line. */
+  { x: 451, y: 1228, w: 200, h: 64, alpha: 0.95 },
+];
+
+/**
  * Ambient motion constants: she balances on tiptoe, so the whole plate
  * gently bobs (vertical scale around the planted shoe tips) and sways
  * (skew around the same bottom pivot).  Transform-only animation of one

@@ -2,6 +2,7 @@ import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import shelfBlinkUrl from "../../assets/environment/shelf-blink.png?url";
 import shelfBlushUrl from "../../assets/environment/shelf-blush.png?url";
 import shelfHeroineUrl from "../../assets/environment/shelf-heroine.webp?url";
+import shelfShadowUrl from "../../assets/environment/shelf-shadow.png?url";
 import shelfStockingUrl from "../../assets/environment/shelf-stocking.png?url";
 import { blinkOverlayAt } from "../rig/animationMath.ts";
 import {
@@ -12,6 +13,7 @@ import {
   SHELF_PATCHES,
   SHELF_ROOM,
   SHELF_ROOM_ART_SCALE,
+  SHELF_SHADOWS,
   SHELF_STOCKING_ENVELOPE,
   shelfAmbientStockingAt,
   shelfEnvelopeAt,
@@ -46,6 +48,7 @@ interface ShelfHitShape {
  */
 export class ShelfHeroine extends Container {
   private readonly artRoot = new Container();
+  private readonly shadowLayer = new Container();
   private readonly art = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
@@ -80,9 +83,13 @@ export class ShelfHeroine extends Container {
       patch.alpha = 0;
     }
     this.artRoot.pivot.set(SHELF_ART_W / 2, SHELF_ART_H);
+    this.shadowLayer.eventMode = "none";
     // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
     // plate's open eye while she blinks; the stocking patch is disjoint.
+    // Contact shadows render UNDER the art so the soles overlap their
+    // cores and only the soft rim spills onto the floor boards.
     this.artRoot.addChild(
+      this.shadowLayer,
       this.art,
       this.blushPatch,
       this.blinkPatch,
@@ -95,16 +102,28 @@ export class ShelfHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, stocking] = await Promise.all([
+    const [art, blink, blush, stocking, shadow] = await Promise.all([
       Assets.load<Texture>(shelfHeroineUrl),
       Assets.load<Texture>(shelfBlinkUrl),
       Assets.load<Texture>(shelfBlushUrl),
       Assets.load<Texture>(shelfStockingUrl),
+      Assets.load<Texture>(shelfShadowUrl),
     ]);
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
     this.stockingPatch.texture = stocking;
+    for (const spec of SHELF_SHADOWS) {
+      const sprite = new Sprite(shadow);
+      sprite.anchor.set(0.5);
+      sprite.position.set(spec.x, spec.y);
+      sprite.width = spec.w;
+      sprite.height = spec.h;
+      sprite.alpha = spec.alpha;
+      sprite.tint = 0x0c080e;
+      sprite.eventMode = "none";
+      this.shadowLayer.addChild(sprite);
+    }
     this.loaded = true;
   }
 

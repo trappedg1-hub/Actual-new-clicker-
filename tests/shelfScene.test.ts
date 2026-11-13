@@ -8,6 +8,7 @@ import {
   SHELF_PATCHES,
   SHELF_ROOM,
   SHELF_ROOM_ART_SCALE,
+  SHELF_SHADOWS,
   SHELF_STOCKING_AMBIENT,
   SHELF_STOCKING_ENVELOPE,
   SHELF_ZONE_ECONOMY,
@@ -84,6 +85,18 @@ test("SHELF SCENE: overlay patches sit inside the cutout grid", () => {
   // closed-eye overlay fully covers the blush plate's open eye.
   assert.ok(SHELF_PATCHES.blush.x <= SHELF_PATCHES.blink.x);
   assert.ok(SHELF_PATCHES.blush.y <= SHELF_PATCHES.blink.y);
+});
+
+test("SHELF SCENE: contact shadows sit under the shoes, not under the body", () => {
+  assert.ok(SHELF_SHADOWS.length >= 2, "need at least one shadow per shoe");
+  for (const s of SHELF_SHADOWS) {
+    // Under the feet: the shoe band of the plate is y ~1150..1236.
+    assert.ok(s.y > 1150, `shadow at y ${s.y} is too high up the figure`);
+    assert.ok(s.y < SHELF_ART_H + 60, `shadow at y ${s.y} floats below floor`);
+    assert.ok(s.x > 0 && s.x < SHELF_ART_W, "shadow left the plate");
+    assert.ok(s.alpha > 0 && s.alpha <= 1);
+    assert.ok(s.w > s.h, "contact shadows must be flat ellipses");
+  }
 });
 
 test("SHELF SCENE: reaction envelopes rise, hold and fully decay", () => {
