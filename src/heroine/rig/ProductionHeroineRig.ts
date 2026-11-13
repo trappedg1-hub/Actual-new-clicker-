@@ -483,6 +483,20 @@ export class ProductionHeroineRig extends Container {
    * skirt edge as painted.  Stays empty in the classic variant.
    */
   private readonly naturalArmsGroup = new Container();
+  /**
+   * BLOCK C tap physics (natural pose only).  The classic Category-D ban on
+   * arm/hair rigid motion protected ZERO-overlap cut contours between the
+   * 20 approved slots.  The natural overlays have different geometry: the
+   * arms are self-contained cutouts rendered ABOVE intact skirt/blouse art,
+   * and the repainted back hair extends 4px UNDER every covering layer
+   * (front-union eroded by disk(4)), so small damped swings cannot open
+   * black slits.  Amplitudes stay inside those measured margins.
+   */
+  private naturalHairSprite: Sprite | null = null;
+  private naturalArmSpriteL: Sprite | null = null;
+  private naturalArmSpriteR: Sprite | null = null;
+  private naturalImpulse: ReactionState = { ...NO_REACTION };
+  private naturalImpulseAgeMs = Number.POSITIVE_INFINITY;
   private readonly hitLayer = new Container();
   private underlay: Sprite | null = null;
   private loadingText: Text | null = null;
@@ -538,6 +552,10 @@ export class ProductionHeroineRig extends Container {
 
   reactToTap(zone: HeroineTouchZone): void {
     this.reaction = triggerReaction(zone as TouchZone);
+    if (this.poseVariant === "natural") {
+      this.naturalImpulse = triggerReaction(zone as TouchZone);
+      this.naturalImpulseAgeMs = 0;
+    }
     this.touchOverride = {
       state: TAP_EXPRESSION_STATES[zone as TouchZone],
       remainingMs: 900,
@@ -554,6 +572,7 @@ export class ProductionHeroineRig extends Container {
     this.reaction = decayReaction(this.reaction, animationDeltaMs);
     if (reactionEnergy(this.reaction) < 0.002)
       this.reaction = { ...NO_REACTION };
+    this.naturalImpulseAgeMs += animationDeltaMs;
 
     let override: ExpressionOverride | null = null;
     if (this.touchOverride) {
@@ -781,17 +800,27 @@ export class ProductionHeroineRig extends Container {
     hair.position.set(0, 0);
     hair.eventMode = "none";
     this.groups.backHairGroup.addChild(hair);
-    for (const [label, texture] of [
-      ["natural arm L (variant B)", armLTexture],
-      ["natural arm R (variant B)", armRTexture],
-    ] as const) {
+    this.naturalHairSprite = hair;
+    // Shoulder pivots: the arms swing like pendulums from the shoulder, so
+    // displacement is ~0 at the blouse seam and largest at the free hand,
+    // which rests over intact skirt art (nothing to expose behind it).
+    const armDefs = [
+      ["natural arm L (variant B)", armLTexture, 325, 335],
+      ["natural arm R (variant B)", armRTexture, 523, 335],
+    ] as const;
+    const sprites: Sprite[] = [];
+    for (const [label, texture, px, py] of armDefs) {
       const sprite = new Sprite(texture);
       sprite.roundPixels = false;
       sprite.label = label;
-      sprite.position.set(0, 0);
+      sprite.pivot.set(px, py);
+      sprite.position.set(px, py);
       sprite.eventMode = "none";
       this.naturalArmsGroup.addChild(sprite);
+      sprites.push(sprite);
     }
+    this.naturalArmSpriteL = sprites[0] ?? null;
+    this.naturalArmSpriteR = sprites[1] ?? null;
   }
 
   private createLegMesh(
@@ -1287,5 +1316,45 @@ export class ProductionHeroineRig extends Container {
       sprite.alpha = weight;
       sprite.visible = weight > 0;
     }
+
+    this.applyNaturalTapMotion();
+  }
+
+  /**
+   * BLOCK C tap physics (natural pose only).  Damped spring: the impulse
+   * swings the relaxed arms around their shoulder pivots and nudges the
+   * back-hair mass, both oscillating through ~2 visible periods and dying
+   * out in under a second.  Amplitude budget vs measured safe margins:
+   * hair |x| <= 3.2px (4px hidden under-lap), hair |y| <= 2.1px, arm
+   * rotation <= 0.025rad -> <=11px at the hand, which rests over intact
+   * skirt art.  Classic pose: this method is a no-op, Category-D rules
+   * stay in force.
+   */
+  private applyNaturalTapMotion(): void {
+    if (this.poseVariant !== "natural") return;
+    const age = this.naturalImpulseAgeMs;
+    const env = Number.isFinite(age) ? Math.exp(-age / 300) : 0;
+    const imp = this.naturalImpulse;
+    const hair = this.naturalHairSprite;
+    const armL = this.naturalArmSpriteL;
+    const armR = this.naturalArmSpriteR;
+    if (env < 0.01) {
+      if (hair) hair.position.set(0, 0);
+      if (armL) armL.rotation = 0;
+      if (armR) armR.rotation = 0;
+      return;
+    }
+    const osc = Math.cos((2 * Math.PI * age) / 420);
+    const hairX =
+      (imp.hair * 0.42 + imp.head * 0.18 + (imp.armL + imp.armR) * 0.05) *
+      env *
+      osc;
+    const hairY =
+      -(Math.abs(imp.hair) * 0.2 + Math.abs(imp.body) * 0.45) *
+      env *
+      Math.abs(osc);
+    if (hair) hair.position.set(hairX, hairY);
+    if (armL) armL.rotation = imp.armL * 0.002 * env * osc;
+    if (armR) armR.rotation = imp.armR * 0.002 * env * osc;
   }
 }
