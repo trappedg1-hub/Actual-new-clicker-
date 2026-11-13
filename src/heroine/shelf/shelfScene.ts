@@ -15,11 +15,17 @@ export const SHELF_ROOM = {
   /** Backdrop art size the placement refers to. */
   roomW: 1152,
   roomH: 2048,
-  /** Bottom-center anchor of the figure in backdrop pixels (shoe tips). */
-  footCenterX: 744,
-  footY: 1660,
+  /**
+   * Bottom-center anchor of the figure in backdrop pixels (shoe tips).
+   * She stands a single step from the shelf base (y 1395), body centered
+   * on the shelf face, so the raised hand lands ON the boxes of the top
+   * shelf (fingertips ~x528/y493) instead of reaching diagonally across
+   * the room — the natural "about to grab it" posture.
+   */
+  footCenterX: 700,
+  footY: 1560,
   /** Display height of the figure in backdrop pixels. */
-  displayH: 1098,
+  displayH: 1080,
 } as const;
 
 /** Figure scale in backdrop pixels per cutout pixel. */
