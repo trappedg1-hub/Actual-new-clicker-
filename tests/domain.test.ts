@@ -17,6 +17,7 @@ import {
   POSE_TAP_LINES,
   RELATIONSHIP_STAGES,
   relationshipLadderIsConsistent,
+  upgradeRomanticName,
   relationshipStage,
 } from "../src/content/relationship/relationship.ts";
 
@@ -139,6 +140,45 @@ test("the relationship ladder has ten fan-service stages with hotter lines", () 
     assert.ok(POSE_TAP_LINES[pose][2]?.includes(poseLine));
     assert.ok(relationshipStage(8).tapLines.includes(stageLine));
   }
+});
+
+test("stocking lines live only in poses where a stocking actually slips", () => {
+  const stocking = /чулок|чулоч/i;
+  // Stage banks are pose-agnostic — no prop lines allowed there.
+  for (const stage of RELATIONSHIP_STAGES) {
+    for (const line of [stage.unlockLine, ...stage.tapLines]) {
+      assert.ok(
+        !stocking.test(line),
+        `stage «${stage.name}» mentions a stocking in a pose-agnostic line`,
+      );
+    }
+  }
+  // Classic and bed poses have no slipping stocking.
+  for (const pose of ["classic", "bed"] as const) {
+    for (const band of POSE_TAP_LINES[pose]) {
+      for (const line of band) {
+        assert.ok(!stocking.test(line), `${pose} must not mention stockings`);
+      }
+    }
+  }
+  // Carpet (slipped ring) and shelf (tiptoe stretch) keep theirs.
+  const carpetAll = POSE_TAP_LINES.carpet.flat().join(" ");
+  const shelfAll = POSE_TAP_LINES.shelf.flat().join(" ");
+  assert.ok(stocking.test(carpetAll));
+  assert.ok(stocking.test(shelfAll));
+});
+
+test("upgrades carry romantic stage-aware display names", () => {
+  for (const kind of ["tap", "income", "charm"] as const) {
+    const names = new Set([
+      upgradeRomanticName(kind, 1),
+      upgradeRomanticName(kind, 5),
+      upgradeRomanticName(kind, 10),
+    ]);
+    assert.equal(names.size, 3, `${kind} needs three heat-band names`);
+    for (const name of names) assert.ok(name.length > 3);
+  }
+  assert.equal(upgradeRomanticName("income", 1), "Мысли о тебе");
 });
 
 test("affection tiers and save migration are derived from persisted source values", () => {

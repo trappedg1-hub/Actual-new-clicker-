@@ -27,18 +27,21 @@ export class BottomNavigation extends Container {
     super();
     this.label = "six-section bottom navigation placeholders";
     this.addChild(this.background, this.row);
+    // HOME and SHOP are live sections; the rest stay teased but disabled.
+    const enabled = new Set(["HOME", "SHOP"]);
     for (const [index, label] of NAV_ITEMS.entries()) {
+      const active = enabled.has(label);
       const button = createStyledButton(label, {
         width: 44,
         height: 50,
         fontSize: label.length > 5 ? 7 : 8,
-        fill: index === 0 ? 0x593779 : 0x21182f,
-        stroke: index === 0 ? 0xb774d8 : 0x4d3a61,
-        textColor: index === 0 ? "#fff7ff" : "#998ba9",
+        fill: index === 0 ? 0x593779 : active ? 0x2c1d40 : 0x21182f,
+        stroke: index === 0 ? 0xb774d8 : active ? 0x8a5cb8 : 0x4d3a61,
+        textColor: index === 0 || active ? "#fff7ff" : "#998ba9",
         radius: 12,
         onPress: () => onPlaceholder(label),
       });
-      if (index > 0) button.setEnabled(false);
+      if (!active) button.setEnabled(false);
       this.buttons.push(button);
       this.row.addChild(button.node);
     }
@@ -54,10 +57,10 @@ export class BottomNavigation extends Container {
     this.background
       .clear()
       .roundRect(0, 0, this.currentWidth, panelHeight, 18)
-      .fill({ color: 0x130d22, alpha: 0.96 });
+      .fill({ color: 0x130d22, alpha: 0.55 });
     this.background
       .roundRect(0, 0, this.currentWidth, panelHeight, 18)
-      .stroke({ color: 0x49305f, alpha: 0.72, width: 1 });
+      .stroke({ color: 0x8a5cb8, alpha: 0.55, width: 1 });
     const innerWidth = this.currentWidth - 16;
     this.row.position.set(8, 5);
     this.row.layout = {

@@ -32,14 +32,12 @@ import {
   pickTapLine,
   relationshipStage,
   RELATIONSHIP_STAGES,
+  upgradeRomanticName,
   type HeroinePose,
 } from "../../content/relationship/relationship.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
-import {
-  charmBonus,
-  tapPowerBonus,
-} from "../../domain/upgrades/upgrades.ts";
+import { affectionProgress } from "../../domain/progression/progression.ts";
 import { isIntroDialogueUnlocked } from "../../domain/unlocks/unlocks.ts";
 import type { InkIntroStory as InkIntroStoryType } from "../../narrative/ink/InkIntroStory.ts";
 import { GameSession } from "../GameSession.ts";
@@ -50,7 +48,7 @@ import { DialogueOverlay } from "../../presentation/ui/DialogueOverlay.ts";
 import { FloatingPanel } from "../../presentation/ui/FloatingPanel.ts";
 import { SpeechBubble } from "../../presentation/ui/SpeechBubble.ts";
 import { StatusHud } from "../../presentation/ui/StatusHud.ts";
-import { UpgradePanel } from "../../presentation/ui/UpgradePanel.ts";
+import { RomanceShop } from "../../presentation/ui/RomanceShop.ts";
 import { RewardFeedback } from "../../presentation/pixi/RewardFeedback.ts";
 import {
   HeartBurst,
@@ -92,7 +90,7 @@ export class MainScene extends Container {
   private readonly ambient = new Graphics();
   private readonly heroine: ProductionHeroineRig;
   private readonly statusHud: StatusHud;
-  private readonly upgradePanel: UpgradePanel;
+  private readonly romanceShop: RomanceShop;
   private readonly bottomNavigation: BottomNavigation;
   private readonly floatingPanel: FloatingPanel;
   private readonly dialogue = new DialogueOverlay();
@@ -227,7 +225,10 @@ export class MainScene extends Container {
 
     this.statusHud = new StatusHud(() => void this.exportBackup());
     this.floatingPanel = new FloatingPanel(() => void this.openIntroDialogue());
-    this.upgradePanel = new UpgradePanel((kind) => this.purchaseUpgrade(kind));
+    this.romanceShop = new RomanceShop(
+      (kind) => this.purchaseUpgrade(kind),
+      () => this.closeShop(),
+    );
     this.bottomNavigation = new BottomNavigation((section) =>
       this.showPlaceholder(section),
     );
@@ -246,11 +247,11 @@ export class MainScene extends Container {
       this.bedToggle.node,
       this.shelfToggle.node,
       this.carpetToggle.node,
-      this.upgradePanel,
       this.interactionHint,
       this.speechBubble,
       this.statusHud,
       this.bottomNavigation,
+      this.romanceShop,
       this.dialogue,
     );
     this.renderState();
@@ -323,7 +324,7 @@ export class MainScene extends Container {
 
     this.statusHud.resize(widthSafe);
     this.bottomNavigation.resize(widthSafe, heightSafe);
-    this.upgradePanel.resize(widthSafe, heightSafe, portrait);
+    this.romanceShop.resize(widthSafe, heightSafe);
 
     let heroineCenterX: number;
     let heroineCenterY: number;
@@ -531,7 +532,7 @@ export class MainScene extends Container {
   renderState(): void {
     const state = this.session.state;
     this.statusHud.render(state);
-    this.upgradePanel.render(state);
+    this.romanceShop.render(state);
     this.floatingPanel.setRate(passiveIncomePerSecond(state));
   }
 
@@ -596,19 +597,11 @@ export class MainScene extends Container {
     globalX: number,
     globalY: number,
   ): void {
-    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
+    // No floating "+5/+1" toasts: the heart burst and the counting HUD
+    // are the tap feedback (the toasts doubled the heart particles and
+    // cluttered the premium look).
     this.hearts.burst(globalX, globalY);
     tapHaptic();
-    this.feedback.show(
-      `+${outcome.currencyDelta} 💰`,
-      toastX,
-      this.rewardToastY,
-    );
-    this.feedback.show(
-      `+${outcome.affectionDelta} 💗`,
-      toastX,
-      this.rewardToastY,
-    );
     const now = performance.now();
     if (outcome.leveledUp) {
       const stage = relationshipStage(outcome.nextLevel);
@@ -670,38 +663,27 @@ export class MainScene extends Container {
   private purchaseUpgrade(kind: UpgradeKind): void {
     const result = this.session.buyUpgrade(kind);
     const definition = GAME_BALANCE.upgrades[kind];
+    const level = affectionProgress(this.session.state.affection).level;
+    const romanticName = upgradeRomanticName(kind, level);
     if (!result.purchased) {
       if (result.reason === "locked") {
         const stage =
           RELATIONSHIP_STAGES[definition.unlockStage - 1]?.name ?? "";
-        this.showStatus(`🔒 «${definition.name}» · нужна стадия «${stage}»`);
+        this.showStatus(`🔒 «${romanticName}» · нужна стадия «${stage}»`);
         this.liveRegion.announce(
-          `Улучшение ${definition.name} откроется на стадии ${stage}.`,
+          `Улучшение ${romanticName} откроется на стадии ${stage}.`,
         );
       } else {
-        this.showStatus(`Не хватает монет · нужно ${result.cost} 💰`);
+        this.showStatus(`Не хватает монет · нужно ${result.cost}`);
         this.liveRegion.announce(`Недостаточно монет. Нужно ${result.cost}.`);
       }
       return;
     }
-    const state = this.session.state;
-    const summary =
-      kind === "tap"
-        ? `ТАП +${GAME_BALANCE.taps.head.currency + tapPowerBonus(state)} 💰`
-        : kind === "income"
-          ? `${passiveIncomePerSecond(state).toFixed(2)} 💰/СЕК`
-          : `+${1 + charmBonus(state)} 💗/ТАП`;
-    this.showStatus(`💝 «${definition.name}» · УРОВЕНЬ ${result.newLevel}`);
-    this.feedback.show(
-      summary,
-      this.screenWidth / 2,
-      this.rewardToastY + 14,
-      "milestone",
-    );
+    this.showStatus(`💝 «${romanticName}» · УРОВЕНЬ ${result.newLevel}`);
     this.renderState();
     void this.saveWithNotice(false);
     this.liveRegion.announce(
-      `Куплено улучшение ${definition.name}, уровень ${result.newLevel}.`,
+      `Куплено улучшение ${romanticName}, уровень ${result.newLevel}.`,
     );
   }
 
@@ -799,10 +781,25 @@ export class MainScene extends Container {
 
   private showPlaceholder(section: string): void {
     if (section === "HOME") {
+      this.closeShop();
       this.showStatus("Главная сцена активна.");
       return;
     }
+    if (section === "SHOP") {
+      this.openShop();
+      return;
+    }
     this.showStatus(`${section}: placeholder раздела v0.1`);
+  }
+
+  private openShop(): void {
+    this.speechBubble.hide();
+    this.romanceShop.open(this.session.state);
+    this.liveRegion.announce("Открыт экран улучшений: забота о ней.");
+  }
+
+  private closeShop(): void {
+    this.romanceShop.close();
   }
 
   private showStatus(message: string): void {

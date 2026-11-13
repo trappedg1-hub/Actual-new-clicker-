@@ -48,7 +48,7 @@ export class StatusHud extends Container {
     layout: { width: 74, height: 56 },
   });
   private readonly affectionLabel = makeText(
-    "СЕРДЕЧКИ 💗",
+    "СЕРДЕЧКИ",
     8,
     "#ffb7df",
     "700",
@@ -60,7 +60,7 @@ export class StatusHud extends Container {
     "700",
   );
   private readonly levelValue = makeText("1", 16, "#fff7ff", "700");
-  private readonly currencyValue = makeText("0.0", 13, "#fff7ff", "700");
+  private readonly currencyValue = makeText("0.0", 13, "#ffe9c4", "700");
   private readonly progressBar = new ProgressBar({
     bg: new Graphics().roundRect(0, 0, 100, 7, 4).fill({ color: 0x30233d }),
     fill: new Graphics().roundRect(0, 0, 100, 7, 4).fill({ color: 0xf080d0 }),
@@ -76,18 +76,22 @@ export class StatusHud extends Container {
       width: 46,
       height: 50,
       fontSize: 19,
-      fill: 0x392752,
-      stroke: 0x835bb0,
+      fill: 0x2c1d40,
+      stroke: 0x8a5cb8,
       onPress: onBackup,
     });
     this.addChild(this.panel, this.row);
 
     const affectionBg = new Graphics()
       .roundRect(0, 0, 100, 56, 13)
-      .fill({ color: 0x21182f, alpha: 0.93 });
+      .fill({ color: 0x1c1028, alpha: 0.5 });
     affectionBg
       .roundRect(0, 0, 100, 56, 13)
-      .stroke({ color: 0x583d72, alpha: 0.7, width: 1 });
+      .stroke({ color: 0xf080c8, alpha: 0.45, width: 1 });
+    // NIKKE-style thin accent strip along the left edge.
+    affectionBg
+      .roundRect(2, 10, 3, 36, 2)
+      .fill({ color: 0xf080c8, alpha: 0.9 });
     this.affectionLabel.position.set(10, 7);
     this.affectionValue.position.set(10, 20);
     this.progressBar.position.set(10, 42);
@@ -101,10 +105,10 @@ export class StatusHud extends Container {
 
     const levelBg = new Graphics()
       .roundRect(0, 0, 46, 56, 13)
-      .fill({ color: 0x21182f, alpha: 0.93 });
+      .fill({ color: 0x1c1028, alpha: 0.5 });
     levelBg
       .roundRect(0, 0, 46, 56, 13)
-      .stroke({ color: 0x583d72, alpha: 0.7, width: 1 });
+      .stroke({ color: 0x9d7bff, alpha: 0.45, width: 1 });
     const levelLabel = makeText("LV", 8, "#d9c7ec", "700");
     levelLabel.anchor.set(0.5, 0);
     levelLabel.position.set(23, 7);
@@ -114,11 +118,11 @@ export class StatusHud extends Container {
 
     const currencyBg = new Graphics()
       .roundRect(0, 0, 74, 56, 13)
-      .fill({ color: 0x21182f, alpha: 0.93 });
+      .fill({ color: 0x1c1028, alpha: 0.5 });
     currencyBg
       .roundRect(0, 0, 74, 56, 13)
-      .stroke({ color: 0x583d72, alpha: 0.7, width: 1 });
-    const currencyLabel = makeText("ДЕНЬГИ 💰", 8, "#d9c7ec", "700");
+      .stroke({ color: 0xffd58a, alpha: 0.4, width: 1 });
+    const currencyLabel = makeText("ДЕНЬГИ", 8, "#ffd58a", "700");
     currencyLabel.anchor.set(0.5, 0);
     currencyLabel.position.set(37, 7);
     this.currencyValue.anchor.set(0.5, 0);
@@ -140,10 +144,10 @@ export class StatusHud extends Container {
     this.panel
       .clear()
       .roundRect(0, 0, availableWidth, 68, 18)
-      .fill({ color: 0x130d22, alpha: 0.86 });
+      .fill({ color: 0x0f0a1c, alpha: 0.35 });
     this.panel
       .roundRect(0, 0, availableWidth, 68, 18)
-      .stroke({ color: 0x49305f, alpha: 0.72, width: 1 });
+      .stroke({ color: 0x8a5cb8, alpha: 0.4, width: 1 });
     this.row.position.set(10, 6);
     this.rowWidth = availableWidth - 20;
     this.row.layout = {

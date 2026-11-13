@@ -1,10 +1,24 @@
-import { GAME_BALANCE } from "../upgrades/balance.ts";
+import {
+  GAME_BALANCE,
+  type UpgradeKind,
+} from "../upgrades/balance.ts";
 
 /**
- * The fan-service relationship ladder: ten stages from a total stranger
- * to her boyfriend.  The stage index is the affection level returned by
- * `affectionProgress` (1-based), driven by the hearts thresholds in
- * `GAME_BALANCE.affection.thresholds`.
+ * DIALOGUE LOGIC (the writing bible of the ladder)
+ * ------------------------------------------------
+ * Context: you are classmates.  Somehow you ended up in HER room, and
+ * at the start she barely knows you.  The arc is a classic tsundere
+ * melt: stages 1-4 she is indignant that you are even here (but never
+ * actually kicks you out), stages 5-6 the mask slips into warmth,
+ * stages 7-8 she flirts first and blames you for it, stages 9-10 she
+ * is openly, possessively in love.
+ *
+ * FAN-SERVICE LOGIC: early stages tease by ACCIDENT (she denies and
+ * deflects — "не смотри!"), middle stages tease on PURPOSE while
+ * keeping plausible deniability, late stages are open invitations.
+ * Props must match the pose: stocking lines live ONLY in poses where a
+ * stocking is actually slipping (the carpet scene, and the shelf
+ * stretch where tiptoes pull it down).  No pose prop — no prop line.
  */
 export interface RelationshipStage {
   /** Short fan-service stage title, shown in the HUD. */
@@ -21,42 +35,44 @@ export interface RelationshipStage {
 export const RELATIONSHIP_STAGES: readonly RelationshipStage[] = [
   {
     name: "Незнакомец",
-    unlockLine: "Ой… ты кто? Я тебя тут раньше не видела.",
+    unlockLine:
+      "Т-ты кто?! Кто разрешил заходить в мою комнату?! …Ладно. Только дверь закрой.",
     tapLines: [
-      "Эй! Мы вообще знакомы?",
-      "Не трогай, я вообще-то читаю…",
-      "Хм. Странный ты.",
-      "Ты всегда так пялишься?",
+      "Н-не трогай! Мы даже толком не знакомы!",
+      "Ты из моего класса, да? Это не повод тут расхаживать!",
+      "Я тебя не выгоняю только потому, что… лень. Ясно?!",
+      "Чего уставился? Комнаты не видел?",
     ],
   },
   {
     name: "Сосед по парте",
-    unlockLine: "А, это снова ты. Ладно, можешь сесть рядом.",
+    unlockLine:
+      "Раз уж мы сидим рядом на уроках… можешь иногда заходить. Иногда!",
     tapLines: [
-      "Опять ты? Ну… привет.",
-      "Не мешай, тут самое интересное место!",
-      "У тебя ручки лишней не найдётся?",
-      "Ты смешной. Совсем чуть-чуть.",
+      "Это не значит, что ты мне нравишься! Просто удобно списывать.",
+      "Опять пришёл? …Я не говорила, что против. Б-балбес.",
+      "Не придвигайся! Парта — общая, комната — моя!",
+      "Я видела, как ты смотришь на меня на уроках. Прекрати… ну, не сразу.",
     ],
   },
   {
     name: "Знакомый",
-    unlockLine: "Я запомнила, как тебя зовут. Это уже что-то.",
+    unlockLine: "Так и быть, запомнила твоё имя. Не воображай себе лишнего!",
     tapLines: [
-      "О, привет! Как дела?",
-      "Сегодня я в хорошем настроении. Повезло тебе.",
-      "Хочешь, расскажу, про что эта книжка?",
-      "Ты сегодня какой-то… милый.",
+      "Я не ждала тебя! Просто… случайно посмотрела в окно. Два раза.",
+      "Хочешь чаю? Это мама велела предложить. Наверное.",
+      "Завтра контрольная… позанимаемся? Только без глупостей!",
+      "Ты смешной. Это не комплимент! …Ну, почти.",
     ],
   },
   {
     name: "Приятель",
-    unlockLine: "С тобой весело. Заходи почаще, ладно?",
+    unlockLine: "Ладно, признаю: с тобой не скучно. Доволен?",
     tapLines: [
-      "Хи-хи, щекотно же!",
-      "Я тебе рада. Правда.",
-      "Посидишь со мной ещё немного?",
-      "Только никому не говори, что я так улыбаюсь.",
+      "Хи-хи… я не над тобой смеюсь! …Ладно, над тобой.",
+      "Садись, где обычно. У тебя уже есть «своё место», представляешь?",
+      "Я сегодня убралась. НЕ ради тебя! Просто совпало.",
+      "Только никому не говори, что я тут так улыбаюсь.",
     ],
   },
   {
@@ -85,7 +101,7 @@ export const RELATIONSHIP_STAGES: readonly RelationshipStage[] = [
     tapLines: [
       "Ты меня смущаешь… не останавливайся.",
       "Сердце так громко стучит… слышишь?",
-      "Когда ты так близко, я забываю, что читала…",
+      "Когда ты так близко, я всё забываю…",
       "Щёки горят… Это из-за тебя, да?",
     ],
   },
@@ -94,7 +110,7 @@ export const RELATIONSHIP_STAGES: readonly RelationshipStage[] = [
     unlockLine: "Поиграем? Только чур не влюбляться первым.",
     tapLines: [
       "Ещё один тап — и я тебя поцелую. Шучу… или нет?",
-      "Заметил чулок? Он сполз не случайно.",
+      "Жарко здесь… или это только рядом с тобой?",
       "Подойди ближе… ещё ближе…",
       "Обожаю, как ты на меня смотришь.",
     ],
@@ -117,7 +133,7 @@ export const RELATIONSHIP_STAGES: readonly RelationshipStage[] = [
       "Люблю, когда ты меня так касаешься…",
       "Сегодня вечером — только ты и я.",
       "Можешь не стучать. Для тебя всегда открыто.",
-      "Этот чулок — только ради тебя…",
+      "Запри дверь… сегодня без уроков.",
     ],
   },
 ] as const;
@@ -128,7 +144,9 @@ export type HeroinePose = "classic" | "shelf" | "carpet" | "bed";
 /**
  * Pose-specific lines in three heat bands: band 0 for stages 1-4,
  * band 1 for stages 5-7, band 2 for stages 8-10.  They comment on what
- * she is actually doing in that pose, and warm up with the ladder.
+ * she is actually doing in that pose.  Stocking lines appear only
+ * where a stocking really slips: the carpet pose, and the shelf pose
+ * where stretching on tiptoes pulls it down.
  */
 export const POSE_TAP_LINES: Record<
   HeroinePose,
@@ -136,9 +154,9 @@ export const POSE_TAP_LINES: Record<
 > = {
   classic: [
     [
-      "Что? У меня форма помялась?",
-      "Я просто стою. Не надо так смотреть.",
-      "Школьная форма — не повод пялиться!",
+      "Это МОЯ комната! Веди себя прилично!",
+      "Форма помялась? Г-где?! Не смотри так пристально!",
+      "Я не наряжалась! Это обычная форма. Обычная!",
     ],
     [
       "Как тебе моя форма? Только честно.",
@@ -153,26 +171,26 @@ export const POSE_TAP_LINES: Record<
   ],
   shelf: [
     [
-      "Не подглядывай! Я просто тянусь за книгой.",
-      "Ай… высоко. Не смотри снизу!",
-      "Лучше бы помог достать, чем смотреть.",
+      "Не подглядывай! Я просто тянусь за книгой!",
+      "Ай… высоко. Н-не смотри снизу!",
+      "Когда я так тянусь, чулок сползает… ОТВЕРНИСЬ!",
     ],
     [
       "Подержишь меня за талию? Чтобы не упала…",
       "Эта книга для нас двоих. Поймал?",
-      "Каблучки приподнялись… заметил, да?",
+      "Тянусь-тянусь… а чулочек сполза-а-ет. Не смотри! Ну… чуть-чуть можно.",
     ],
     [
       "Юбка задралась? Упс… и пусть.",
       "Лови меня, если соскользну… только крепко.",
-      "Могу тянуться так весь день, раз тебе нравится.",
+      "Пока я тянулась, чулок сполз совсем… поправишь его сам?",
     ],
   ],
   carpet: [
     [
       "Я читаю, между прочим!",
       "Чулок сполз… не смотри!",
-      "Тут интересная глава, не отвлекай.",
+      "Тут интересная глава, не отвлекай!",
     ],
     [
       "Ложись рядом, почитаем вместе?",
@@ -187,9 +205,9 @@ export const POSE_TAP_LINES: Record<
   ],
   bed: [
     [
-      "Эй! Это моя кровать!",
-      "Я просто отдыхаю. Выйди, а?",
-      "Это место не для гостей, вообще-то…",
+      "Эй! Это моя кровать! Кто разрешил подходить?!",
+      "Я просто отдыхаю! В-выйди… ну, или стой там.",
+      "Это место не для одноклассников, вообще-то!",
     ],
     [
       "Посидишь со мной, пока я засыпаю?",
@@ -209,6 +227,36 @@ export function poseHeatBand(level: number): number {
   if (level <= 4) return 0;
   if (level <= 7) return 1;
   return 2;
+}
+
+/**
+ * Romantic upgrade titles that warm up with the relationship: the same
+ * mechanic reads shy early on and intimate near the end of the ladder.
+ */
+export const UPGRADE_ROMANTIC_NAMES: Record<
+  UpgradeKind,
+  readonly [string, string, string]
+> = {
+  tap: ["Робкие касания", "Нежные руки", "Ласковые пальчики"],
+  income: ["Мысли о тебе", "Скучает по тебе", "Считает минуты до встречи"],
+  charm: ["Комплименты", "Милые слова", "Горячий шёпот"],
+} as const;
+
+/** Romantic flavor description of each upgrade for the shop screen. */
+export const UPGRADE_ROMANTIC_FLAVOR: Record<UpgradeKind, string> = {
+  tap: "Каждое касание ей всё приятнее — больше монет за тап.",
+  income: "Она думает о тебе, даже когда тебя нет — монеты сами капают.",
+  charm: "От твоих слов её сердце бьётся чаще — больше сердечек за тап.",
+} as const;
+
+/** Stage-aware display name of an upgrade. */
+export function upgradeRomanticName(
+  kind: UpgradeKind,
+  level: number,
+): string {
+  return UPGRADE_ROMANTIC_NAMES[kind][
+    poseHeatBand(level) as 0 | 1 | 2
+  ] as string;
 }
 
 /** Stage record of a 1-based affection level, clamped to the ladder. */

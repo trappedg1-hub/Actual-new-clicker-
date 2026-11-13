@@ -42,6 +42,12 @@ export class SpeechBubble extends Container {
     this.screenWidth = screenWidth;
   }
 
+  /** Hides the bubble immediately (e.g. when an overlay opens). */
+  hide(): void {
+    this.removeAllActions();
+    this.visible = false;
+  }
+
   /** Shows `text` with the tail pointing at (anchorX, anchorY). */
   say(text: string, anchorX: number, anchorY: number): void {
     this.removeAllActions();

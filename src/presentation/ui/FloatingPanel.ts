@@ -33,10 +33,10 @@ export class FloatingPanel extends Container {
     this.rateLabel.position.set(29, 77);
     this.badge
       .roundRect(0, 60, 58, 35, 12)
-      .fill({ color: 0x241833, alpha: 0.94 });
+      .fill({ color: 0x1c1028, alpha: 0.55 });
     this.badge
       .roundRect(0, 60, 58, 35, 12)
-      .stroke({ color: 0x764b93, alpha: 0.74, width: 1 });
+      .stroke({ color: 0x8a5cb8, alpha: 0.5, width: 1 });
     this.addChild(this.badge, this.storyButton.node, this.rateLabel);
   }
 
