@@ -1,15 +1,113 @@
-import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
+import {
+  Assets,
+  Container,
+  Graphics,
+  Mesh,
+  MeshGeometry,
+  Sprite,
+  Texture,
+} from "pixi.js";
 import bedBlinkPatchUrl from "../../assets/environment/bed-blink-patch.png?url";
+import bedBlushUrl from "../../assets/environment/bed-blush.png?url";
+import bedMouthOpenUrl from "../../assets/environment/bed-mouth-open.png?url";
+import bedToesCurledUrl from "../../assets/environment/bed-toes-curled.png?url";
 import lyingHeroineUrl from "../../assets/environment/lying-heroine.webp?url";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
-import { blinkOverlayAt } from "../rig/animationMath.ts";
+import { blinkOverlayAt, RIG_LOOP_MS } from "../rig/animationMath.ts";
 
 /** Native pixel grid of the lying-pose web asset. */
 const ART_W = 1152;
 const ART_H = 1330;
 
-/** Eyes band of the closed-eyes plate inside the same pixel grid. */
-const BLINK_PATCH = { x: 597, y: 140, width: 187, height: 112 } as const;
+/** Feathered patch plates cut from the approved art, same pixel grid. */
+const BLINK_PATCH = { x: 597, y: 140 } as const;
+const BLUSH_PATCH = { x: 600, y: 161 } as const;
+const MOUTH_PATCH = { x: 659, y: 228 } as const;
+const TOES_PATCH = { x: 15, y: 758 } as const;
+
+/**
+ * Lying-pose breathing field: zero at and outside [topY, bottomY] so the
+ * face patches (which end at art row 287) and the toes patch (which starts
+ * at art row 758) never move relative to the art under them.
+ */
+const BED_BREATH = {
+  topY: 430,
+  peakY: 560,
+  bottomY: 750,
+  /** Peak vertical lift of the chest/belly band in art pixels. */
+  liftPx: 6,
+  /** Breath cycle length, same as the standing rig. */
+  periodMs: 4_000,
+} as const;
+
+/** Row list of the breathing mesh: dense inside the band, bounds pinned. */
+const BED_MESH_ROWS: readonly number[] = (() => {
+  const rows = [0, BED_BREATH.topY];
+  for (let y = BED_BREATH.topY + 16; y < BED_BREATH.bottomY; y += 16) {
+    rows.push(y);
+  }
+  rows.push(BED_BREATH.bottomY, ART_H);
+  return rows;
+})();
+
+function smoothstep(t: number): number {
+  const x = Math.min(1, Math.max(0, t));
+  return x * x * (3 - 2 * x);
+}
+
+function bedBreathWeight(y: number): number {
+  if (y <= BED_BREATH.topY || y >= BED_BREATH.bottomY) return 0;
+  if (y < BED_BREATH.peakY) {
+    return smoothstep(
+      (y - BED_BREATH.topY) / (BED_BREATH.peakY - BED_BREATH.topY),
+    );
+  }
+  return smoothstep(
+    (BED_BREATH.bottomY - y) / (BED_BREATH.bottomY - BED_BREATH.peakY),
+  );
+}
+
+/** Attack/hold/release envelope of one tap reaction, alpha 0..1. */
+interface ReactionEnvelope {
+  attackMs: number;
+  holdMs: number;
+  releaseMs: number;
+}
+
+function envelopeAt(ageMs: number, env: ReactionEnvelope): number {
+  if (ageMs < 0) return 0;
+  if (ageMs < env.attackMs) return smoothstep(ageMs / env.attackMs);
+  const afterAttack = ageMs - env.attackMs;
+  if (afterAttack < env.holdMs) return 1;
+  const afterHold = afterAttack - env.holdMs;
+  if (afterHold < env.releaseMs)
+    return 1 - smoothstep(afterHold / env.releaseMs);
+  return 0;
+}
+
+const TOES_ENVELOPE: ReactionEnvelope = {
+  attackMs: 110,
+  holdMs: 420,
+  releaseMs: 320,
+};
+const BLUSH_ENVELOPE: ReactionEnvelope = {
+  attackMs: 180,
+  holdMs: 900,
+  releaseMs: 1_400,
+};
+const MOUTH_TAP_ENVELOPE: ReactionEnvelope = {
+  attackMs: 140,
+  holdMs: 700,
+  releaseMs: 450,
+};
+
+/** Ambient open-mouth window inside the shared 12s loop (smile cycle). */
+const MOUTH_AMBIENT = {
+  startMs: 5_200,
+  attackMs: 260,
+  holdMs: 1_300,
+  releaseMs: 400,
+} as const;
 
 /** Touch zones of the bed scene, named by what the player actually taps. */
 export type BedTouchZone = "head" | "belly" | "legs" | "feet";
@@ -33,10 +131,23 @@ interface BedHitShape {
  * above the open-eyes art — the same stable-plate-plus-overlay approach the
  * production rig uses (a swap of the whole plate falls between rendered
  * frames on mobile Safari; an overlay above a stable base never does).
+ *
+ * Step 3c adds, with the same stable-plate-plus-overlay rule:
+ * - breathing: the art itself is a row mesh; a vertical field pinned to zero
+ *   outside the chest/belly band lifts her chest the way the standing torso
+ *   band breathes (no patch sits inside the band, so overlays never shear);
+ * - tap reactions: toes curl on feet taps, blush on head/belly/legs taps;
+ * - mouth emotions: an ambient open-mouth window inside the shared 12s loop
+ *   plus an extra open-mouth pulse when her head is tapped.
  */
 export class BedHeroine extends Container {
-  private readonly art = new Sprite(Texture.EMPTY);
+  private readonly artGeometry: MeshGeometry;
+  private readonly artPositions: Float32Array;
+  private readonly art: Mesh;
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
+  private readonly blushPatch = new Sprite(Texture.EMPTY);
+  private readonly mouthPatch = new Sprite(Texture.EMPTY);
+  private readonly toesPatch = new Sprite(Texture.EMPTY);
   private readonly hitLayer = new Container();
   private readonly onTap: (
     zone: BedTouchZone,
@@ -45,6 +156,9 @@ export class BedHeroine extends Container {
   ) => void;
   private timeMs = 0;
   private loaded = false;
+  private toesPulseAt = Number.NEGATIVE_INFINITY;
+  private blushPulseAt = Number.NEGATIVE_INFINITY;
+  private mouthPulseAt = Number.NEGATIVE_INFINITY;
 
   constructor(
     onTap: (zone: BedTouchZone, globalX: number, globalY: number) => void,
@@ -52,22 +166,78 @@ export class BedHeroine extends Container {
     super();
     this.label = "HEROINE-01 bed scene";
     this.onTap = onTap;
+
+    const rows = BED_MESH_ROWS;
+    const positions = new Float32Array(rows.length * 4);
+    const uvs = new Float32Array(rows.length * 4);
+    const indices = new Uint32Array((rows.length - 1) * 6);
+    for (let r = 0; r < rows.length; r += 1) {
+      const y = rows[r] ?? 0;
+      positions[r * 4 + 0] = 0;
+      positions[r * 4 + 1] = y;
+      positions[r * 4 + 2] = ART_W;
+      positions[r * 4 + 3] = y;
+      const v = y / ART_H;
+      uvs[r * 4 + 0] = 0;
+      uvs[r * 4 + 1] = v;
+      uvs[r * 4 + 2] = 1;
+      uvs[r * 4 + 3] = v;
+    }
+    for (let r = 0; r < rows.length - 1; r += 1) {
+      const a = r * 2;
+      indices[r * 6 + 0] = a;
+      indices[r * 6 + 1] = a + 1;
+      indices[r * 6 + 2] = a + 2;
+      indices[r * 6 + 3] = a + 1;
+      indices[r * 6 + 4] = a + 3;
+      indices[r * 6 + 5] = a + 2;
+    }
+    this.artGeometry = new MeshGeometry({ positions, uvs, indices });
+    this.artGeometry.batchMode = "batch";
+    this.artPositions = positions;
+    this.art = new Mesh({ geometry: this.artGeometry, texture: Texture.EMPTY });
+    this.art.roundPixels = false;
     this.art.eventMode = "none";
-    this.blinkPatch.eventMode = "none";
-    this.blinkPatch.position.set(BLINK_PATCH.x, BLINK_PATCH.y);
-    this.blinkPatch.alpha = 0;
-    this.addChild(this.art, this.blinkPatch, this.hitLayer);
+
+    for (const [patch, place] of [
+      [this.blushPatch, BLUSH_PATCH],
+      [this.blinkPatch, BLINK_PATCH],
+      [this.mouthPatch, MOUTH_PATCH],
+      [this.toesPatch, TOES_PATCH],
+    ] as const) {
+      patch.eventMode = "none";
+      patch.position.set(place.x, place.y);
+      patch.alpha = 0;
+    }
+    // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
+    // plate's open eyes while she blinks; the mouth and toes patches do not
+    // overlap the eyes band meaningfully and sit on top.
+    this.addChild(
+      this.art,
+      this.blushPatch,
+      this.blinkPatch,
+      this.mouthPatch,
+      this.toesPatch,
+      this.hitLayer,
+    );
     this.buildHitZones();
   }
 
-  /** Loads both plates; safe to call once from the scene constructor. */
+  /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [artTexture, patchTexture] = await Promise.all([
-      Assets.load<Texture>(lyingHeroineUrl),
-      Assets.load<Texture>(bedBlinkPatchUrl),
-    ]);
+    const [artTexture, blinkTexture, blushTexture, mouthTexture, toesTexture] =
+      await Promise.all([
+        Assets.load<Texture>(lyingHeroineUrl),
+        Assets.load<Texture>(bedBlinkPatchUrl),
+        Assets.load<Texture>(bedBlushUrl),
+        Assets.load<Texture>(bedMouthOpenUrl),
+        Assets.load<Texture>(bedToesCurledUrl),
+      ]);
     this.art.texture = artTexture;
-    this.blinkPatch.texture = patchTexture;
+    this.blinkPatch.texture = blinkTexture;
+    this.blushPatch.texture = blushTexture;
+    this.mouthPatch.texture = mouthTexture;
+    this.toesPatch.texture = toesTexture;
     this.loaded = true;
   }
 
@@ -75,11 +245,65 @@ export class BedHeroine extends Container {
     return this.loaded;
   }
 
-  /** Drives the auto-blink with the shared 12s loop envelope. */
+  /** Drives blink, breathing, reactions and the mouth cycle. */
   update(elapsedMs: number): void {
     if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
     this.timeMs += elapsedMs;
     this.blinkPatch.alpha = blinkOverlayAt(this.timeMs).weight;
+    this.applyBreathing();
+    this.toesPatch.alpha = envelopeAt(
+      this.timeMs - this.toesPulseAt,
+      TOES_ENVELOPE,
+    );
+    this.blushPatch.alpha = envelopeAt(
+      this.timeMs - this.blushPulseAt,
+      BLUSH_ENVELOPE,
+    );
+    this.mouthPatch.alpha = Math.max(
+      this.ambientMouthWeight(),
+      envelopeAt(this.timeMs - this.mouthPulseAt, MOUTH_TAP_ENVELOPE),
+    );
+  }
+
+  /** Vertical chest/belly lift via the row mesh, whole-pixel per row. */
+  private applyBreathing(): void {
+    const phase = (2 * Math.PI * this.timeMs) / BED_BREATH.periodMs;
+    const lift = Math.sin(phase) * BED_BREATH.liftPx;
+    const positions = this.artPositions;
+    for (let r = 0; r < BED_MESH_ROWS.length; r += 1) {
+      const base = BED_MESH_ROWS[r] ?? 0;
+      const y = base - Math.round(lift * bedBreathWeight(base));
+      positions[r * 4 + 1] = y;
+      positions[r * 4 + 3] = y;
+    }
+    this.artGeometry.attributes.aPosition!.buffer.update();
+  }
+
+  /** Ambient smile -> open-mouth window inside the shared 12s loop. */
+  private ambientMouthWeight(): number {
+    const loopT = this.timeMs % RIG_LOOP_MS;
+    return envelopeAt(loopT - MOUTH_AMBIENT.startMs, {
+      attackMs: MOUTH_AMBIENT.attackMs,
+      holdMs: MOUTH_AMBIENT.holdMs,
+      releaseMs: MOUTH_AMBIENT.releaseMs,
+    });
+  }
+
+  /** Visible reaction of one tapped zone; economy stays in the scene. */
+  private reactToTap(zone: BedTouchZone): void {
+    switch (zone) {
+      case "feet":
+        this.toesPulseAt = this.timeMs;
+        break;
+      case "head":
+        this.blushPulseAt = this.timeMs;
+        this.mouthPulseAt = this.timeMs;
+        break;
+      case "belly":
+      case "legs":
+        this.blushPulseAt = this.timeMs;
+        break;
+    }
   }
 
   /**
@@ -140,6 +364,7 @@ export class BedHeroine extends Container {
       g.cursor = "pointer";
       g.label = `bed zone ${shape.zone}`;
       g.on("pointertap", (event) => {
+        this.reactToTap(shape.zone);
         this.onTap(shape.zone, event.global.x, event.global.y);
       });
       this.hitLayer.addChild(g);

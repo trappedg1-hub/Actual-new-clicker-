@@ -1353,25 +1353,31 @@ export class ProductionHeroineRig extends Container {
     }
     const osc = Math.cos((2 * Math.PI * age) / 420);
     // Hair: crown-pivot rotation puts the visible swing into the long
-    // free-hanging tips (~1000px from the pivot -> up to ~15px arc on a
-    // hair tap) while the tucked-under rows near the head move <=2px,
-    // inside the 4px under-lap margin.  A small translation keeps the
-    // mid-cascade moving in the same direction, and body taps bob the
-    // whole mass vertically.
+    // free-hanging tips while the tucked-under rows near the head move
+    // <=1px, inside the 4px under-lap margin.  Over the bright room
+    // backdrop any slit reads as a glowing ghost line, so the swing is
+    // kept to ~7px at the tips and the vertical bob stays small.
     const hairAngle =
-      (imp.hair * 0.002 + imp.head * 0.001 + (imp.armL + imp.armR) * 0.0003) *
+      (imp.hair * 0.001 + imp.head * 0.0005 + (imp.armL + imp.armR) * 0.00015) *
       env *
       osc;
-    const hairX = imp.hair * 0.3 * env * osc;
+    const hairX = imp.hair * 0.18 * env * osc;
     const hairY =
-      -(Math.abs(imp.hair) * 0.2 + Math.abs(imp.body) * 1.1) *
+      -(Math.abs(imp.hair) * 0.12 + Math.abs(imp.body) * 0.6) *
       env *
       Math.abs(osc);
     if (hair) {
       hair.rotation = hairAngle;
       hair.position.set(424 + hairX, 150 + hairY);
     }
-    if (armL) armL.rotation = imp.armL * 0.002 * env * osc;
-    if (armR) armR.rotation = imp.armR * 0.002 * env * osc;
+    // Arms: OUTWARD-only pendulum.  A signed cosine used to swing the arm
+    // cutouts into the torso on the back half of each cycle, opening a
+    // bright slit between the inner arm edge and the blouse over the room
+    // art ("ghosting").  |osc| keeps every excursion away from the body:
+    // positive rotation moves the left hand screen-left, negative moves
+    // the right hand screen-right.
+    const armSwing = 0.0015 * env * Math.abs(osc);
+    if (armL) armL.rotation = Math.abs(imp.armL) * armSwing;
+    if (armR) armR.rotation = -Math.abs(imp.armR) * armSwing;
   }
 }
