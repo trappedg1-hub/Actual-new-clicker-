@@ -106,7 +106,7 @@ export class MainScene extends Container {
   private readonly hearts = new HeartBurst();
   private readonly liveRegion = new LiveRegion();
   private readonly interactionHint = new Text({
-    text: "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ",
+    text: "ТАП: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ",
     style: {
       fontFamily: "Arial",
       fontSize: 8,
@@ -491,23 +491,9 @@ export class MainScene extends Container {
       this.roomBackdrop.position.y,
       this.roomBackdrop.scale.x,
     );
-    const bottomBandTop = portrait
-      ? this.screenHeight - 66 - 82 - 8 - 30
-      : this.screenHeight - 68 - 24;
-    this.backdropScrim
-      .rect(0, 0, this.screenWidth, this.screenHeight)
-      .fill({ color: 0x100b20, alpha: 0.2 });
-    this.backdropScrim
-      .rect(0, 0, this.screenWidth, 96)
-      .fill({ color: 0x100b20, alpha: 0.34 });
-    this.backdropScrim
-      .rect(
-        0,
-        bottomBandTop,
-        this.screenWidth,
-        this.screenHeight - bottomBandTop,
-      )
-      .fill({ color: 0x100b20, alpha: 0.34 });
+    // J5: no dark bands, no global dim — the room runs edge to edge
+    // under the transparent Liquid-Glass HUD like a premium build.
+    // (backdropScrim stays cleared; drop shadows keep the text legible.)
   }
 
   applyOfflineProgress(
@@ -575,12 +561,12 @@ export class MainScene extends Container {
     this.carpetToggle.setLabel(mode === "carpet" ? "ПОДНЯТЬСЯ" : "НА ПОЛ");
     this.interactionHint.text =
       mode === "bed"
-        ? "КАСАНИЕ: ГОЛОВА · ЖИВОТ · НОГИ · СТУПНИ"
+        ? "ТАП: ГОЛОВА · ЖИВОТ · НОГИ · СТУПНИ"
         : mode === "shelf"
-          ? "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · БЁДРА · СТУПНИ"
+          ? "ТАП: ГОЛОВА · ВОЛОСЫ · БЁДРА · СТУПНИ"
           : mode === "carpet"
-            ? "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · БЁДРА · НОЖКИ"
-            : "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
+            ? "ТАП: ГОЛОВА · ВОЛОСЫ · БЁДРА · НОЖКИ"
+            : "ТАП: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
     const room = this.roomTextureForMode();
     if (room) {
       this.roomBackdrop.texture = room;

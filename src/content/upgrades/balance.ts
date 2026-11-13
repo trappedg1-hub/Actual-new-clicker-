@@ -59,7 +59,7 @@ export const GAME_BALANCE = {
       id: "sweet-words",
       name: "Комплименты",
       shortName: "ШАРМ",
-      description: "+1 сердечко к каждому тапу",
+      description: "+1 симпатия за каждый тап",
       baseCost: 40,
       costMultiplier: 1.75,
       unlockStage: 4,

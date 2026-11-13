@@ -1,4 +1,14 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+
+const UPGRADE_ICON_URLS = {
+  tap: new URL("../../assets/ui/icon-hands.png", import.meta.url).href,
+  income: new URL("../../assets/ui/icon-lantern.png", import.meta.url).href,
+  charm: new URL("../../assets/ui/icon-whisper.png", import.meta.url).href,
+} as const;
+const iconCoinUrl = new URL("../../assets/ui/icon-coin.png", import.meta.url)
+  .href;
+const iconHeartUrl = new URL("../../assets/ui/icon-heart.png", import.meta.url)
+  .href;
 import {
   GAME_BALANCE,
   UPGRADE_KINDS,
@@ -38,12 +48,6 @@ function makeText(
   });
 }
 
-const ICONS: Record<UpgradeKind, string> = {
-  tap: "✋",
-  income: "💭",
-  charm: "💬",
-};
-
 const ACCENTS: Record<UpgradeKind, number> = {
   tap: 0xf080c8,
   income: 0x9d7bff,
@@ -53,7 +57,7 @@ const ACCENTS: Record<UpgradeKind, number> = {
 interface ShopRow {
   kind: UpgradeKind;
   card: Graphics;
-  icon: Text;
+  icon: Sprite;
   iconPlate: Graphics;
   name: Text;
   flavor: Text;
@@ -76,7 +80,10 @@ export class RomanceShop extends Container {
     10,
     "#d9a9d4",
   );
-  private readonly walletText = makeText("", 12, "#ffe3a9", "700");
+  private readonly walletCoin = new Sprite(Texture.EMPTY);
+  private readonly walletHeart = new Sprite(Texture.EMPTY);
+  private readonly walletMoneyText = makeText("", 12, "#ffe3a9", "700");
+  private readonly walletHeartText = makeText("", 12, "#ffd3ec", "700");
   private readonly rows: ShopRow[] = [];
   private readonly closeButton: StyledButton;
   private screenWidth = 320;
@@ -88,12 +95,45 @@ export class RomanceShop extends Container {
     this.visible = false;
     this.eventMode = "static";
     this.addChild(this.dimmer, this.titleText, this.subtitleText);
-    this.addChild(this.walletText);
+    this.walletCoin.anchor.set(0, 0.5);
+    this.walletHeart.anchor.set(0, 0.5);
+    this.addChild(
+      this.walletCoin,
+      this.walletMoneyText,
+      this.walletHeart,
+      this.walletHeartText,
+    );
+    void Promise.all([
+      Assets.load<Texture>(iconCoinUrl),
+      Assets.load<Texture>(iconHeartUrl),
+      ...UPGRADE_KINDS.map((kind) =>
+        Assets.load<Texture>(UPGRADE_ICON_URLS[kind]),
+      ),
+    ])
+      .then(([coin, heart, ...upgradeIcons]) => {
+        this.walletCoin.texture = coin;
+        this.walletCoin.scale.set(16 / coin.height);
+        this.walletHeart.texture = heart;
+        this.walletHeart.scale.set(16 / heart.height);
+        UPGRADE_KINDS.forEach((kind, i) => {
+          const row = this.rows.find((r) => r.kind === kind);
+          const texture = upgradeIcons[i];
+          if (row && texture) {
+            row.icon.texture = texture;
+            const fit = 30 / Math.max(texture.width, texture.height);
+            row.icon.scale.set(fit);
+          }
+        });
+      })
+      .catch(() => {
+        // Icons are decoration; the shop stays usable without them.
+      });
 
     for (const kind of UPGRADE_KINDS) {
       const card = new Graphics();
       const iconPlate = new Graphics();
-      const icon = makeText(ICONS[kind], 20, "#fff7ff", "700");
+      const icon = new Sprite(Texture.EMPTY);
+      icon.anchor.set(0.5);
       const name = makeText("", 13, "#fff7ff", "700");
       const flavor = makeText("", 9, "#cdb6d6");
       flavor.style.wordWrap = true;
@@ -146,7 +186,10 @@ export class RomanceShop extends Container {
     const left = (width - sheetWidth) / 2;
     this.titleText.position.set(left + 6, 96);
     this.subtitleText.position.set(left + 6, 122);
-    this.walletText.position.set(left + 6, 140);
+    this.walletCoin.position.set(left + 6, 148);
+    this.walletMoneyText.position.set(left + 34, 141);
+    this.walletHeart.position.set(left + 104, 148);
+    this.walletHeartText.position.set(left + 132, 141);
 
     const cardHeight = 92;
     let y = 168;
@@ -169,7 +212,6 @@ export class RomanceShop extends Container {
         .fill({ color: 0x160e22, alpha: 0.9 })
         .circle(left + 34, y + cardHeight / 2, 20)
         .stroke({ color: ACCENTS[row.kind], alpha: 0.65, width: 1 });
-      row.icon.anchor.set(0.5);
       row.icon.position.set(left + 34, y + cardHeight / 2);
       row.name.position.set(left + 64, y + 12);
       row.flavor.position.set(left + 64, y + 32);
@@ -191,7 +233,8 @@ export class RomanceShop extends Container {
   render(state: Readonly<GameState>): void {
     if (!this.visible) return;
     const level = affectionProgress(state.affection).level;
-    this.walletText.text = `💰 ${Math.floor(state.currency)}   ·   💗 ${Math.floor(state.affection)}`;
+    this.walletMoneyText.text = `${Math.floor(state.currency)}`;
+    this.walletHeartText.text = `${Math.floor(state.affection)}`;
     for (const row of this.rows) {
       const definition = GAME_BALANCE.upgrades[row.kind];
       const unlocked = isUpgradeUnlocked(state, row.kind);
@@ -204,7 +247,7 @@ export class RomanceShop extends Container {
         row.flavor.alpha = 0.45;
         row.icon.alpha = 0.4;
         row.stat.text = "";
-        row.lockNote.text = `🔒 Откроется на стадии «${stage}»`;
+        row.lockNote.text = `Откроется на стадии «${stage}»`;
         row.buy.setLabel("ЗАКРЫТО");
         row.buy.setEnabled(false);
         continue;
@@ -220,9 +263,9 @@ export class RomanceShop extends Container {
           ? `УР ${upgradeLevel} · +${tapPowerBonus(state)} монет к тапу`
           : row.kind === "income"
             ? `УР ${upgradeLevel} · ${passiveIncomePerSecond(state).toFixed(2)} монет/сек`
-            : `УР ${upgradeLevel} · +${1 + charmBonus(state)} сердечка за тап`;
+            : `УР ${upgradeLevel} · +${1 + charmBonus(state)} симпатии за тап`;
       row.stat.text = statText;
-      row.buy.setLabel(`КУПИТЬ\n💰 ${cost}`);
+      row.buy.setLabel(`КУПИТЬ\n${cost} монет`);
       row.buy.setEnabled(state.currency >= cost);
     }
   }

@@ -42,17 +42,21 @@ import expr0Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-AS
 import expr1Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-eye_r_closed-B.png?url";
 import expr2Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_open-A.png?url";
 import expr3Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_smile-A.png?url";
-import naturalHairBackUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-hair-back.png?url";
-import naturalBlouseUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-blouse.png?url";
-import naturalArmLUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-l.png?url";
-import naturalArmRUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-r.png?url";
-import cleanLayer03Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/03_leg_l.png?url";
-import cleanLayer04Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/04_leg_r.png?url";
-import cleanLayer05Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/05_torso.png?url";
-import cleanLayer09Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/09_outfit_collar.png?url";
-import cleanLayer10Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/10_outfit_ribbon.png?url";
-import cleanLayer11Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/11_outfit_skirt_01.png?url";
-import cleanLayer12Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/12_outfit_skirt_02.png?url";
+import naturalHairBackUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-hair-back-aa.png?url";
+import naturalBlouseUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-blouse-aa.png?url";
+import naturalArmLUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-l-aa.png?url";
+import naturalArmRUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-r-aa.png?url";
+import cleanLayer03Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/03_leg_l-aa.png?url";
+import cleanLayer04Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/04_leg_r-aa.png?url";
+import cleanLayer05Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/05_torso-aa.png?url";
+import cleanLayer09Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/09_outfit_collar-aa.png?url";
+import cleanLayer10Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/10_outfit_ribbon-aa.png?url";
+import cleanLayer11Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/11_outfit_skirt_01-aa.png?url";
+import cleanLayer12Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/12_outfit_skirt_02-aa.png?url";
+import cleanLayer17Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/17_hair_side_l-aa.png?url";
+import cleanLayer18Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/18_hair_side_r-aa.png?url";
+import cleanLayer19Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/19_hair_front_01-aa.png?url";
+import cleanLayer20Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/20_hair_front_02-aa.png?url";
 
 export interface SlotDefinition {
   z: number;
@@ -175,6 +179,10 @@ export const NATURAL_CLEAN_LAYER_URLS: Readonly<Record<number, string>> = {
   10: cleanLayer10Url,
   11: cleanLayer11Url,
   12: cleanLayer12Url,
+  17: cleanLayer17Url,
+  18: cleanLayer18Url,
+  19: cleanLayer19Url,
+  20: cleanLayer20Url,
 };
 
 export const ALL_RUNTIME_TEXTURE_URLS: readonly string[] = [

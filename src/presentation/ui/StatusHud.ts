@@ -15,7 +15,13 @@ import type { GameState } from "../../domain/economy/types.ts";
 import { affectionProgress } from "../../domain/progression/progression.ts";
 import { relationshipStage } from "../../content/relationship/relationship.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
-import { drawCoinIcon, drawHeartIcon } from "./nikkeKit.ts";
+
+const iconHeartUrl = new URL("../../assets/ui/icon-heart.png", import.meta.url)
+  .href;
+const iconCoinUrl = new URL("../../assets/ui/icon-coin.png", import.meta.url)
+  .href;
+const iconGearUrl = new URL("../../assets/ui/icon-gear.png", import.meta.url)
+  .href;
 
 function makeText(
   text: string,
@@ -49,7 +55,6 @@ function formatAmount(amount: number): string {
 }
 
 const PINK = 0xff6ec0;
-const GOLD = 0xffc85c;
 
 /**
  * Liquid-Glass status HUD: three AI-painted translucent glass plates
@@ -61,9 +66,11 @@ export class StatusHud extends Container {
   private readonly heartsPlate = new Sprite(Texture.EMPTY);
   private readonly moneyPlate = new Sprite(Texture.EMPTY);
   private readonly levelPlate = new Sprite(Texture.EMPTY);
-  private readonly icons = new Graphics();
+  private readonly heartIcon = new Sprite(Texture.EMPTY);
+  private readonly coinIcon = new Sprite(Texture.EMPTY);
+  private readonly gearIcon = new Sprite(Texture.EMPTY);
   private readonly progress = new Graphics();
-  private readonly heartsLabel = makeText("СЕРДЕЧКИ", 7, "#ffd3ec", "700");
+  private readonly heartsLabel = makeText("СИМПАТИЯ", 7, "#ffd3ec", "700");
   private readonly heartsValue = makeText("0", 13, "#fff7ff", "700");
   private readonly stageValue = makeText("Незнакомец", 9, "#ffe3f4", "700");
   private readonly levelLabel = makeText("LV", 7, "#e3d8ff", "700");
@@ -77,7 +84,7 @@ export class StatusHud extends Container {
   constructor(onBackup: () => void) {
     super();
     this.label = "top HUD";
-    this.settings = createStyledButton("⚙", {
+    this.settings = createStyledButton("", {
       width: 42,
       height: 52,
       fontSize: 17,
@@ -90,7 +97,6 @@ export class StatusHud extends Container {
       this.heartsPlate,
       this.levelPlate,
       this.moneyPlate,
-      this.icons,
       this.progress,
       this.heartsLabel,
       this.heartsValue,
@@ -100,16 +106,29 @@ export class StatusHud extends Container {
       this.moneyLabel,
       this.moneyValue,
       this.settings.node,
+      this.heartIcon,
+      this.coinIcon,
+      this.gearIcon,
     );
+    this.heartIcon.anchor.set(0.5);
+    this.coinIcon.anchor.set(0.5);
+    this.gearIcon.anchor.set(0.5);
+    this.gearIcon.eventMode = "none";
     void Promise.all([
       Assets.load<Texture>(liquidHeartsUrl),
       Assets.load<Texture>(liquidMoneyUrl),
       Assets.load<Texture>(liquidLevelUrl),
+      Assets.load<Texture>(iconHeartUrl),
+      Assets.load<Texture>(iconCoinUrl),
+      Assets.load<Texture>(iconGearUrl),
     ])
-      .then(([hearts, money, level]) => {
+      .then(([hearts, money, level, heart, coin, gear]) => {
         this.heartsPlate.texture = hearts;
         this.moneyPlate.texture = money;
         this.levelPlate.texture = level;
+        this.setIcon(this.heartIcon, heart, 20);
+        this.setIcon(this.coinIcon, coin, 20);
+        this.setIcon(this.gearIcon, gear, 22);
       })
       .catch(() => {
         // The HUD stays functional with text only if the art fails.
@@ -140,22 +159,32 @@ export class StatusHud extends Container {
     this.moneyPlate.width = moneyW;
     this.moneyPlate.height = h;
 
-    this.icons.clear();
-    drawHeartIcon(this.icons, 17, 23, 12, PINK);
-    drawCoinIcon(this.icons, moneyX + 16, 24, 7, GOLD);
+    this.heartIcon.position.set(20, 24);
+    this.coinIcon.position.set(moneyX + 19, 25);
 
-    this.heartsLabel.position.set(31, 7);
-    this.heartsValue.position.set(31, 16);
+    this.heartsLabel.position.set(37, 7);
+    this.heartsValue.position.set(37, 16);
     this.stageValue.position.set(12, 39);
     this.levelLabel.anchor.set(0.5, 0);
     this.levelLabel.position.set(lvX + levelW / 2, 9);
     this.levelValue.anchor.set(0.5, 0);
     this.levelValue.position.set(lvX + levelW / 2, 20);
-    this.moneyLabel.position.set(moneyX + 28, 11);
-    this.moneyValue.position.set(moneyX + 28, 23);
+    this.moneyLabel.position.set(moneyX + 34, 11);
+    this.moneyValue.position.set(moneyX + 34, 23);
     this.settings.setSize(gearW, h - 4);
     this.settings.node.position.set(moneyX + moneyW + gap, 2);
+    this.gearIcon.position.set(
+      moneyX + moneyW + gap + gearW / 2,
+      2 + (h - 4) / 2,
+    );
     this.redrawProgress();
+  }
+
+  /** Fits a generated icon sprite to `height` px, keeping its ratio. */
+  private setIcon(sprite: Sprite, texture: Texture, height: number): void {
+    sprite.texture = texture;
+    const s = height / texture.height;
+    sprite.scale.set(s);
   }
 
   private redrawProgress(): void {
