@@ -1,11 +1,20 @@
 import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
+import shelfBlinkUrl from "../../assets/environment/shelf-blink.png?url";
+import shelfBlushUrl from "../../assets/environment/shelf-blush.png?url";
 import shelfHeroineUrl from "../../assets/environment/shelf-heroine.webp?url";
+import shelfStockingUrl from "../../assets/environment/shelf-stocking.png?url";
+import { blinkOverlayAt } from "../rig/animationMath.ts";
 import {
   SHELF_ART_H,
   SHELF_ART_W,
+  SHELF_BLUSH_ENVELOPE,
   SHELF_MOTION,
+  SHELF_PATCHES,
   SHELF_ROOM,
   SHELF_ROOM_ART_SCALE,
+  SHELF_STOCKING_ENVELOPE,
+  shelfAmbientStockingAt,
+  shelfEnvelopeAt,
   shelfPulseAt,
   type ShelfTouchZone,
 } from "./shelfScene.ts";
@@ -22,18 +31,25 @@ interface ShelfHitShape {
 
 /**
  * BLOCK H shelf scene: the approved shelf-reach cutout rendered above the
- * `room-shelf.webp` backdrop (room + baked-in bookshelf).  The scene owner
- * aligns this container to the cover-fitted backdrop through
- * {@link alignToBackdrop}, so the figure stays glued to the bookshelf and
- * the floor boards on every screen size and crop.
+ * `room-shelf.webp` backdrop (the previously unseen corner wall of the
+ * room with the bookshelf).  The scene owner aligns this container to the
+ * fitted backdrop through {@link alignToBackdrop}, so the figure stays
+ * glued to the bookshelf and the floor boards on every screen size.
  *
  * The inner art root pivots at the shoe tips (bottom center), so breathing
  * and the tiptoe bob scale the figure upward from the planted toes — the
  * shoes never slide on the floor.
+ *
+ * Reactions follow the bed-scene stable-plate-plus-overlay rule: the base
+ * plate never swaps; the blink, blush and slipped-stocking plates are
+ * feathered patches cut from aligned pose variants that fade above it.
  */
 export class ShelfHeroine extends Container {
   private readonly artRoot = new Container();
   private readonly art = new Sprite(Texture.EMPTY);
+  private readonly blushPatch = new Sprite(Texture.EMPTY);
+  private readonly blinkPatch = new Sprite(Texture.EMPTY);
+  private readonly stockingPatch = new Sprite(Texture.EMPTY);
   private readonly hitLayer = new Container();
   private readonly onTap: (
     zone: ShelfTouchZone,
@@ -43,6 +59,8 @@ export class ShelfHeroine extends Container {
   private timeMs = 0;
   private loaded = false;
   private pulseAt = Number.NEGATIVE_INFINITY;
+  private blushPulseAt = Number.NEGATIVE_INFINITY;
+  private stockingPulseAt = Number.NEGATIVE_INFINITY;
 
   constructor(
     onTap: (zone: ShelfTouchZone, globalX: number, globalY: number) => void,
@@ -52,15 +70,41 @@ export class ShelfHeroine extends Container {
     this.onTap = onTap;
 
     this.art.eventMode = "none";
+    for (const [patch, place] of [
+      [this.blushPatch, SHELF_PATCHES.blush],
+      [this.blinkPatch, SHELF_PATCHES.blink],
+      [this.stockingPatch, SHELF_PATCHES.stocking],
+    ] as const) {
+      patch.eventMode = "none";
+      patch.position.set(place.x, place.y);
+      patch.alpha = 0;
+    }
     this.artRoot.pivot.set(SHELF_ART_W / 2, SHELF_ART_H);
-    this.artRoot.addChild(this.art, this.hitLayer);
+    // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
+    // plate's open eye while she blinks; the stocking patch is disjoint.
+    this.artRoot.addChild(
+      this.art,
+      this.blushPatch,
+      this.blinkPatch,
+      this.stockingPatch,
+      this.hitLayer,
+    );
     this.addChild(this.artRoot);
     this.buildHitZones();
   }
 
-  /** Loads the cutout plate; safe to call once from the scene constructor. */
+  /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    this.art.texture = await Assets.load<Texture>(shelfHeroineUrl);
+    const [art, blink, blush, stocking] = await Promise.all([
+      Assets.load<Texture>(shelfHeroineUrl),
+      Assets.load<Texture>(shelfBlinkUrl),
+      Assets.load<Texture>(shelfBlushUrl),
+      Assets.load<Texture>(shelfStockingUrl),
+    ]);
+    this.art.texture = art;
+    this.blinkPatch.texture = blink;
+    this.blushPatch.texture = blush;
+    this.stockingPatch.texture = stocking;
     this.loaded = true;
   }
 
@@ -69,8 +113,8 @@ export class ShelfHeroine extends Container {
   }
 
   /**
-   * Glues the figure to the cover-fitted backdrop: `x`/`y` are the screen
-   * position of the backdrop's top-left corner and `scale` its cover scale
+   * Glues the figure to the fitted backdrop: `x`/`y` are the screen
+   * position of the backdrop's top-left corner and `scale` its fit scale
    * (backdrop art px -> screen px), exactly as the scene computed them.
    */
   alignToBackdrop(x: number, y: number, scale: number): void {
@@ -81,7 +125,7 @@ export class ShelfHeroine extends Container {
     this.scale.set(scale * SHELF_ROOM_ART_SCALE);
   }
 
-  /** Drives breathing, the tiptoe bob, the sway and tap pulses. */
+  /** Drives motion, blink, blush and the slipping stocking. */
   update(elapsedMs: number): void {
     if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
     this.timeMs += elapsedMs;
@@ -98,11 +142,33 @@ export class ShelfHeroine extends Container {
     this.artRoot.skew.x =
       Math.sin((2 * Math.PI * t) / SHELF_MOTION.swayPeriodMs) *
       SHELF_MOTION.swaySkew;
+
+    this.blinkPatch.alpha = blinkOverlayAt(t).weight;
+    this.blushPatch.alpha = shelfEnvelopeAt(
+      t - this.blushPulseAt,
+      SHELF_BLUSH_ENVELOPE,
+    );
+    this.stockingPatch.alpha = Math.max(
+      shelfAmbientStockingAt(t),
+      shelfEnvelopeAt(t - this.stockingPulseAt, SHELF_STOCKING_ENVELOPE),
+    );
   }
 
   /** Visible reaction of one tapped zone; economy stays in the scene. */
-  private reactToTap(): void {
+  private reactToTap(zone: ShelfTouchZone): void {
     this.pulseAt = this.timeMs;
+    switch (zone) {
+      case "head":
+        this.blushPulseAt = this.timeMs;
+        break;
+      case "thighs":
+        this.blushPulseAt = this.timeMs;
+        this.stockingPulseAt = this.timeMs;
+        break;
+      case "hair":
+      case "feet":
+        break;
+    }
   }
 
   private buildHitZones(): void {
@@ -114,28 +180,28 @@ export class ShelfHeroine extends Container {
         zone: "hair",
         draw: (g) => {
           // The long fall of hair down her right side, plus the crown.
-          g.rect(430, 130, 227, 660).fill({ color: 0xffffff, alpha: 1 });
-          g.rect(300, 40, 150, 120).fill({ color: 0xffffff, alpha: 1 });
+          g.rect(416, 124, 227, 660).fill({ color: 0xffffff, alpha: 1 });
+          g.rect(286, 34, 150, 120).fill({ color: 0xffffff, alpha: 1 });
         },
       },
       {
         zone: "thighs",
         draw: (g) => {
           // Pleated skirt, hips and the lace stocking tops.
-          g.rect(215, 440, 300, 310).fill({ color: 0xffffff, alpha: 1 });
+          g.rect(201, 434, 300, 310).fill({ color: 0xffffff, alpha: 1 });
         },
       },
       {
         zone: "feet",
         draw: (g) => {
           // Calves, raised stockinged heels and the shoes.
-          g.rect(170, 750, 400, 492).fill({ color: 0xffffff, alpha: 1 });
+          g.rect(156, 744, 400, 492).fill({ color: 0xffffff, alpha: 1 });
         },
       },
       {
         zone: "head",
         draw: (g) => {
-          g.ellipse(330, 125, 115, 95).fill({ color: 0xffffff, alpha: 1 });
+          g.ellipse(316, 119, 115, 95).fill({ color: 0xffffff, alpha: 1 });
         },
       },
     ];
@@ -147,7 +213,7 @@ export class ShelfHeroine extends Container {
       g.cursor = "pointer";
       g.label = `shelf zone ${shape.zone}`;
       g.on("pointertap", (event) => {
-        this.reactToTap();
+        this.reactToTap(shape.zone);
         this.onTap(shape.zone, event.global.x, event.global.y);
       });
       this.hitLayer.addChild(g);
