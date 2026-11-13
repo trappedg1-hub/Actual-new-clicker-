@@ -43,8 +43,16 @@ export const CARPET_PATCHES = {
   blink: { x: 156, y: 115 },
   /** Deep embarrassed flush with the flustered open smile. */
   blush: { x: 170, y: 119 },
-  /** Raised crossed shins leaned a few degrees back — sway frame B. */
-  legs: { x: 534, y: 291 },
+  /**
+   * Raised crossed shins window.  Unlike the other overlays this is a
+   * SWAP region: the base plate has a hard hole here and two full
+   * frames (A = base shins, B = leaned-back shins) cross-exchange
+   * alphas — so exactly one crisp frame shows at any moment and the
+   * vacated base shins can never ghost through.  Frame B's 8px border
+   * band is blended into frame A pixels, so the hole edge is seamless
+   * in both frames.
+   */
+  legs: { x: 540, y: 233 },
   /** The rolled stocking ring slid further down the bare calf. */
   stocking: { x: 523, y: 707 },
   /** One paper page caught mid-turn, curling above the open book. */
@@ -89,7 +97,7 @@ export const CARPET_MOTION = {
    * instead each frame HOLDS crisp and the blend lasts only this long —
    * a lively kick-pause-kick rhythm.
    */
-  legSwingTransitionMs: 340,
+  legSwingTransitionMs: 140,
   /** Damped squash of one tap reaction (she presses into the floor). */
   pulseMs: 640,
   pulseScale: 0.009,

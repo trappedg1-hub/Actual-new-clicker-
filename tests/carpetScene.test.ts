@@ -163,7 +163,9 @@ test("CARPET SCENE: the crossed shins kick without ghosting", () => {
   for (let t = 16; t <= period * 2; t += 16) {
     const v = carpetLegSwingAt(t);
     assert.ok(v >= 0 && v <= 1, `swing ${v} out of range`);
-    assert.ok(Math.abs(v - prev) < 0.12, `swing pops at ${t}ms`);
+    // 16ms of a 140ms smoothstep moves at most ~17% — continuous, just
+    // snappy.  A worse jump would be a visible pop.
+    assert.ok(Math.abs(v - prev) < 0.2, `swing pops at ${t}ms`);
     if (v > 0.02 && v < 0.98) mixedMs += 16;
     prev = v;
   }

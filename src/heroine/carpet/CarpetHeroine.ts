@@ -2,6 +2,7 @@ import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import carpetBlinkUrl from "../../assets/environment/carpet-blink.png?url";
 import carpetBlushUrl from "../../assets/environment/carpet-blush.png?url";
 import carpetHeroineUrl from "../../assets/environment/carpet-heroine.webp?url";
+import carpetLegsAUrl from "../../assets/environment/carpet-legs-a.png?url";
 import carpetLegsUrl from "../../assets/environment/carpet-legs.png?url";
 import carpetPageUrl from "../../assets/environment/carpet-page.png?url";
 import carpetStockingUrl from "../../assets/environment/carpet-stocking.png?url";
@@ -57,6 +58,9 @@ export class CarpetHeroine extends Container {
   private readonly art = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
+  /** Swap frame A: the base crossed shins (fills the base plate hole). */
+  private readonly legsFrameA = new Sprite(Texture.EMPTY);
+  /** Swap frame B: the shins leaned back — the kick frame. */
   private readonly legsPatch = new Sprite(Texture.EMPTY);
   private readonly stockingPatch = new Sprite(Texture.EMPTY);
   private readonly pagePatch = new Sprite(Texture.EMPTY);
@@ -83,6 +87,7 @@ export class CarpetHeroine extends Container {
     for (const [patch, place] of [
       [this.blushPatch, CARPET_PATCHES.blush],
       [this.blinkPatch, CARPET_PATCHES.blink],
+      [this.legsFrameA, CARPET_PATCHES.legs],
       [this.legsPatch, CARPET_PATCHES.legs],
       [this.stockingPatch, CARPET_PATCHES.stocking],
       [this.pagePatch, CARPET_PATCHES.page],
@@ -91,6 +96,7 @@ export class CarpetHeroine extends Container {
       patch.position.set(place.x, place.y);
       patch.alpha = 0;
     }
+    this.legsFrameA.alpha = 1;
     this.artRoot.pivot.set(CARPET_ART_W / 2, CARPET_ART_H / 2);
     this.shadowLayer.eventMode = "none";
     // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
@@ -101,9 +107,10 @@ export class CarpetHeroine extends Container {
     this.artRoot.addChild(
       this.shadowLayer,
       this.art,
+      this.legsFrameA,
+      this.legsPatch,
       this.blushPatch,
       this.blinkPatch,
-      this.legsPatch,
       this.stockingPatch,
       this.pagePatch,
       this.hitLayer,
@@ -114,11 +121,12 @@ export class CarpetHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, legs, stocking, page, shadow] =
+    const [art, blink, blush, legsA, legs, stocking, page, shadow] =
       await Promise.all([
         Assets.load<Texture>(carpetHeroineUrl),
         Assets.load<Texture>(carpetBlinkUrl),
         Assets.load<Texture>(carpetBlushUrl),
+        Assets.load<Texture>(carpetLegsAUrl),
         Assets.load<Texture>(carpetLegsUrl),
         Assets.load<Texture>(carpetStockingUrl),
         Assets.load<Texture>(carpetPageUrl),
@@ -127,6 +135,7 @@ export class CarpetHeroine extends Container {
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
+    this.legsFrameA.texture = legsA;
     this.legsPatch.texture = legs;
     this.stockingPatch.texture = stocking;
     this.pagePatch.texture = page;
@@ -175,7 +184,12 @@ export class CarpetHeroine extends Container {
     // height dips, as the ribcage presses into the floor.
     this.artRoot.scale.set(1 + lift * 0.4, 1 - lift);
 
-    this.legsPatch.alpha = carpetLegSwingAt(t);
+    // Swap region: the two shin frames cross-exchange alphas, so one
+    // crisp frame is always fully visible (the base plate has a hole
+    // here — no vacated shins can ghost through from below).
+    const swing = carpetLegSwingAt(t);
+    this.legsPatch.alpha = swing;
+    this.legsFrameA.alpha = 1 - swing;
     this.blinkPatch.alpha = blinkOverlayAt(t).weight;
     this.blushPatch.alpha = carpetEnvelopeAt(
       t - this.blushPulseAt,
