@@ -13,6 +13,7 @@ import {
   CarpetHeroine,
   type CarpetTouchZone,
 } from "../../heroine/carpet/CarpetHeroine.ts";
+import { CARPET_ROOM } from "../../heroine/carpet/carpetScene.ts";
 import {
   SHELF_ZONE_ECONOMY,
   ShelfHeroine,
@@ -402,12 +403,11 @@ export class MainScene extends Container {
     const texture = this.roomBackdrop.texture;
     if (texture === Texture.EMPTY || texture.width <= 1) return;
     const portrait = this.screenWidth <= this.screenHeight;
-    if (this.sceneMode === "shelf" || this.sceneMode === "carpet") {
-      // The shelf and carpet scenes show the WHOLE room above the bottom
-      // UI band (contain-fit, bottom-anchored): with the cover crop her
-      // feet (shelf) or the raised crossed shins (carpet) — the point of
-      // each pose — would sit behind the upgrade card.  The camera
-      // "steps back" instead.
+    if (this.sceneMode === "shelf") {
+      // The shelf scene shows the WHOLE room above the bottom UI band
+      // (contain-fit, bottom-anchored): with the cover crop her feet and
+      // the raised stockinged heels — the point of the pose — would sit
+      // behind the upgrade card.  The camera "steps back" instead.
       const bottomLimit = portrait
         ? this.screenHeight - 66 - 82 - 8 + 6
         : this.screenHeight - 62;
@@ -419,6 +419,24 @@ export class MainScene extends Container {
       this.roomBackdrop.position.set(
         (this.screenWidth - texture.width * scale) / 2,
         bottomLimit - texture.height * scale,
+      );
+    } else if (this.sceneMode === "carpet") {
+      // The carpet scene cover-fits the WHOLE game screen — no side
+      // bars, the floor boards run edge to edge like the standing room.
+      // The horizontal crop window is centered on the lying figure (and
+      // clamped to the art bounds), so she always stays fully visible;
+      // the figure itself is placed small enough in the backdrop grid
+      // to fit the narrowest portrait window.
+      const scale = Math.max(
+        this.screenWidth / texture.width,
+        this.screenHeight / texture.height,
+      );
+      const minX = this.screenWidth - texture.width * scale;
+      const focusX = this.screenWidth / 2 - CARPET_ROOM.centerX * scale;
+      this.roomBackdrop.scale.set(scale);
+      this.roomBackdrop.position.set(
+        Math.min(0, Math.max(minX, focusX)),
+        Math.min(0, (this.screenHeight - texture.height * scale) / 2),
       );
     } else {
       const scale = Math.max(

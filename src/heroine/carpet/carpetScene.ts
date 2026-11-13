@@ -18,9 +18,16 @@ export const CARPET_ROOM = {
   roomH: 1508,
   /** Center anchor of the figure in backdrop pixels. */
   centerX: 410,
-  centerY: 930,
-  /** Display width of the figure in backdrop pixels. */
-  displayW: 780,
+  centerY: 840,
+  /**
+   * Display width of the figure in backdrop pixels.  The carpet backdrop
+   * COVER-fits the whole game screen (no side bars), which zooms the
+   * room: on a 390x844 portrait screen only a ~697px-wide window of the
+   * 848px art is visible.  620px keeps the figure fully inside that
+   * window (with margins) while her on-screen size stays the same as
+   * the old contain-fit placement.
+   */
+  displayW: 620,
 } as const;
 
 /** Figure scale in backdrop pixels per cutout pixel. */

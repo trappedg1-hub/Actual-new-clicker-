@@ -55,6 +55,32 @@ test("CARPET SCENE: figure placement stays inside the backdrop grid", () => {
   assert.ok(CARPET_ROOM.centerY - halfH > CARPET_ROOM.roomH * 0.25);
 });
 
+test("CARPET SCENE: figure fits the cover-fit window of a 390x844 phone", () => {
+  // The backdrop cover-fits the full screen; on the reference portrait
+  // viewport the fit is height-limited, so only a horizontal window of
+  // the art is visible.  The figure (and a margin) must fit inside it,
+  // and her feet must stay above the upgrade card band.
+  const screenW = 390;
+  const screenH = 844;
+  const scale = Math.max(
+    screenW / CARPET_ROOM.roomW,
+    screenH / CARPET_ROOM.roomH,
+  );
+  const windowW = screenW / scale;
+  const halfW = (CARPET_ART_W * CARPET_ROOM_ART_SCALE) / 2;
+  assert.ok(
+    halfW + 20 < windowW / 2,
+    `figure half-width ${halfW} overflows the ${windowW}px cover window`,
+  );
+  const cardTop = screenH - 66 - 82 - 8;
+  const bottomY =
+    (CARPET_ROOM.centerY + (CARPET_ART_H * CARPET_ROOM_ART_SCALE) / 2) * scale;
+  assert.ok(
+    bottomY <= cardTop + 2,
+    `figure bottom ${bottomY} hides behind the upgrade card ${cardTop}`,
+  );
+});
+
 test("CARPET SCENE: tap pulse is zero at rest and bounded during the squash", () => {
   assert.equal(carpetPulseAt(-1), 0);
   assert.equal(carpetPulseAt(CARPET_MOTION.pulseMs), 0);
