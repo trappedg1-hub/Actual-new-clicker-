@@ -234,24 +234,28 @@ export class MainScene extends Container {
       const cardTop = heightSafe - 66 - 82 - 8;
       const areaTop = 88;
       const availableHeight = Math.max(150, cardTop - areaTop - 22);
-      // Over the room art the heroine stands close to the player: the real
-      // figure spans ~628px of the 848px canvas, so the width constraint
-      // divides by 700 (figure + margin), not the full canvas, and the pose
-      // is bottom-anchored so she stands on the floor instead of floating
-      // in the middle of the backdrop.  The classic dark variant keeps the
-      // original distant framing.
+      // Over the room art the heroine stands close to the player, framed
+      // from just above her head (art row ~36) down to mid-thigh (art row
+      // ~880): the scale fits that 844px span into the available height and
+      // the pose is TOP-anchored, so her legs below the thighs continue
+      // behind the upgrade card instead of shrinking the whole figure.
+      // Width still caps the zoom on narrow phones (628px figure core +
+      // hair; outer hair tips may touch the screen edge).  The classic dark
+      // variant keeps the original distant full-body framing.
+      const frameTopArt = 36;
+      const frameSpanArt = 844;
       heroineScale = this.roomEnabled
-        ? Math.min(1.04, availableHeight / 1264, (widthSafe - 24) / 700)
+        ? Math.min(1.04, availableHeight / frameSpanArt, (widthSafe + 40) / 660)
         : Math.min(1.04, availableHeight / 1264, (widthSafe - 88) / 848);
       heroineCenterX = widthSafe / 2;
       heroineCenterY = this.roomEnabled
-        ? cardTop - 26 - (heroineScale * 1264) / 2
+        ? areaTop + heroineScale * (1264 / 2 - frameTopArt)
         : areaTop + availableHeight / 2;
-      this.floatingPanel.resize(10, Math.max(112, heroineCenterY - 35));
-      this.bedToggle.node.position.set(
-        10,
-        Math.max(112, heroineCenterY - 35) + 104,
-      );
+      const panelY = this.roomEnabled
+        ? Math.max(112, Math.min(heroineCenterY - 35, heightSafe * 0.42))
+        : Math.max(112, heroineCenterY - 35);
+      this.floatingPanel.resize(10, panelY);
+      this.bedToggle.node.position.set(10, panelY + 104);
       this.bedHeroine.layoutScene(widthSafe, areaTop, cardTop - 10);
       this.interactionHint.position.set(widthSafe / 2, cardTop - 18);
     } else {

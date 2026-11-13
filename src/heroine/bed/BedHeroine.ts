@@ -50,6 +50,15 @@ const BED_MESH_ROWS: readonly number[] = (() => {
   return rows;
 })();
 
+/**
+ * Column list and weights: the field is also zero OUTSIDE her torso
+ * horizontally (art columns ~430-880), so the bed sheets around her do not
+ * breathe with her — only the chest/belly of the figure itself lifts.
+ * Linear interpolation between columns gives the smooth falloff.
+ */
+const BED_MESH_COLS: readonly number[] = [0, 430, 520, 650, 780, 880, ART_W];
+const BED_COL_WEIGHTS: readonly number[] = [0, 0, 1, 1, 1, 0, 0];
+
 function smoothstep(t: number): number {
   const x = Math.min(1, Math.max(0, t));
   return x * x * (3 - 2 * x);
@@ -168,29 +177,35 @@ export class BedHeroine extends Container {
     this.onTap = onTap;
 
     const rows = BED_MESH_ROWS;
-    const positions = new Float32Array(rows.length * 4);
-    const uvs = new Float32Array(rows.length * 4);
-    const indices = new Uint32Array((rows.length - 1) * 6);
+    const cols = BED_MESH_COLS;
+    const positions = new Float32Array(rows.length * cols.length * 2);
+    const uvs = new Float32Array(rows.length * cols.length * 2);
+    const indices = new Uint32Array((rows.length - 1) * (cols.length - 1) * 6);
     for (let r = 0; r < rows.length; r += 1) {
       const y = rows[r] ?? 0;
-      positions[r * 4 + 0] = 0;
-      positions[r * 4 + 1] = y;
-      positions[r * 4 + 2] = ART_W;
-      positions[r * 4 + 3] = y;
-      const v = y / ART_H;
-      uvs[r * 4 + 0] = 0;
-      uvs[r * 4 + 1] = v;
-      uvs[r * 4 + 2] = 1;
-      uvs[r * 4 + 3] = v;
+      for (let c = 0; c < cols.length; c += 1) {
+        const x = cols[c] ?? 0;
+        const i = (r * cols.length + c) * 2;
+        positions[i] = x;
+        positions[i + 1] = y;
+        uvs[i] = x / ART_W;
+        uvs[i + 1] = y / ART_H;
+      }
     }
+    let q = 0;
     for (let r = 0; r < rows.length - 1; r += 1) {
-      const a = r * 2;
-      indices[r * 6 + 0] = a;
-      indices[r * 6 + 1] = a + 1;
-      indices[r * 6 + 2] = a + 2;
-      indices[r * 6 + 3] = a + 1;
-      indices[r * 6 + 4] = a + 3;
-      indices[r * 6 + 5] = a + 2;
+      for (let c = 0; c < cols.length - 1; c += 1) {
+        const a = r * cols.length + c;
+        const b = a + 1;
+        const d = a + cols.length;
+        const e = d + 1;
+        indices[q++] = a;
+        indices[q++] = b;
+        indices[q++] = d;
+        indices[q++] = b;
+        indices[q++] = e;
+        indices[q++] = d;
+      }
     }
     this.artGeometry = new MeshGeometry({ positions, uvs, indices });
     this.artGeometry.batchMode = "batch";
@@ -265,16 +280,19 @@ export class BedHeroine extends Container {
     );
   }
 
-  /** Vertical chest/belly lift via the row mesh, whole-pixel per row. */
+  /** Vertical chest/belly lift via the grid mesh, zero outside her torso. */
   private applyBreathing(): void {
     const phase = (2 * Math.PI * this.timeMs) / BED_BREATH.periodMs;
     const lift = Math.sin(phase) * BED_BREATH.liftPx;
     const positions = this.artPositions;
+    const cols = BED_MESH_COLS.length;
     for (let r = 0; r < BED_MESH_ROWS.length; r += 1) {
       const base = BED_MESH_ROWS[r] ?? 0;
-      const y = base - Math.round(lift * bedBreathWeight(base));
-      positions[r * 4 + 1] = y;
-      positions[r * 4 + 3] = y;
+      const rowLift = lift * bedBreathWeight(base);
+      for (let c = 0; c < cols; c += 1) {
+        positions[(r * cols + c) * 2 + 1] =
+          base - rowLift * (BED_COL_WEIGHTS[c] ?? 0);
+      }
     }
     this.artGeometry.attributes.aPosition!.buffer.update();
   }
