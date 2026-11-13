@@ -1,0 +1,176 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  CARPET_ART_H,
+  CARPET_ART_W,
+  CARPET_BLUSH_ENVELOPE,
+  CARPET_MOTION,
+  CARPET_PAGE_AMBIENT,
+  CARPET_PAGE_ENVELOPE,
+  CARPET_PATCHES,
+  CARPET_ROOM,
+  CARPET_ROOM_ART_SCALE,
+  CARPET_SHADOWS,
+  CARPET_STOCKING_AMBIENT,
+  CARPET_STOCKING_ENVELOPE,
+  CARPET_ZONE_ECONOMY,
+  carpetAmbientPageAt,
+  carpetAmbientStockingAt,
+  carpetEnvelopeAt,
+  carpetLegSwingAt,
+  carpetPulseAt,
+  type CarpetTouchZone,
+} from "../src/heroine/carpet/carpetScene.ts";
+
+test("CARPET SCENE: every touch zone maps into a real economy zone", () => {
+  const zones: readonly CarpetTouchZone[] = ["head", "hair", "thighs", "legs"];
+  const economyZones = new Set(["head", "hair", "body", "arms", "legs"]);
+  for (const zone of zones) {
+    const mapped = CARPET_ZONE_ECONOMY[zone];
+    assert.ok(
+      economyZones.has(mapped),
+      `zone ${zone} maps to unknown economy zone ${mapped}`,
+    );
+  }
+  // The four carpet zones reuse four DISTINCT standing-economy zones, so
+  // the player earns the same spread of rewards as in the standing scene.
+  assert.equal(new Set(Object.values(CARPET_ZONE_ECONOMY)).size, 4);
+});
+
+test("CARPET SCENE: figure placement stays inside the backdrop grid", () => {
+  const halfW = (CARPET_ART_W * CARPET_ROOM_ART_SCALE) / 2;
+  const halfH = (CARPET_ART_H * CARPET_ROOM_ART_SCALE) / 2;
+  assert.ok(CARPET_ROOM.centerX - halfW >= 0, "figure pokes out left");
+  assert.ok(
+    CARPET_ROOM.centerX + halfW <= CARPET_ROOM.roomW,
+    "figure pokes out right",
+  );
+  assert.ok(CARPET_ROOM.centerY - halfH > 0, "figure pokes above the room");
+  assert.ok(
+    CARPET_ROOM.centerY + halfH < CARPET_ROOM.roomH,
+    "figure pokes below the floor",
+  );
+  // She lies on the OPEN floor half of the backdrop (the room furniture
+  // band occupies roughly the top third of the art).
+  assert.ok(CARPET_ROOM.centerY - halfH > CARPET_ROOM.roomH * 0.25);
+});
+
+test("CARPET SCENE: tap pulse is zero at rest and bounded during the squash", () => {
+  assert.equal(carpetPulseAt(-1), 0);
+  assert.equal(carpetPulseAt(CARPET_MOTION.pulseMs), 0);
+  assert.equal(carpetPulseAt(CARPET_MOTION.pulseMs + 1000), 0);
+  assert.ok(carpetPulseAt(0) === 0);
+  let peak = 0;
+  for (let t = 0; t < CARPET_MOTION.pulseMs; t += 4) {
+    const v = carpetPulseAt(t);
+    assert.ok(Math.abs(v) <= 1, `pulse ${v} out of range at ${t}ms`);
+    peak = Math.max(peak, Math.abs(v));
+  }
+  assert.ok(peak > 0.4, "pulse never reaches a visible amplitude");
+  assert.ok(carpetPulseAt(CARPET_MOTION.pulseMs * 0.2) < 0);
+});
+
+test("CARPET SCENE: overlay patches sit inside the cutout grid", () => {
+  for (const [name, patch] of Object.entries(CARPET_PATCHES)) {
+    assert.ok(
+      patch.x >= 0 && patch.x < CARPET_ART_W,
+      `${name} x outside the plate`,
+    );
+    assert.ok(
+      patch.y >= 0 && patch.y < CARPET_ART_H,
+      `${name} y outside the plate`,
+    );
+  }
+  // The blink plate must start at or above-left of the blush plate's
+  // origin so the closed-eye overlay covers the blush plate's widened
+  // eyes (blink renders ABOVE blush in the sprite stack).
+  assert.ok(CARPET_PATCHES.blink.x <= CARPET_PATCHES.blush.x);
+  assert.ok(CARPET_PATCHES.blink.y <= CARPET_PATCHES.blush.y);
+  // Swing and stocking patches live on the legs half of the plate,
+  // the page patch on the book side — disjoint from the face patches.
+  assert.ok(CARPET_PATCHES.legs.x > CARPET_ART_W / 2);
+  assert.ok(CARPET_PATCHES.stocking.x > CARPET_ART_W / 2);
+  assert.ok(CARPET_PATCHES.page.x < CARPET_PATCHES.blink.x);
+  assert.ok(CARPET_PATCHES.page.y > CARPET_PATCHES.blink.y);
+});
+
+test("CARPET SCENE: contact shadows lie under the body on the boards", () => {
+  assert.ok(CARPET_SHADOWS.length >= 3, "book, torso and thigh need shadows");
+  for (const s of CARPET_SHADOWS) {
+    assert.ok(s.x > 0 && s.x < CARPET_ART_W, "shadow left the plate");
+    // Under the lying body: lower 2/3 of the plate, may spill a little
+    // below the hip line but never above the raised feet.
+    assert.ok(s.y > CARPET_ART_H * 0.4, `shadow at y ${s.y} floats too high`);
+    assert.ok(s.y < CARPET_ART_H + 80, `shadow at y ${s.y} under the floor`);
+    assert.ok(s.alpha > 0 && s.alpha <= 1);
+    assert.ok(s.w > s.h, "contact shadows must be flat ellipses");
+  }
+});
+
+test("CARPET SCENE: reaction envelopes rise, hold and fully decay", () => {
+  for (const env of [
+    CARPET_BLUSH_ENVELOPE,
+    CARPET_STOCKING_ENVELOPE,
+    CARPET_PAGE_ENVELOPE,
+  ]) {
+    assert.equal(carpetEnvelopeAt(-1, env), 0);
+    assert.equal(carpetEnvelopeAt(env.attackMs, env), 1, "hold must be full");
+    assert.equal(carpetEnvelopeAt(env.attackMs + env.holdMs - 1, env), 1);
+    const total = env.attackMs + env.holdMs + env.releaseMs;
+    assert.equal(carpetEnvelopeAt(total, env), 0, "must fully decay");
+    assert.equal(carpetEnvelopeAt(total + 10_000, env), 0);
+  }
+});
+
+test("CARPET SCENE: the crossed shins swing forever without a seam", () => {
+  const period = CARPET_MOTION.legSwingPeriodMs;
+  // Starts on the base frame, peaks on the leaned-back frame mid-cycle,
+  // returns to the base frame at the period boundary.
+  assert.equal(carpetLegSwingAt(0), 0);
+  assert.ok(Math.abs(carpetLegSwingAt(period / 2) - 1) < 1e-9);
+  assert.ok(carpetLegSwingAt(period) < 1e-9);
+  // Continuous: no frame-to-frame jump bigger than a few percent.
+  let prev = carpetLegSwingAt(0);
+  for (let t = 16; t <= period * 2; t += 16) {
+    const v = carpetLegSwingAt(t);
+    assert.ok(v >= 0 && v <= 1, `swing ${v} out of range`);
+    assert.ok(Math.abs(v - prev) < 0.03, `swing jumps at ${t}ms`);
+    prev = v;
+  }
+});
+
+test("CARPET SCENE: stocking slips once per ambient cycle and resets", () => {
+  const period = CARPET_STOCKING_AMBIENT.periodMs;
+  const start = CARPET_STOCKING_AMBIENT.startMs;
+  const env = CARPET_STOCKING_ENVELOPE;
+  const mid = start + env.attackMs + env.holdMs / 2;
+  assert.equal(carpetAmbientStockingAt(mid), 1);
+  assert.equal(carpetAmbientStockingAt(period * 3 + mid), 1);
+  assert.equal(carpetAmbientStockingAt(start - 1_000), 0);
+  assert.equal(carpetAmbientStockingAt(period - 1), 0);
+  assert.ok(start + env.attackMs + env.holdMs + env.releaseMs < period);
+});
+
+test("CARPET SCENE: she turns a page on a steady reading rhythm", () => {
+  const period = CARPET_PAGE_AMBIENT.periodMs;
+  const start = CARPET_PAGE_AMBIENT.startMs;
+  const env = CARPET_PAGE_ENVELOPE;
+  const mid = start + env.attackMs + env.holdMs / 2;
+  assert.equal(carpetAmbientPageAt(mid), 1);
+  assert.equal(carpetAmbientPageAt(period * 5 + mid), 1);
+  assert.equal(carpetAmbientPageAt(start - 500), 0);
+  assert.equal(carpetAmbientPageAt(period - 1), 0);
+  assert.ok(start + env.attackMs + env.holdMs + env.releaseMs < period);
+  // The flip itself is quick — under 1.5 seconds end to end.
+  assert.ok(env.attackMs + env.holdMs + env.releaseMs < 1_500);
+});
+
+test("CARPET SCENE: ambient amplitudes stay subtle on the shipped plate", () => {
+  // Combined breath+pulse scale shift at the worst frame: under 1.5% of
+  // the plate — she breathes gently, the body never balloons.
+  const worst = CARPET_MOTION.breathScale + CARPET_MOTION.pulseScale;
+  assert.ok(worst < 0.015, `combined amplitude ${worst} too strong`);
+  // The leg swing crossfade is the main motion; its period is slow and
+  // readable, not a flicker.
+  assert.ok(CARPET_MOTION.legSwingPeriodMs >= 4_000);
+});
