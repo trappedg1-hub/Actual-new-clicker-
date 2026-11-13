@@ -84,20 +84,12 @@ export const CARPET_SHADOWS: readonly {
  * Ambient motion constants: she lies on her stomach propped on her
  * forearms, so the whole plate only breathes very gently (scale pulse
  * around the center) — the visible life comes from the overlay cycles:
- * swinging shins, the page flip, blinking at the player.
+ * the page flip, blinking at the player, the slipping stocking.  The
+ * crossed shins stay static and only twitch once on a legs tap.
  */
 export const CARPET_MOTION = {
   breathPeriodMs: 4_000,
   breathScale: 0.0035,
-  /** Full back-and-forth period of the crossed-shins swing. */
-  legSwingPeriodMs: 3_000,
-  /**
-   * Duration of each snap between the two shin frames.  A slow sine
-   * crossfade kept both frames half-visible for seconds (ghosting);
-   * instead each frame HOLDS crisp and the blend lasts only this long —
-   * a lively kick-pause-kick rhythm.
-   */
-  legSwingTransitionMs: 140,
   /** Damped squash of one tap reaction (she presses into the floor). */
   pulseMs: 640,
   pulseScale: 0.009,
@@ -131,6 +123,17 @@ export const CARPET_PAGE_ENVELOPE: CarpetEnvelope = {
   attackMs: 160,
   holdMs: 420,
   releaseMs: 240,
+};
+
+/**
+ * One quick kick of the crossed shins when the player taps her legs:
+ * the shins are otherwise STATIC (no ambient loop — a permanent swap
+ * cycle read as doubling), they just twitch back once and settle.
+ */
+export const CARPET_KICK_ENVELOPE: CarpetEnvelope = {
+  attackMs: 110,
+  holdMs: 90,
+  releaseMs: 180,
 };
 
 /**
@@ -176,19 +179,13 @@ export function carpetPulseAt(ageMs: number): number {
 }
 
 /**
- * Crossfade weight of the leaned-back shins frame at loop time `timeMs`:
- * holds crisp frame A, snaps to crisp frame B mid-cycle, snaps back at
- * the loop point — the crossed feet kick back and forth forever, and
- * the two frames only mix during the short transitions (no ghosting).
+ * Weight of the leaned-back shins frame `ageMs` after a legs tap: zero
+ * at rest (frame A fully visible, perfectly static), one quick twitch
+ * back and settle.  Exactly zero outside the envelope — idle frames
+ * never mix, so the shins can never read as doubled.
  */
-export function carpetLegSwingAt(timeMs: number): number {
-  const period = CARPET_MOTION.legSwingPeriodMs;
-  const f = CARPET_MOTION.legSwingTransitionMs / period;
-  const phase = (((timeMs % period) + period) % period) / period;
-  if (phase < 0.5 - f) return 0;
-  if (phase < 0.5) return smoothstep((phase - (0.5 - f)) / f);
-  if (phase < 1 - f) return 1;
-  return 1 - smoothstep((phase - (1 - f)) / f);
+export function carpetKickAt(ageMs: number): number {
+  return carpetEnvelopeAt(ageMs, CARPET_KICK_ENVELOPE);
 }
 
 /** Ambient stocking weight inside the long cycle at loop time `timeMs`. */

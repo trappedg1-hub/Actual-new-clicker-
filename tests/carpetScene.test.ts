@@ -17,7 +17,8 @@ import {
   carpetAmbientPageAt,
   carpetAmbientStockingAt,
   carpetEnvelopeAt,
-  carpetLegSwingAt,
+  carpetKickAt,
+  CARPET_KICK_ENVELOPE,
   carpetPulseAt,
   type CarpetTouchZone,
 } from "../src/heroine/carpet/carpetScene.ts";
@@ -148,34 +149,27 @@ test("CARPET SCENE: reaction envelopes rise, hold and fully decay", () => {
   }
 });
 
-test("CARPET SCENE: the crossed shins kick without ghosting", () => {
-  const period = CARPET_MOTION.legSwingPeriodMs;
-  const trans = CARPET_MOTION.legSwingTransitionMs;
-  // Starts crisp on the base frame, crisp on the kicked frame mid-cycle,
-  // back to the base frame at the loop point.
-  assert.equal(carpetLegSwingAt(0), 0);
-  assert.ok(Math.abs(carpetLegSwingAt(period / 2) - 1) < 1e-9);
-  assert.ok(carpetLegSwingAt(period) < 1e-9);
-  // Continuous (no pops), but each blend is quick — the mixed-frames
-  // window must cover only a small share of the cycle.
-  let prev = carpetLegSwingAt(0);
-  let mixedMs = 0;
-  for (let t = 16; t <= period * 2; t += 16) {
-    const v = carpetLegSwingAt(t);
-    assert.ok(v >= 0 && v <= 1, `swing ${v} out of range`);
-    // 16ms of a 140ms smoothstep moves at most ~17% — continuous, just
-    // snappy.  A worse jump would be a visible pop.
-    assert.ok(Math.abs(v - prev) < 0.2, `swing pops at ${t}ms`);
-    if (v > 0.02 && v < 0.98) mixedMs += 16;
+test("CARPET SCENE: shins are static and only twitch once on a tap", () => {
+  const env = CARPET_KICK_ENVELOPE;
+  const total = env.attackMs + env.holdMs + env.releaseMs;
+  // At rest (before any tap and after the twitch) frame A is fully
+  // visible: exactly zero, never a lingering mix — that read as doubling.
+  assert.equal(carpetKickAt(-1), 0, "must be static before the tap");
+  assert.equal(carpetKickAt(Number.NEGATIVE_INFINITY), 0);
+  assert.equal(carpetKickAt(total), 0, "must settle fully after the twitch");
+  assert.equal(carpetKickAt(total + 60_000), 0, "idle must stay static");
+  // The twitch itself reaches the full kicked frame (crisp, not a
+  // half-mixed ghost) and is over quickly.
+  assert.equal(carpetKickAt(env.attackMs + env.holdMs / 2), 1);
+  assert.ok(total <= 600, `twitch ${total}ms too slow — reads as a swing`);
+  // Continuous — no visible pops at 60fps.
+  let prev = carpetKickAt(0);
+  for (let t = 16; t <= total + 64; t += 16) {
+    const v = carpetKickAt(t);
+    assert.ok(v >= 0 && v <= 1, `kick ${v} out of range`);
+    assert.ok(Math.abs(v - prev) < 0.25, `kick pops at ${t}ms`);
     prev = v;
   }
-  assert.ok(
-    mixedMs < 2 * 2 * trans + 100,
-    `frames stay mixed ${mixedMs}ms over two cycles — ghosting`,
-  );
-  // The kick itself must be snappy and the rhythm lively.
-  assert.ok(trans <= 500, "transition too slow");
-  assert.ok(period <= 4_000, "swing rhythm too sluggish");
 });
 
 test("CARPET SCENE: stocking slips once per ambient cycle and resets", () => {
@@ -209,6 +203,4 @@ test("CARPET SCENE: ambient amplitudes stay subtle on the shipped plate", () => 
   // the plate — she breathes gently, the body never balloons.
   const worst = CARPET_MOTION.breathScale + CARPET_MOTION.pulseScale;
   assert.ok(worst < 0.015, `combined amplitude ${worst} too strong`);
-  // The leg swing is the main motion; lively but never a flicker.
-  assert.ok(CARPET_MOTION.legSwingPeriodMs >= 2_000);
 });

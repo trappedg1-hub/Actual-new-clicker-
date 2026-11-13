@@ -21,7 +21,7 @@ import {
   carpetAmbientPageAt,
   carpetAmbientStockingAt,
   carpetEnvelopeAt,
-  carpetLegSwingAt,
+  carpetKickAt,
   carpetPulseAt,
   type CarpetTouchZone,
 } from "./carpetScene.ts";
@@ -75,6 +75,7 @@ export class CarpetHeroine extends Container {
   private pulseAt = Number.NEGATIVE_INFINITY;
   private blushPulseAt = Number.NEGATIVE_INFINITY;
   private stockingPulseAt = Number.NEGATIVE_INFINITY;
+  private kickAt = Number.NEGATIVE_INFINITY;
 
   constructor(
     onTap: (zone: CarpetTouchZone, globalX: number, globalY: number) => void,
@@ -170,7 +171,7 @@ export class CarpetHeroine extends Container {
     this.scale.set(scale * CARPET_ROOM_ART_SCALE);
   }
 
-  /** Drives breathing, blink, blush, leg swing, stocking and page flip. */
+  /** Drives breathing, blink, blush, tap-kick, stocking and page flip. */
   update(elapsedMs: number): void {
     if (!Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
     this.timeMs += elapsedMs;
@@ -184,12 +185,13 @@ export class CarpetHeroine extends Container {
     // height dips, as the ribcage presses into the floor.
     this.artRoot.scale.set(1 + lift * 0.4, 1 - lift);
 
-    // Swap region: the two shin frames cross-exchange alphas, so one
-    // crisp frame is always fully visible (the base plate has a hole
-    // here — no vacated shins can ghost through from below).
-    const swing = carpetLegSwingAt(t);
-    this.legsPatch.alpha = swing;
-    this.legsFrameA.alpha = 1 - swing;
+    // Swap region: the shins are STATIC (frame A) and only twitch once
+    // when the legs are tapped.  The two frames cross-exchange alphas,
+    // so one crisp frame is always fully visible (the base plate has a
+    // hole here — no vacated shins can ghost through from below).
+    const kick = carpetKickAt(t - this.kickAt);
+    this.legsPatch.alpha = kick;
+    this.legsFrameA.alpha = 1 - kick;
     this.blinkPatch.alpha = blinkOverlayAt(t).weight;
     this.blushPatch.alpha = carpetEnvelopeAt(
       t - this.blushPulseAt,
@@ -213,8 +215,10 @@ export class CarpetHeroine extends Container {
         this.blushPulseAt = this.timeMs;
         this.stockingPulseAt = this.timeMs;
         break;
-      case "hair":
       case "legs":
+        this.kickAt = this.timeMs;
+        break;
+      case "hair":
         break;
     }
   }
