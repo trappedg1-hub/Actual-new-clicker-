@@ -11,8 +11,9 @@ import {
   affectionProgress,
   progressionLevelForLifetimeCurrency,
 } from "../domain/progression/progression.ts";
+import type { UpgradeKind } from "../content/upgrades/balance.ts";
 import {
-  purchaseIncomeUpgrade,
+  purchaseUpgrade,
   type UpgradePurchaseResult,
 } from "../domain/upgrades/upgrades.ts";
 import {
@@ -47,8 +48,8 @@ export class GameSession {
     return result;
   }
 
-  buyIncomeUpgrade(): UpgradePurchaseResult {
-    const result = purchaseIncomeUpgrade(this.currentState);
+  buyUpgrade(kind: UpgradeKind): UpgradePurchaseResult {
+    const result = purchaseUpgrade(this.currentState, kind);
     if (result.purchased) this.currentState = result.state;
     return result;
   }

@@ -11,7 +11,11 @@ export function createInitialGameState(nowMs = Date.now()): GameState {
     affection: 0,
     level: progressionLevelForLifetimeCurrency(lifetimeCurrencyEarned),
     lifetimeCurrencyEarned,
-    upgrades: { [GAME_BALANCE.upgrade.id]: 0 },
+    upgrades: {
+      [GAME_BALANCE.upgrades.tap.id]: 0,
+      [GAME_BALANCE.upgrades.income.id]: 0,
+      [GAME_BALANCE.upgrades.charm.id]: 0,
+    },
     inkStateJson: null,
     storyFlags: {
       introCompleted: false,

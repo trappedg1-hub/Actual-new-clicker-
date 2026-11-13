@@ -6,6 +6,7 @@ import type {
 } from "../economy/types.ts";
 import { addCurrency } from "../economy/economy.ts";
 import { affectionProgress } from "../progression/progression.ts";
+import { charmBonus, tapPowerBonus } from "../upgrades/upgrades.ts";
 
 export function applyAffection(
   state: Readonly<GameState>,
@@ -21,16 +22,20 @@ export function applyHeroineTap(
 ): EconomyOutcome {
   const reward = GAME_BALANCE.taps[zone];
   const previousLevel = affectionProgress(state.affection).level;
-  const afterCurrency = addCurrency(state, reward.currency);
-  const nextState = applyAffection(
-    afterCurrency,
-    Math.min(reward.affection, GAME_BALANCE.affection.perTapLimit),
+  // Upgrades: "Нежные руки" adds coins to every tap, "Комплименты"
+  // adds hearts to every tap.
+  const currencyReward = reward.currency + tapPowerBonus(state);
+  const affectionReward = Math.min(
+    reward.affection + charmBonus(state),
+    GAME_BALANCE.affection.perTapLimit,
   );
+  const afterCurrency = addCurrency(state, currencyReward);
+  const nextState = applyAffection(afterCurrency, affectionReward);
   const nextLevel = affectionProgress(nextState.affection).level;
 
   return {
     state: nextState,
-    currencyDelta: reward.currency,
+    currencyDelta: currencyReward,
     affectionDelta: nextState.affection - state.affection,
     leveledUp: nextLevel > previousLevel,
     previousLevel,

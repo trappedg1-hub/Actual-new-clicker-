@@ -18,6 +18,7 @@ import {
   carpetAmbientStockingAt,
   carpetEnvelopeAt,
   carpetKickAt,
+  carpetKickShowsFrameB,
   CARPET_KICK_ENVELOPE,
   carpetPulseAt,
   type CarpetTouchZone,
@@ -162,13 +163,18 @@ test("CARPET SCENE: shins are static and only twitch once on a tap", () => {
   // half-mixed ghost) and is over quickly.
   assert.equal(carpetKickAt(env.attackMs + env.holdMs / 2), 1);
   assert.ok(total <= 600, `twitch ${total}ms too slow — reads as a swing`);
-  // Continuous — no visible pops at 60fps.
-  let prev = carpetKickAt(0);
-  for (let t = 16; t <= total + 64; t += 16) {
-    const v = carpetKickAt(t);
-    assert.ok(v >= 0 && v <= 1, `kick ${v} out of range`);
-    assert.ok(Math.abs(v - prev) < 0.25, `kick pops at ${t}ms`);
-    prev = v;
+  // The swap is BINARY: the frames cover a transparent hole in the
+  // base plate, so any partial crossfade dips the summed coverage
+  // below 1 and the legs flash transparent.  At every sampled moment
+  // exactly one frame must be fully visible.
+  assert.equal(carpetKickShowsFrameB(-1), false);
+  assert.equal(carpetKickShowsFrameB(env.attackMs + env.holdMs / 2), true);
+  assert.equal(carpetKickShowsFrameB(total + 1), false);
+  for (let t = -32; t <= total + 64; t += 4) {
+    const b = carpetKickShowsFrameB(t);
+    assert.equal(typeof b, "boolean");
+    const coverage = (b ? 1 : 0) + (b ? 0 : 1);
+    assert.equal(coverage, 1, `coverage dips at ${t}ms — legs vanish`);
   }
 });
 

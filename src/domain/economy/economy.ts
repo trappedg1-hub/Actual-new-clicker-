@@ -3,7 +3,7 @@ import type { GameState } from "./types.ts";
 import { progressionLevelForLifetimeCurrency } from "../progression/progression.ts";
 
 export function passiveIncomePerSecond(state: Readonly<GameState>): number {
-  const upgradeLevel = state.upgrades[GAME_BALANCE.upgrade.id] ?? 0;
+  const upgradeLevel = state.upgrades[GAME_BALANCE.upgrades.income.id] ?? 0;
   return (
     GAME_BALANCE.passiveIncome.basePerSecond +
     upgradeLevel * GAME_BALANCE.passiveIncome.perUpgradeLevel

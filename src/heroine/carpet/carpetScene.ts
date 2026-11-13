@@ -188,6 +188,19 @@ export function carpetKickAt(ageMs: number): number {
   return carpetEnvelopeAt(ageMs, CARPET_KICK_ENVELOPE);
 }
 
+/**
+ * Whether the kicked frame B (not the resting frame A) is the ONE
+ * visible shin frame `ageMs` after a legs tap.  The swap must be
+ * binary: the two frames sit over a transparent hole in the base
+ * plate, so any alpha crossfade dips the summed coverage below 1 and
+ * the floor flashes through the legs for a few frames ("the legs
+ * vanish for a millisecond").  Exactly one frame at full alpha at all
+ * times — the twitch is a clean 2-frame snap.
+ */
+export function carpetKickShowsFrameB(ageMs: number): boolean {
+  return carpetKickAt(ageMs) >= 0.5;
+}
+
 /** Ambient stocking weight inside the long cycle at loop time `timeMs`. */
 export function carpetAmbientStockingAt(timeMs: number): number {
   const loopT = timeMs % CARPET_STOCKING_AMBIENT.periodMs;

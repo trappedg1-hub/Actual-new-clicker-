@@ -24,9 +24,22 @@ import {
   createStyledButton,
   type StyledButton,
 } from "../../presentation/ui/button.ts";
-import { GAME_BALANCE } from "../../content/upgrades/balance.ts";
+import {
+  GAME_BALANCE,
+  type UpgradeKind,
+} from "../../content/upgrades/balance.ts";
+import {
+  pickTapLine,
+  relationshipStage,
+  RELATIONSHIP_STAGES,
+  type HeroinePose,
+} from "../../content/relationship/relationship.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
+import {
+  charmBonus,
+  tapPowerBonus,
+} from "../../domain/upgrades/upgrades.ts";
 import { isIntroDialogueUnlocked } from "../../domain/unlocks/unlocks.ts";
 import type { InkIntroStory as InkIntroStoryType } from "../../narrative/ink/InkIntroStory.ts";
 import { GameSession } from "../GameSession.ts";
@@ -35,6 +48,7 @@ import { downloadGameBackup } from "../../persistence/backups/exportGameSave.ts"
 import { BottomNavigation } from "../../presentation/ui/BottomNavigation.ts";
 import { DialogueOverlay } from "../../presentation/ui/DialogueOverlay.ts";
 import { FloatingPanel } from "../../presentation/ui/FloatingPanel.ts";
+import { SpeechBubble } from "../../presentation/ui/SpeechBubble.ts";
 import { StatusHud } from "../../presentation/ui/StatusHud.ts";
 import { UpgradePanel } from "../../presentation/ui/UpgradePanel.ts";
 import { RewardFeedback } from "../../presentation/pixi/RewardFeedback.ts";
@@ -82,6 +96,9 @@ export class MainScene extends Container {
   private readonly bottomNavigation: BottomNavigation;
   private readonly floatingPanel: FloatingPanel;
   private readonly dialogue = new DialogueOverlay();
+  private readonly speechBubble = new SpeechBubble();
+  /** Wall-clock time of her last spoken tap line (bubble spam guard). */
+  private lastSpokenAtMs = 0;
   private readonly feedback: RewardFeedback;
   private readonly hearts = new HeartBurst();
   private readonly liveRegion = new LiveRegion();
@@ -210,7 +227,7 @@ export class MainScene extends Container {
 
     this.statusHud = new StatusHud(() => void this.exportBackup());
     this.floatingPanel = new FloatingPanel(() => void this.openIntroDialogue());
-    this.upgradePanel = new UpgradePanel(() => this.purchaseUpgrade());
+    this.upgradePanel = new UpgradePanel((kind) => this.purchaseUpgrade(kind));
     this.bottomNavigation = new BottomNavigation((section) =>
       this.showPlaceholder(section),
     );
@@ -231,6 +248,7 @@ export class MainScene extends Container {
       this.carpetToggle.node,
       this.upgradePanel,
       this.interactionHint,
+      this.speechBubble,
       this.statusHud,
       this.bottomNavigation,
       this.dialogue,
@@ -393,6 +411,7 @@ export class MainScene extends Container {
     // a no-op for the existing scene layout contract.
     this.heroine.setTagBottomLimit(null);
     this.dialogue.resize(widthSafe, heightSafe);
+    this.speechBubble.resize(widthSafe);
     this.renderState();
   }
 
@@ -565,37 +584,62 @@ export class MainScene extends Container {
     );
   }
 
+  /**
+   * Shared aftermath of every heroine tap: reward toasts, her voice
+   * line (hotter with every relationship stage), milestone status and
+   * accessibility announcements.
+   */
+  private afterHeroineTap(
+    outcome: ReturnType<GameSession["tap"]>,
+    zoneName: string,
+    pose: HeroinePose,
+    globalX: number,
+    globalY: number,
+  ): void {
+    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
+    this.hearts.burst(globalX, globalY);
+    tapHaptic();
+    this.feedback.show(
+      `+${outcome.currencyDelta} 💰`,
+      toastX,
+      this.rewardToastY,
+    );
+    this.feedback.show(
+      `+${outcome.affectionDelta} 💗`,
+      toastX,
+      this.rewardToastY,
+    );
+    const now = performance.now();
+    if (outcome.leveledUp) {
+      const stage = relationshipStage(outcome.nextLevel);
+      this.showStatus(`💘 НОВАЯ СТАДИЯ: ${stage.name.toUpperCase()}`);
+      this.speechBubble.say(stage.unlockLine, globalX, globalY);
+      this.lastSpokenAtMs = now;
+      this.liveRegion.announce(
+        `Новая стадия отношений: ${stage.name}. Она говорит: ${stage.unlockLine}`,
+      );
+    } else if (
+      now - this.lastSpokenAtMs > 6_000 &&
+      (this.lastSpokenAtMs === 0 || Math.random() < 0.35)
+    ) {
+      const line = pickTapLine(outcome.nextLevel, pose, Math.random);
+      this.speechBubble.say(line, globalX, globalY);
+      this.lastSpokenAtMs = now;
+      this.liveRegion.announce(`Она говорит: ${line}`);
+    }
+    this.liveRegion.announce(
+      `${zoneName}. Получено ${outcome.currencyDelta} монет и ${outcome.affectionDelta} сердечек.`,
+    );
+    this.renderState();
+  }
+
   private onCarpetTap(
     zone: CarpetTouchZone,
     globalX: number,
     globalY: number,
   ): void {
     const outcome = this.session.tap(CARPET_ZONE_ECONOMY[zone]);
-    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
-    this.hearts.burst(globalX, globalY);
-    tapHaptic();
-    this.feedback.show(
-      `+${outcome.currencyDelta} credits`,
-      toastX,
-      this.rewardToastY,
-    );
-    this.feedback.show(
-      `+${outcome.affectionDelta} affection`,
-      toastX,
-      this.rewardToastY,
-    );
-    if (outcome.leveledUp) {
-      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
-    }
-    this.liveRegion.announce(
-      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
-    );
-    if (outcome.nextLevel > outcome.previousLevel) {
-      this.liveRegion.announce(
-        `Новый уровень отношений: ${outcome.nextLevel}.`,
-      );
-    }
-    this.renderState();
+    this.afterHeroineTap(outcome, zone, "carpet", globalX, globalY);
   }
 
   private onShelfTap(
@@ -604,60 +648,12 @@ export class MainScene extends Container {
     globalY: number,
   ): void {
     const outcome = this.session.tap(SHELF_ZONE_ECONOMY[zone]);
-    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
-    this.hearts.burst(globalX, globalY);
-    tapHaptic();
-    this.feedback.show(
-      `+${outcome.currencyDelta} credits`,
-      toastX,
-      this.rewardToastY,
-    );
-    this.feedback.show(
-      `+${outcome.affectionDelta} affection`,
-      toastX,
-      this.rewardToastY,
-    );
-    if (outcome.leveledUp) {
-      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
-    }
-    this.liveRegion.announce(
-      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
-    );
-    if (outcome.nextLevel > outcome.previousLevel) {
-      this.liveRegion.announce(
-        `Новый уровень отношений: ${outcome.nextLevel}.`,
-      );
-    }
-    this.renderState();
+    this.afterHeroineTap(outcome, zone, "shelf", globalX, globalY);
   }
 
   private onBedTap(zone: BedTouchZone, globalX: number, globalY: number): void {
     const outcome = this.session.tap(BED_ZONE_ECONOMY[zone]);
-    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
-    this.hearts.burst(globalX, globalY);
-    tapHaptic();
-    this.feedback.show(
-      `+${outcome.currencyDelta} credits`,
-      toastX,
-      this.rewardToastY,
-    );
-    this.feedback.show(
-      `+${outcome.affectionDelta} affection`,
-      toastX,
-      this.rewardToastY,
-    );
-    if (outcome.leveledUp) {
-      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
-    }
-    this.liveRegion.announce(
-      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
-    );
-    if (outcome.nextLevel > outcome.previousLevel) {
-      this.liveRegion.announce(
-        `Новый уровень отношений: ${outcome.nextLevel}.`,
-      );
-    }
-    this.renderState();
+    this.afterHeroineTap(outcome, zone, "bed", globalX, globalY);
   }
 
   private onHeroineTap(
@@ -667,46 +663,37 @@ export class MainScene extends Container {
   ): void {
     const outcome = this.session.tap(zone);
     const global = this.heroine.toGlobal({ x: localX, y: localY });
-    const previousLevel = outcome.previousLevel;
-    const toastX = Math.max(110, Math.min(this.screenWidth - 110, global.x));
-    this.hearts.burst(global.x, global.y);
-    tapHaptic();
-    this.feedback.show(
-      `+${outcome.currencyDelta} credits`,
-      toastX,
-      this.rewardToastY,
-    );
-    this.feedback.show(
-      `+${outcome.affectionDelta} affection`,
-      toastX,
-      this.rewardToastY,
-    );
-    if (outcome.leveledUp)
-      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
-    this.renderState();
+    this.afterHeroineTap(outcome, zone, "classic", global.x, global.y);
     void this.saveWithNotice(false);
-    this.liveRegion.announce(
-      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
-    );
-    if (outcome.nextLevel > previousLevel)
-      this.liveRegion.announce(
-        `Новый уровень отношений: ${outcome.nextLevel}.`,
-      );
   }
 
-  private purchaseUpgrade(): void {
-    const result = this.session.buyIncomeUpgrade();
+  private purchaseUpgrade(kind: UpgradeKind): void {
+    const result = this.session.buyUpgrade(kind);
+    const definition = GAME_BALANCE.upgrades[kind];
     if (!result.purchased) {
-      this.showStatus(`Не хватает кредитов · нужно ${result.cost}`);
-      this.liveRegion.announce(`Недостаточно кредитов. Нужно ${result.cost}.`);
+      if (result.reason === "locked") {
+        const stage =
+          RELATIONSHIP_STAGES[definition.unlockStage - 1]?.name ?? "";
+        this.showStatus(`🔒 «${definition.name}» · нужна стадия «${stage}»`);
+        this.liveRegion.announce(
+          `Улучшение ${definition.name} откроется на стадии ${stage}.`,
+        );
+      } else {
+        this.showStatus(`Не хватает монет · нужно ${result.cost} 💰`);
+        this.liveRegion.announce(`Недостаточно монет. Нужно ${result.cost}.`);
+      }
       return;
     }
-    const rate = passiveIncomePerSecond(this.session.state);
-    this.showStatus(
-      `УЛУЧШЕНИЕ КУПЛЕНО · +${GAME_BALANCE.passiveIncome.perUpgradeLevel.toFixed(2)} / сек`,
-    );
+    const state = this.session.state;
+    const summary =
+      kind === "tap"
+        ? `ТАП +${GAME_BALANCE.taps.head.currency + tapPowerBonus(state)} 💰`
+        : kind === "income"
+          ? `${passiveIncomePerSecond(state).toFixed(2)} 💰/СЕК`
+          : `+${1 + charmBonus(state)} 💗/ТАП`;
+    this.showStatus(`💝 «${definition.name}» · УРОВЕНЬ ${result.newLevel}`);
     this.feedback.show(
-      `PASSIVE ${rate.toFixed(2)} / SEC`,
+      summary,
       this.screenWidth / 2,
       this.rewardToastY + 14,
       "milestone",
@@ -714,7 +701,7 @@ export class MainScene extends Container {
     this.renderState();
     void this.saveWithNotice(false);
     this.liveRegion.announce(
-      `Улучшение куплено. Пассивный доход ${rate.toFixed(2)} в секунду.`,
+      `Куплено улучшение ${definition.name}, уровень ${result.newLevel}.`,
     );
   }
 

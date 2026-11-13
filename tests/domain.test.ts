@@ -7,9 +7,18 @@ import { calculateOfflineProgress } from "../src/simulation/offline/offlineSimul
 import {
   getIncomeUpgradeCost,
   purchaseIncomeUpgrade,
+  purchaseUpgrade,
 } from "../src/domain/upgrades/upgrades.ts";
 import { affectionProgress } from "../src/domain/progression/progression.ts";
 import { migrateSave } from "../src/persistence/migrations/migrateSave.ts";
+import { GAME_BALANCE } from "../src/content/upgrades/balance.ts";
+import {
+  pickTapLine,
+  POSE_TAP_LINES,
+  RELATIONSHIP_STAGES,
+  relationshipLadderIsConsistent,
+  relationshipStage,
+} from "../src/content/relationship/relationship.ts";
 
 test("tap adds separate currency and affection, and advances lifetime level", () => {
   const initial = createInitialGameState(1_000);
@@ -68,44 +77,96 @@ test("clock rollback grants no income until the wall clock catches up to the sav
   assert.equal(caughtUp.elapsedSeconds, 1);
 });
 
-test("upgrade purchase enforces affordability and increases income level", () => {
+test("upgrade purchase enforces affordability and relationship unlock stages", () => {
   const initial = createInitialGameState(0);
   assert.equal(getIncomeUpgradeCost(initial), 20);
   assert.equal(purchaseIncomeUpgrade(initial).purchased, false);
 
+  // The income upgrade appears at relationship stage 2 — with zero
+  // hearts it stays locked even with money in hand.
   const funded = { ...initial, currency: 20, lifetimeCurrencyEarned: 20 };
-  const locked = purchaseIncomeUpgrade({ ...funded, level: 0 });
+  const locked = purchaseIncomeUpgrade(funded);
   assert.equal(locked.purchased, false);
   assert.equal(locked.reason, "locked");
 
-  const purchase = purchaseIncomeUpgrade(funded);
+  const warmed = { ...funded, affection: 15 };
+  const purchase = purchaseIncomeUpgrade(warmed);
   assert.equal(purchase.purchased, true);
   assert.equal(purchase.state.currency, 0);
   assert.equal(purchase.newLevel, 1);
   assert.equal(getIncomeUpgradeCost(purchase.state), 32);
 });
 
+test("tap and charm upgrades boost every tap once bought", () => {
+  const initial = createInitialGameState(0);
+  // Tap upgrade is available from stage 1; charm needs stage 4 (90💗).
+  const rich = { ...initial, currency: 10_000, affection: 90 };
+  const withTap = purchaseUpgrade(rich, "tap");
+  assert.equal(withTap.purchased, true);
+  const withBoth = purchaseUpgrade(withTap.state, "charm");
+  assert.equal(withBoth.purchased, true);
+
+  const tapped = applyHeroineTap(withBoth.state, "head");
+  assert.equal(
+    tapped.currencyDelta,
+    GAME_BALANCE.taps.head.currency + GAME_BALANCE.tapPower.perUpgradeLevel,
+  );
+  assert.equal(
+    tapped.affectionDelta,
+    GAME_BALANCE.taps.head.affection + GAME_BALANCE.charm.perUpgradeLevel,
+  );
+});
+
+test("the relationship ladder has ten fan-service stages with hotter lines", () => {
+  assert.equal(RELATIONSHIP_STAGES.length, 10);
+  assert.equal(relationshipLadderIsConsistent(), true);
+  assert.equal(relationshipStage(1).name, "Незнакомец");
+  assert.equal(relationshipStage(10).name, "Её парень");
+  assert.equal(relationshipStage(99).name, "Её парень");
+  for (const stage of RELATIONSHIP_STAGES) {
+    assert.ok(stage.tapLines.length >= 3, `${stage.name} needs lines`);
+    assert.ok(stage.unlockLine.length > 0);
+  }
+  // Every pose has its own line bank for all three heat bands.
+  for (const pose of ["classic", "shelf", "carpet", "bed"] as const) {
+    assert.equal(POSE_TAP_LINES[pose].length, 3);
+    for (const band of POSE_TAP_LINES[pose]) {
+      assert.ok(band.length >= 3, `${pose} band needs lines`);
+    }
+    // pickTapLine always lands inside a real bank.
+    const poseLine = pickTapLine(8, pose, () => 0.1);
+    const stageLine = pickTapLine(8, pose, () => 0.9);
+    assert.ok(POSE_TAP_LINES[pose][2]?.includes(poseLine));
+    assert.ok(relationshipStage(8).tapLines.includes(stageLine));
+  }
+});
+
 test("affection tiers and save migration are derived from persisted source values", () => {
-  assert.deepEqual(affectionProgress(10), {
+  assert.deepEqual(affectionProgress(15), {
     level: 2,
     progress: 0,
-    currentThreshold: 10,
-    nextThreshold: 30,
+    currentThreshold: 15,
+    nextThreshold: 40,
   });
+  assert.equal(affectionProgress(3_200).level, 10);
+  assert.equal(affectionProgress(999_999).level, 10);
 
   const migrated = migrateSave(
     {
       schemaVersion: 1,
       savedAtMs: 5,
       currency: 23,
-      affection: 11,
+      affection: 16,
       lifetimeCurrencyEarned: 52,
-      upgrades: { "warm-lantern": 1 },
+      upgrades: { "warm-lantern": 1, "gentle-hands": 2, "sweet-words": 1 },
       inkStateJson: null,
       storyFlags: { introCompleted: false, introChoice: null },
     },
     100,
   );
   assert.equal(migrated.level, 2);
+  assert.equal(migrated.upgrades["warm-lantern"], 1);
+  assert.equal(migrated.upgrades["gentle-hands"], 2);
+  assert.equal(migrated.upgrades["sweet-words"], 1);
   assert.equal(migrated.storyFlags.introTranscript, "");
 });

@@ -21,7 +21,7 @@ import {
   carpetAmbientPageAt,
   carpetAmbientStockingAt,
   carpetEnvelopeAt,
-  carpetKickAt,
+  carpetKickShowsFrameB,
   carpetPulseAt,
   type CarpetTouchZone,
 } from "./carpetScene.ts";
@@ -186,12 +186,13 @@ export class CarpetHeroine extends Container {
     this.artRoot.scale.set(1 + lift * 0.4, 1 - lift);
 
     // Swap region: the shins are STATIC (frame A) and only twitch once
-    // when the legs are tapped.  The two frames cross-exchange alphas,
-    // so one crisp frame is always fully visible (the base plate has a
-    // hole here — no vacated shins can ghost through from below).
-    const kick = carpetKickAt(t - this.kickAt);
-    this.legsPatch.alpha = kick;
-    this.legsFrameA.alpha = 1 - kick;
+    // when the legs are tapped.  The swap is BINARY — the frames sit
+    // over a transparent hole in the base plate, so a partial alpha
+    // crossfade would let the floor flash through the legs.  Exactly
+    // one frame is fully opaque at every moment.
+    const kicked = carpetKickShowsFrameB(t - this.kickAt);
+    this.legsPatch.alpha = kicked ? 1 : 0;
+    this.legsFrameA.alpha = kicked ? 0 : 1;
     this.blinkPatch.alpha = blinkOverlayAt(t).weight;
     this.blushPatch.alpha = carpetEnvelopeAt(
       t - this.blushPulseAt,

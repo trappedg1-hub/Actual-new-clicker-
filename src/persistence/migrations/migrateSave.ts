@@ -45,8 +45,14 @@ export function migrateSave(raw: unknown, nowMs = Date.now()): GameState {
     level: progressionLevelForLifetimeCurrency(lifetimeCurrencyEarned),
     lifetimeCurrencyEarned,
     upgrades: {
-      [GAME_BALANCE.upgrade.id]: safeInteger(
-        rawUpgrades[GAME_BALANCE.upgrade.id],
+      [GAME_BALANCE.upgrades.tap.id]: safeInteger(
+        rawUpgrades[GAME_BALANCE.upgrades.tap.id],
+      ),
+      [GAME_BALANCE.upgrades.income.id]: safeInteger(
+        rawUpgrades[GAME_BALANCE.upgrades.income.id],
+      ),
+      [GAME_BALANCE.upgrades.charm.id]: safeInteger(
+        rawUpgrades[GAME_BALANCE.upgrades.charm.id],
       ),
     },
     inkStateJson:

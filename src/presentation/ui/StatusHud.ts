@@ -2,6 +2,7 @@ import { ProgressBar } from "@pixi/ui";
 import { Container, Graphics, Text } from "pixi.js";
 import type { GameState } from "../../domain/economy/types.ts";
 import { affectionProgress } from "../../domain/progression/progression.ts";
+import { relationshipStage } from "../../content/relationship/relationship.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
 
 function makeText(
@@ -46,9 +47,14 @@ export class StatusHud extends Container {
   private readonly currencyCard = new Container({
     layout: { width: 74, height: 56 },
   });
-  private readonly affectionLabel = makeText("AFFECTION", 8, "#d9c7ec", "700");
+  private readonly affectionLabel = makeText(
+    "СЕРДЕЧКИ 💗",
+    8,
+    "#ffb7df",
+    "700",
+  );
   private readonly affectionValue = makeText(
-    "0 · TIER 1",
+    "0 · Незнакомец",
     11,
     "#fff7ff",
     "700",
@@ -112,7 +118,7 @@ export class StatusHud extends Container {
     currencyBg
       .roundRect(0, 0, 74, 56, 13)
       .stroke({ color: 0x583d72, alpha: 0.7, width: 1 });
-    const currencyLabel = makeText("CREDITS", 8, "#d9c7ec", "700");
+    const currencyLabel = makeText("ДЕНЬГИ 💰", 8, "#d9c7ec", "700");
     currencyLabel.anchor.set(0.5, 0);
     currencyLabel.position.set(37, 7);
     this.currencyValue.anchor.set(0.5, 0);
@@ -163,7 +169,8 @@ export class StatusHud extends Container {
 
   render(state: Readonly<GameState>): void {
     const relation = affectionProgress(state.affection);
-    this.affectionValue.text = `${formatAmount(state.affection)} · TIER ${relation.level}`;
+    const stage = relationshipStage(relation.level);
+    this.affectionValue.text = `${formatAmount(state.affection)} · ${stage.name}`;
     this.progressBar.progress = relation.progress * 100;
     this.levelValue.text = state.level.toString();
     this.currencyValue.text = formatAmount(state.currency);
