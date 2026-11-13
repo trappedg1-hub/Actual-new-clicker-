@@ -42,10 +42,17 @@ import expr0Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-AS
 import expr1Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-eye_r_closed-B.png?url";
 import expr2Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_open-A.png?url";
 import expr3Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_smile-A.png?url";
-import naturalHairBackUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-hair-back.png?url";
-import naturalBlouseUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-blouse.png?url";
-import naturalArmLUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-l.png?url";
-import naturalArmRUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-r.png?url";
+import naturalHairBackUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-hair-back.png?url";
+import naturalBlouseUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-blouse.png?url";
+import naturalArmLUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-l.png?url";
+import naturalArmRUrl from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/natural-arm-r.png?url";
+import cleanLayer03Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/03_leg_l.png?url";
+import cleanLayer04Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/04_leg_r.png?url";
+import cleanLayer05Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/05_torso.png?url";
+import cleanLayer09Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/09_outfit_collar.png?url";
+import cleanLayer10Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/10_outfit_ribbon.png?url";
+import cleanLayer11Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/11_outfit_skirt_01.png?url";
+import cleanLayer12Url from "../../../art-studio/production/BLOCK-G-EDGE-REBUILD/layers/12_outfit_skirt_02.png?url";
 
 export interface SlotDefinition {
   z: number;
@@ -144,6 +151,31 @@ export const NATURAL_POSE_URLS = {
   armL: naturalArmLUrl,
   armR: naturalArmRUrl,
 } as const;
+
+/**
+ * BLOCK G edge-rebuilt copies of the shared slots, loaded ONLY in the
+ * natural pose.  Alpha-only treatment: the full-canvas haze baked into the
+ * back-hair render (the "dark square" that dimmed the room) is removed,
+ * matte-colored fringe pixels fade out instead of being recolored, and the
+ * silhouettes get a gentle feather so DPR3 upscaling shows no staircase.
+ * RGB channels are byte-identical to the approved BUILD-v01 art and
+ * `?pose=classic` keeps loading the untouched originals.
+ *
+ * Slots 13/17/18/19/20 (head + front/side hair) stay ORIGINAL on purpose:
+ * the pale crown strands lost genuine highlight edges under every edge
+ * treatment tried (visible light patches on the live DPR3 render), while
+ * the dirt the user saw around the hair actually came from the back-hair
+ * veil, fixed in the dedicated natural-hair-back rebuild.
+ */
+export const NATURAL_CLEAN_LAYER_URLS: Readonly<Record<number, string>> = {
+  3: cleanLayer03Url,
+  4: cleanLayer04Url,
+  5: cleanLayer05Url,
+  9: cleanLayer09Url,
+  10: cleanLayer10Url,
+  11: cleanLayer11Url,
+  12: cleanLayer12Url,
+};
 
 export const ALL_RUNTIME_TEXTURE_URLS: readonly string[] = [
   UNDERLAY_UNION_URL,

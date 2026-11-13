@@ -50,6 +50,7 @@ import {
   EXPRESSION_OVERLAY_URLS,
   LAYER_URLS,
   NATURAL_POSE_URLS,
+  NATURAL_CLEAN_LAYER_URLS,
   SLOT_DEFINITIONS,
   STATE_PLATE_URLS,
   SWITCH_MATRIX,
@@ -624,6 +625,11 @@ export class ProductionHeroineRig extends Container {
     if (this.poseVariant === "natural" && z === 8) {
       return NATURAL_POSE_URLS.blouse;
     }
+    if (this.poseVariant === "natural" && NATURAL_CLEAN_LAYER_URLS[z]) {
+      // BLOCK G alpha-only edge rebuild (haze removal + matte fade +
+      // feather).  Classic still resolves to the approved BLOCK 1 file.
+      return NATURAL_CLEAN_LAYER_URLS[z];
+    }
     return LAYER_URLS[z];
   }
 
@@ -632,7 +638,10 @@ export class ProductionHeroineRig extends Container {
       const urls = [
         ...ALL_RUNTIME_TEXTURE_URLS,
         ...(this.poseVariant === "natural"
-          ? Object.values(NATURAL_POSE_URLS)
+          ? [
+              ...Object.values(NATURAL_POSE_URLS),
+              ...Object.values(NATURAL_CLEAN_LAYER_URLS),
+            ]
           : []),
       ];
       const entries: Array<readonly [string, Texture]> = await Promise.all(
