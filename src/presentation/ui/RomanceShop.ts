@@ -20,6 +20,7 @@ import {
   tapPowerBonus,
 } from "../../domain/upgrades/upgrades.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
+import { drawChamferPlate } from "./nikkeKit.ts";
 
 function makeText(
   text: string,
@@ -108,6 +109,7 @@ export class RomanceShop extends Container {
         fontSize: 10,
         fill: 0x8b44c2,
         stroke: ACCENTS[kind],
+        chamfer: true,
         onPress: () => onPurchase(kind),
       });
       this.addChild(card, iconPlate, icon, name, flavor, stat, lockNote);
@@ -131,6 +133,7 @@ export class RomanceShop extends Container {
       fontSize: 11,
       fill: 0x3a2750,
       stroke: 0xb978df,
+      chamfer: true,
       onPress: onClose,
     });
     this.addChild(this.closeButton.node);
@@ -153,16 +156,16 @@ export class RomanceShop extends Container {
     let y = 168;
     for (const row of this.rows) {
       row.card.clear();
-      row.card
-        .roundRect(left, y, sheetWidth, cardHeight, 16)
-        .fill({ color: 0x241732, alpha: 0.82 });
-      row.card
-        .roundRect(left, y, sheetWidth, cardHeight, 16)
-        .stroke({ color: ACCENTS[row.kind], alpha: 0.5, width: 1 });
-      // Thin accent strip on the left edge, NIKKE-style.
-      row.card
-        .roundRect(left + 2, y + 10, 3, cardHeight - 20, 2)
-        .fill({ color: ACCENTS[row.kind], alpha: 0.9 });
+      drawChamferPlate(row.card, left, y, sheetWidth, cardHeight, {
+        cutTL: 14,
+        cutBR: 14,
+        fill: 0x1c1028,
+        fillAlpha: 0.85,
+        stroke: ACCENTS[row.kind],
+        strokeAlpha: 0.55,
+        accent: ACCENTS[row.kind],
+        accentSide: "left",
+      });
       row.iconPlate
         .clear()
         .circle(left + 34, y + cardHeight / 2, 20)

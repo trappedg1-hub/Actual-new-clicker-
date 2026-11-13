@@ -15,7 +15,7 @@ export class FloatingPanel extends Container {
       fontSize: 8,
       fill: 0x673b8f,
       stroke: 0xd187e8,
-      radius: 14,
+      chamfer: true,
       onPress: onStory,
     });
     this.rateLabel = new Text({

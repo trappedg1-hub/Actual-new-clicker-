@@ -32,6 +32,24 @@ export const SHELF_ROOM = {
 export const SHELF_ROOM_ART_SCALE = SHELF_ROOM.displayH / SHELF_ART_H;
 
 /**
+ * Shelf-scene camera: cover-fits the room art to the WHOLE game screen
+ * (no black side bars) and steps IN a little — the contain-fit camera
+ * kept the heroine and the bookshelf too far from the player.  The
+ * horizontal crop window is centered between the shelf she reaches
+ * into (fingertips ~x528) and her feet, clamped to the art bounds;
+ * vertically her shoe tips anchor just above the bottom UI band.
+ */
+export const SHELF_CAMERA = {
+  /** Extra zoom multiplied over the full-screen cover scale. */
+  zoom: 1.18,
+  /** Horizontal focus point in backdrop pixels (shelf face + figure). */
+  focusX: 614,
+  /** Screen-bottom margin under her shoe tips, portrait / landscape. */
+  footMarginPortrait: 92,
+  footMarginLandscape: 46,
+} as const;
+
+/**
  * Feathered patch plates cut from the pose variants, positioned on the
  * cutout pixel grid (same stable-plate-plus-overlay rule as the bed
  * scene: the base plate never swaps, overlays fade above it).

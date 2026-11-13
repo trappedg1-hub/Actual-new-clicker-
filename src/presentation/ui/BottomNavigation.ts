@@ -35,10 +35,10 @@ export class BottomNavigation extends Container {
         width: 44,
         height: 50,
         fontSize: label.length > 5 ? 7 : 8,
-        fill: index === 0 ? 0x593779 : active ? 0x2c1d40 : 0x21182f,
-        stroke: index === 0 ? 0xb774d8 : active ? 0x8a5cb8 : 0x4d3a61,
+        fill: index === 0 ? 0x593779 : active ? 0x2c1d40 : 0x1b1228,
+        stroke: index === 0 ? 0xff6ec0 : active ? 0x8a5cb8 : 0x42305a,
         textColor: index === 0 || active ? "#fff7ff" : "#998ba9",
-        radius: 12,
+        chamfer: true,
         onPress: () => onPlaceholder(label),
       });
       if (!active) button.setEnabled(false);
@@ -54,13 +54,31 @@ export class BottomNavigation extends Container {
     const x = Math.max(8, (width - this.currentWidth) / 2);
     const panelHeight = 60;
     this.position.set(x, height - panelHeight - 6);
+    // NIKKE-style dock: angular glass slab with a luminous top edge.
+    this.background.clear();
     this.background
-      .clear()
-      .roundRect(0, 0, this.currentWidth, panelHeight, 18)
-      .fill({ color: 0x130d22, alpha: 0.55 });
+      .poly([
+        { x: 14, y: 0 },
+        { x: this.currentWidth - 14, y: 0 },
+        { x: this.currentWidth, y: 14 },
+        { x: this.currentWidth, y: panelHeight },
+        { x: 0, y: panelHeight },
+        { x: 0, y: 14 },
+      ])
+      .fill({ color: 0x120b20, alpha: 0.55 });
     this.background
-      .roundRect(0, 0, this.currentWidth, panelHeight, 18)
-      .stroke({ color: 0x8a5cb8, alpha: 0.55, width: 1 });
+      .poly([
+        { x: 14, y: 0 },
+        { x: this.currentWidth - 14, y: 0 },
+        { x: this.currentWidth, y: 14 },
+        { x: this.currentWidth, y: panelHeight },
+        { x: 0, y: panelHeight },
+        { x: 0, y: 14 },
+      ])
+      .stroke({ color: 0x8a5cb8, alpha: 0.5, width: 1 });
+    this.background
+      .rect(20, 1, this.currentWidth - 40, 1.5)
+      .fill({ color: 0xb98ae0, alpha: 0.45 });
     const innerWidth = this.currentWidth - 16;
     this.row.position.set(8, 5);
     this.row.layout = {

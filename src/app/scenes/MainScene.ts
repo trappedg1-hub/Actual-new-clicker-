@@ -19,6 +19,10 @@ import {
   ShelfHeroine,
   type ShelfTouchZone,
 } from "../../heroine/shelf/ShelfHeroine.ts";
+import {
+  SHELF_CAMERA,
+  SHELF_ROOM,
+} from "../../heroine/shelf/shelfScene.ts";
 import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
 import {
   createStyledButton,
@@ -184,7 +188,7 @@ export class MainScene extends Container {
       fontSize: 8,
       fill: 0x673b8f,
       stroke: 0xd187e8,
-      radius: 12,
+      chamfer: true,
       onPress: () =>
         this.setSceneMode(this.sceneMode === "bed" ? "standing" : "bed"),
     });
@@ -195,7 +199,7 @@ export class MainScene extends Container {
       fontSize: 8,
       fill: 0x673b8f,
       stroke: 0xd187e8,
-      radius: 12,
+      chamfer: true,
       onPress: () =>
         this.setSceneMode(this.sceneMode === "shelf" ? "standing" : "shelf"),
     });
@@ -206,7 +210,7 @@ export class MainScene extends Container {
       fontSize: 8,
       fill: 0x673b8f,
       stroke: 0xd187e8,
-      radius: 12,
+      chamfer: true,
       onPress: () =>
         this.setSceneMode(this.sceneMode === "carpet" ? "standing" : "carpet"),
     });
@@ -424,21 +428,27 @@ export class MainScene extends Container {
     if (texture === Texture.EMPTY || texture.width <= 1) return;
     const portrait = this.screenWidth <= this.screenHeight;
     if (this.sceneMode === "shelf") {
-      // The shelf scene shows the WHOLE room above the bottom UI band
-      // (contain-fit, bottom-anchored): with the cover crop her feet and
-      // the raised stockinged heels — the point of the pose — would sit
-      // behind the upgrade card.  The camera "steps back" instead.
-      const bottomLimit = portrait
-        ? this.screenHeight - 66 - 82 - 8 + 6
-        : this.screenHeight - 62;
-      const scale = Math.min(
-        this.screenWidth / texture.width,
-        Math.max(120, bottomLimit) / texture.height,
-      );
+      // Cover-fit the WHOLE game screen (no side bars) and zoom in a
+      // touch — the old contain-fit camera kept her and the shelf too
+      // far away.  The upgrade card is gone from the main screen, so
+      // her feet and the raised heels now anchor just above the nav.
+      const scale =
+        Math.max(
+          this.screenWidth / texture.width,
+          this.screenHeight / texture.height,
+        ) * SHELF_CAMERA.zoom;
+      const minX = this.screenWidth - texture.width * scale;
+      const focusX = this.screenWidth / 2 - SHELF_CAMERA.focusX * scale;
+      const footMargin = portrait
+        ? SHELF_CAMERA.footMarginPortrait
+        : SHELF_CAMERA.footMarginLandscape;
+      const footY =
+        this.screenHeight - footMargin - SHELF_ROOM.footY * scale;
+      const minY = this.screenHeight - texture.height * scale;
       this.roomBackdrop.scale.set(scale);
       this.roomBackdrop.position.set(
-        (this.screenWidth - texture.width * scale) / 2,
-        bottomLimit - texture.height * scale,
+        Math.min(0, Math.max(minX, focusX)),
+        Math.min(0, Math.max(minY, footY)),
       );
     } else if (this.sceneMode === "carpet") {
       // The carpet scene cover-fits the WHOLE game screen — no side
@@ -549,6 +559,8 @@ export class MainScene extends Container {
    * the BLOCK H shelf scene and the BLOCK I carpet scene.
    */
   private setSceneMode(mode: "standing" | "bed" | "shelf" | "carpet"): void {
+    // A line spoken in the previous pose must not survive the switch.
+    this.speechBubble.hide();
     if (mode === "bed" && !this.bedHeroine.ready) return;
     if (mode === "shelf" && !this.shelfHeroine.ready) return;
     if (mode === "carpet" && !this.carpetHeroine.ready) return;
