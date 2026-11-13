@@ -797,7 +797,12 @@ export class ProductionHeroineRig extends Container {
     const hair = new Sprite(hairTexture);
     hair.roundPixels = false;
     hair.label = "natural back hair (variant B)";
-    hair.position.set(0, 0);
+    // Crown pivot: tap physics rotates the whole back-hair mass around the
+    // head crown, so displacement is near zero where the hair is tucked
+    // under the head/front hair (tight 4px under-lap) and largest at the
+    // free-hanging tips over the plain background.
+    hair.pivot.set(424, 150);
+    hair.position.set(424, 150);
     hair.eventMode = "none";
     this.groups.backHairGroup.addChild(hair);
     this.naturalHairSprite = hair;
@@ -1031,43 +1036,72 @@ export class ProductionHeroineRig extends Container {
     }
   }
 
+  /**
+   * Cuts one plate rect out of an approved state composite into a
+   * standalone texture with the rounded corners BAKED into its alpha.
+   * The earlier implementation shared one white-filled Graphics roundRect
+   * as a stencil mask across all plates; on some GPUs PixiJS v8 briefly
+   * rendered that mask itself while the masked sprites toggled
+   * `visible`, which flashed a WHITE RECTANGLE over the face during
+   * blinks.  Baking the corner alpha removes the mask object entirely,
+   * so the flash is structurally impossible.  The plate interior is
+   * opaque approved art, so the canvas round-trip cannot premultiply
+   * away any edge colour (the alpha=0 rule only affects transparent
+   * pixels, which exist here only outside the rounded corners).
+   */
+  private roundedPlateTexture(
+    source: Texture,
+    rect: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      radius: number;
+    },
+  ): Texture {
+    const canvas = document.createElement("canvas");
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      // No 2D context: fall back to a plain rect crop (square corners).
+      return new Texture({
+        source: source.source,
+        frame: new Rectangle(rect.x, rect.y, rect.width, rect.height),
+      });
+    }
+    ctx.beginPath();
+    ctx.roundRect(0, 0, rect.width, rect.height, rect.radius);
+    ctx.clip();
+    ctx.drawImage(
+      source.source.resource as ApprovedSlotResource,
+      rect.x,
+      rect.y,
+      rect.width,
+      rect.height,
+      0,
+      0,
+      rect.width,
+      rect.height,
+    );
+    return Texture.from(canvas);
+  }
+
   private buildFacePlates(textures: Map<string, Texture>): void {
     const faceGroup = this.groups.faceGroup;
-    const mask = new Graphics();
-    mask.label = "approved face-state crop mask";
-    mask
-      .roundRect(
-        FACE_PLATE_RECT.x,
-        FACE_PLATE_RECT.y,
-        FACE_PLATE_RECT.width,
-        FACE_PLATE_RECT.height,
-        FACE_PLATE_RECT.radius,
-      )
-      .fill({ color: 0xffffff, alpha: 1 });
-    mask.eventMode = "none";
-    mask.roundPixels = false;
-    faceGroup.addChild(mask);
 
     for (const state of EXPRESSION_STATES) {
       const url = STATE_PLATE_URLS[state];
       const texture = textures.get(url);
       if (!texture) throw new Error(`Missing approved face state ${state}.`);
-      const cropped = new Texture({
-        source: texture.source,
-        frame: new Rectangle(
-          FACE_PLATE_RECT.x,
-          FACE_PLATE_RECT.y,
-          FACE_PLATE_RECT.width,
-          FACE_PLATE_RECT.height,
-        ),
-      });
-      const sprite = new Sprite(cropped);
+      const sprite = new Sprite(
+        this.roundedPlateTexture(texture, FACE_PLATE_RECT),
+      );
       sprite.roundPixels = false;
       sprite.label = `approved state ${state}`;
       sprite.position.set(FACE_PLATE_RECT.x, FACE_PLATE_RECT.y);
       sprite.alpha = state === "00-neutral" ? 1 : 0;
       sprite.eventMode = "none";
-      sprite.mask = mask;
       faceGroup.addChild(sprite);
       this.facePlates.set(state, sprite);
     }
@@ -1087,23 +1121,15 @@ export class ProductionHeroineRig extends Container {
       const url = STATE_PLATE_URLS[state];
       const texture = textures.get(url);
       if (!texture) throw new Error(`Missing approved blink state ${state}.`);
-      const cropped = new Texture({
-        source: texture.source,
-        frame: new Rectangle(
-          FACE_PLATE_RECT.x,
-          FACE_PLATE_RECT.y,
-          FACE_PLATE_RECT.width,
-          FACE_PLATE_RECT.height,
-        ),
-      });
-      const sprite = new Sprite(cropped);
+      const sprite = new Sprite(
+        this.roundedPlateTexture(texture, FACE_PLATE_RECT),
+      );
       sprite.roundPixels = false;
       sprite.label = `blink overlay ${state}`;
       sprite.position.set(FACE_PLATE_RECT.x, FACE_PLATE_RECT.y);
       sprite.alpha = 0;
       sprite.visible = false;
       sprite.eventMode = "none";
-      sprite.mask = mask;
       faceGroup.addChild(sprite);
       this.blinkPlates.set(state, sprite);
     }
@@ -1118,20 +1144,6 @@ export class ProductionHeroineRig extends Container {
     // above the baked fragments.  buildFacePlates runs after every slot is
     // parented, so these land above z17-z20 in paint order.
     const headGroup = this.groups.headGroup;
-    const patchMask = new Graphics();
-    patchMask.label = "blink eye-patch crop mask";
-    patchMask
-      .roundRect(
-        EYE_PATCH_RECT.x,
-        EYE_PATCH_RECT.y,
-        EYE_PATCH_RECT.width,
-        EYE_PATCH_RECT.height,
-        EYE_PATCH_RECT.radius,
-      )
-      .fill({ color: 0xffffff, alpha: 1 });
-    patchMask.eventMode = "none";
-    patchMask.roundPixels = false;
-    headGroup.addChild(patchMask);
     for (const state of [
       "05-both-eyes-closed",
       "06-both-eyes-closed-smile",
@@ -1140,23 +1152,15 @@ export class ProductionHeroineRig extends Container {
       const url = STATE_PLATE_URLS[state];
       const texture = textures.get(url);
       if (!texture) throw new Error(`Missing approved blink state ${state}.`);
-      const cropped = new Texture({
-        source: texture.source,
-        frame: new Rectangle(
-          EYE_PATCH_RECT.x,
-          EYE_PATCH_RECT.y,
-          EYE_PATCH_RECT.width,
-          EYE_PATCH_RECT.height,
-        ),
-      });
-      const sprite = new Sprite(cropped);
+      const sprite = new Sprite(
+        this.roundedPlateTexture(texture, EYE_PATCH_RECT),
+      );
       sprite.roundPixels = false;
       sprite.label = `blink eye patch ${state}`;
       sprite.position.set(EYE_PATCH_RECT.x, EYE_PATCH_RECT.y);
       sprite.alpha = 0;
       sprite.visible = false;
       sprite.eventMode = "none";
-      sprite.mask = patchMask;
       headGroup.addChild(sprite);
       this.eyePatchPlates.set(state, sprite);
     }
@@ -1339,21 +1343,34 @@ export class ProductionHeroineRig extends Container {
     const armL = this.naturalArmSpriteL;
     const armR = this.naturalArmSpriteR;
     if (env < 0.01) {
-      if (hair) hair.position.set(0, 0);
+      if (hair) {
+        hair.rotation = 0;
+        hair.position.set(424, 150);
+      }
       if (armL) armL.rotation = 0;
       if (armR) armR.rotation = 0;
       return;
     }
     const osc = Math.cos((2 * Math.PI * age) / 420);
-    const hairX =
-      (imp.hair * 0.42 + imp.head * 0.18 + (imp.armL + imp.armR) * 0.05) *
+    // Hair: crown-pivot rotation puts the visible swing into the long
+    // free-hanging tips (~1000px from the pivot -> up to ~15px arc on a
+    // hair tap) while the tucked-under rows near the head move <=2px,
+    // inside the 4px under-lap margin.  A small translation keeps the
+    // mid-cascade moving in the same direction, and body taps bob the
+    // whole mass vertically.
+    const hairAngle =
+      (imp.hair * 0.002 + imp.head * 0.001 + (imp.armL + imp.armR) * 0.0003) *
       env *
       osc;
+    const hairX = imp.hair * 0.3 * env * osc;
     const hairY =
-      -(Math.abs(imp.hair) * 0.2 + Math.abs(imp.body) * 0.45) *
+      -(Math.abs(imp.hair) * 0.2 + Math.abs(imp.body) * 1.1) *
       env *
       Math.abs(osc);
-    if (hair) hair.position.set(hairX, hairY);
+    if (hair) {
+      hair.rotation = hairAngle;
+      hair.position.set(424 + hairX, 150 + hairY);
+    }
     if (armL) armL.rotation = imp.armL * 0.002 * env * osc;
     if (armR) armR.rotation = imp.armR * 0.002 * env * osc;
   }
