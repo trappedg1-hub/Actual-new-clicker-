@@ -148,21 +148,32 @@ test("CARPET SCENE: reaction envelopes rise, hold and fully decay", () => {
   }
 });
 
-test("CARPET SCENE: the crossed shins swing forever without a seam", () => {
+test("CARPET SCENE: the crossed shins kick without ghosting", () => {
   const period = CARPET_MOTION.legSwingPeriodMs;
-  // Starts on the base frame, peaks on the leaned-back frame mid-cycle,
-  // returns to the base frame at the period boundary.
+  const trans = CARPET_MOTION.legSwingTransitionMs;
+  // Starts crisp on the base frame, crisp on the kicked frame mid-cycle,
+  // back to the base frame at the loop point.
   assert.equal(carpetLegSwingAt(0), 0);
   assert.ok(Math.abs(carpetLegSwingAt(period / 2) - 1) < 1e-9);
   assert.ok(carpetLegSwingAt(period) < 1e-9);
-  // Continuous: no frame-to-frame jump bigger than a few percent.
+  // Continuous (no pops), but each blend is quick — the mixed-frames
+  // window must cover only a small share of the cycle.
   let prev = carpetLegSwingAt(0);
+  let mixedMs = 0;
   for (let t = 16; t <= period * 2; t += 16) {
     const v = carpetLegSwingAt(t);
     assert.ok(v >= 0 && v <= 1, `swing ${v} out of range`);
-    assert.ok(Math.abs(v - prev) < 0.03, `swing jumps at ${t}ms`);
+    assert.ok(Math.abs(v - prev) < 0.12, `swing pops at ${t}ms`);
+    if (v > 0.02 && v < 0.98) mixedMs += 16;
     prev = v;
   }
+  assert.ok(
+    mixedMs < 2 * 2 * trans + 100,
+    `frames stay mixed ${mixedMs}ms over two cycles — ghosting`,
+  );
+  // The kick itself must be snappy and the rhythm lively.
+  assert.ok(trans <= 500, "transition too slow");
+  assert.ok(period <= 4_000, "swing rhythm too sluggish");
 });
 
 test("CARPET SCENE: stocking slips once per ambient cycle and resets", () => {
@@ -196,7 +207,6 @@ test("CARPET SCENE: ambient amplitudes stay subtle on the shipped plate", () => 
   // the plate — she breathes gently, the body never balloons.
   const worst = CARPET_MOTION.breathScale + CARPET_MOTION.pulseScale;
   assert.ok(worst < 0.015, `combined amplitude ${worst} too strong`);
-  // The leg swing crossfade is the main motion; its period is slow and
-  // readable, not a flicker.
-  assert.ok(CARPET_MOTION.legSwingPeriodMs >= 4_000);
+  // The leg swing is the main motion; lively but never a flicker.
+  assert.ok(CARPET_MOTION.legSwingPeriodMs >= 2_000);
 });
