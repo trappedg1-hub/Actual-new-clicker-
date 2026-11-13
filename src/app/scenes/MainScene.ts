@@ -1,6 +1,16 @@
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import roomLyingUrl from "../../assets/environment/room-lying.webp?url";
 import roomStandingUrl from "../../assets/environment/room-standing.webp?url";
+import {
+  BED_ZONE_ECONOMY,
+  BedHeroine,
+  type BedTouchZone,
+} from "../../heroine/bed/BedHeroine.ts";
 import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
+import {
+  createStyledButton,
+  type StyledButton,
+} from "../../presentation/ui/button.ts";
 import { GAME_BALANCE } from "../../content/upgrades/balance.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
@@ -34,6 +44,12 @@ export class MainScene extends Container {
   private readonly backdropScrim = new Graphics();
   private readonly roomEnabled =
     resolvePoseVariant(window.location.search) === "natural";
+  /** BLOCK D bed scene (lying pose); reachable through the ЛЕЧЬ toggle. */
+  private readonly bedHeroine: BedHeroine;
+  private readonly bedToggle: StyledButton;
+  private bedMode = false;
+  private roomStandingTexture: Texture | null = null;
+  private roomLyingTexture: Texture | null = null;
   private readonly ambient = new Graphics();
   private readonly heroine: ProductionHeroineRig;
   private readonly statusHud: StatusHud;
@@ -82,9 +98,14 @@ export class MainScene extends Container {
       this.ambient,
     );
     if (this.roomEnabled) {
-      void Assets.load<Texture>(roomStandingUrl)
-        .then((texture) => {
-          this.roomBackdrop.texture = texture;
+      void Promise.all([
+        Assets.load<Texture>(roomStandingUrl),
+        Assets.load<Texture>(roomLyingUrl),
+      ])
+        .then(([standing, lying]) => {
+          this.roomStandingTexture = standing;
+          this.roomLyingTexture = lying;
+          this.roomBackdrop.texture = this.bedMode ? lying : standing;
           this.layoutBackdrop();
         })
         .catch(() => {
@@ -96,6 +117,27 @@ export class MainScene extends Container {
       this.onHeroineTap(zone, localX, localY),
     );
     this.addChild(this.heroine);
+
+    this.bedHeroine = new BedHeroine((zone, globalX, globalY) =>
+      this.onBedTap(zone, globalX, globalY),
+    );
+    this.bedHeroine.visible = false;
+    this.addChild(this.bedHeroine);
+    this.bedToggle = createStyledButton("ЛЕЧЬ", {
+      width: 58,
+      height: 34,
+      fontSize: 8,
+      fill: 0x673b8f,
+      stroke: 0xd187e8,
+      radius: 12,
+      onPress: () => this.setBedMode(!this.bedMode),
+    });
+    this.bedToggle.node.visible = this.roomEnabled;
+    if (this.roomEnabled) {
+      void this.bedHeroine.load().catch(() => {
+        this.bedToggle.setEnabled(false);
+      });
+    }
 
     this.statusHud = new StatusHud(() => void this.exportBackup());
     this.floatingPanel = new FloatingPanel(() => void this.openIntroDialogue());
@@ -111,6 +153,7 @@ export class MainScene extends Container {
 
     this.addChild(
       this.floatingPanel,
+      this.bedToggle.node,
       this.upgradePanel,
       this.interactionHint,
       this.statusHud,
@@ -122,7 +165,11 @@ export class MainScene extends Container {
 
   update(elapsedMs: number): void {
     if (this.paused || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
-    this.heroine.update(elapsedMs);
+    if (this.bedMode) {
+      this.bedHeroine.update(elapsedMs);
+    } else {
+      this.heroine.update(elapsedMs);
+    }
     this.session.tick(elapsedMs);
     this.uiAccumulatorMs += elapsedMs;
     this.autosaveAccumulatorMs += elapsedMs;
@@ -187,14 +234,25 @@ export class MainScene extends Container {
       const cardTop = heightSafe - 66 - 82 - 8;
       const areaTop = 88;
       const availableHeight = Math.max(150, cardTop - areaTop - 22);
-      heroineScale = Math.min(
-        1.04,
-        availableHeight / 1264,
-        (widthSafe - 88) / 848,
-      );
+      // Over the room art the heroine stands close to the player: the real
+      // figure spans ~628px of the 848px canvas, so the width constraint
+      // divides by 700 (figure + margin), not the full canvas, and the pose
+      // is bottom-anchored so she stands on the floor instead of floating
+      // in the middle of the backdrop.  The classic dark variant keeps the
+      // original distant framing.
+      heroineScale = this.roomEnabled
+        ? Math.min(1.04, availableHeight / 1264, (widthSafe - 24) / 700)
+        : Math.min(1.04, availableHeight / 1264, (widthSafe - 88) / 848);
       heroineCenterX = widthSafe / 2;
-      heroineCenterY = areaTop + availableHeight / 2;
+      heroineCenterY = this.roomEnabled
+        ? cardTop - 26 - (heroineScale * 1264) / 2
+        : areaTop + availableHeight / 2;
       this.floatingPanel.resize(10, Math.max(112, heroineCenterY - 35));
+      this.bedToggle.node.position.set(
+        10,
+        Math.max(112, heroineCenterY - 35) + 104,
+      );
+      this.bedHeroine.layoutScene(widthSafe, areaTop, cardTop - 10);
       this.interactionHint.position.set(widthSafe / 2, cardTop - 18);
     } else {
       const sidePanelWidth = 204;
@@ -212,6 +270,15 @@ export class MainScene extends Container {
       heroineCenterX = areaLeft + availableWidth / 2;
       heroineCenterY = areaTop + availableHeight / 2;
       this.floatingPanel.resize(8, Math.max(90, heroineCenterY - 44));
+      this.bedToggle.node.position.set(
+        8,
+        Math.max(90, heroineCenterY - 44) + 104,
+      );
+      this.bedHeroine.layoutScene(
+        Math.min(widthSafe, (availableHeight * 1152) / 1330),
+        areaTop,
+        areaBottom,
+      );
       this.interactionHint.position.set(heroineCenterX, areaBottom - 12);
     }
     // Reward toasts used to spawn exactly at the touch point, on top of the
@@ -304,6 +371,54 @@ export class MainScene extends Container {
     this.statusHud.render(state);
     this.upgradePanel.render(state);
     this.floatingPanel.setRate(passiveIncomePerSecond(state));
+  }
+
+  /** Switches between the standing room scene and the BLOCK D bed scene. */
+  private setBedMode(enabled: boolean): void {
+    if (enabled && !this.bedHeroine.ready) return;
+    this.bedMode = enabled;
+    this.heroine.visible = !enabled;
+    this.bedHeroine.visible = enabled;
+    this.bedToggle.setLabel(enabled ? "ВСТАТЬ" : "ЛЕЧЬ");
+    this.interactionHint.text = enabled
+      ? "КАСАНИЕ: ГОЛОВА · ЖИВОТ · НОГИ · СТУПНИ"
+      : "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
+    const room = enabled ? this.roomLyingTexture : this.roomStandingTexture;
+    if (room) {
+      this.roomBackdrop.texture = room;
+      this.layoutBackdrop();
+    }
+    this.liveRegion.announce(
+      enabled ? "Героиня легла на кровать." : "Героиня встала с кровати.",
+    );
+  }
+
+  private onBedTap(zone: BedTouchZone, globalX: number, globalY: number): void {
+    const outcome = this.session.tap(BED_ZONE_ECONOMY[zone]);
+    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
+    void globalY;
+    this.feedback.show(
+      `+${outcome.currencyDelta} credits`,
+      toastX,
+      this.rewardToastY,
+    );
+    this.feedback.show(
+      `+${outcome.affectionDelta} affection`,
+      toastX,
+      this.rewardToastY,
+    );
+    if (outcome.leveledUp) {
+      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
+    }
+    this.liveRegion.announce(
+      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
+    );
+    if (outcome.nextLevel > outcome.previousLevel) {
+      this.liveRegion.announce(
+        `Новый уровень отношений: ${outcome.nextLevel}.`,
+      );
+    }
+    this.renderState();
   }
 
   private onHeroineTap(
