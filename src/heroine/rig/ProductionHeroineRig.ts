@@ -49,6 +49,7 @@ import {
   ORIGINAL_ART_URL,
   EXPRESSION_OVERLAY_URLS,
   LAYER_URLS,
+  NATURAL_CLEAN_LAYER_URLS,
   NATURAL_POSE_URLS,
   SLOT_DEFINITIONS,
   STATE_PLATE_URLS,
@@ -621,8 +622,12 @@ export class ProductionHeroineRig extends Container {
    * and `?pose=classic` resolves every slot to the approved BLOCK 1 file.
    */
   private layerUrlForSlot(z: number): string | undefined {
-    if (this.poseVariant === "natural" && z === 8) {
-      return NATURAL_POSE_URLS.blouse;
+    if (this.poseVariant === "natural") {
+      if (z === 8) return NATURAL_POSE_URLS.blouse;
+      // BLOCK F: edge-cleaned copies (outer silhouette only) for the
+      // natural pose; classic keeps the approved BLOCK 1 files untouched.
+      const cleaned = NATURAL_CLEAN_LAYER_URLS[z];
+      if (cleaned) return cleaned;
     }
     return LAYER_URLS[z];
   }
@@ -632,7 +637,10 @@ export class ProductionHeroineRig extends Container {
       const urls = [
         ...ALL_RUNTIME_TEXTURE_URLS,
         ...(this.poseVariant === "natural"
-          ? Object.values(NATURAL_POSE_URLS)
+          ? [
+              ...Object.values(NATURAL_POSE_URLS),
+              ...Object.values(NATURAL_CLEAN_LAYER_URLS),
+            ]
           : []),
       ];
       const entries: Array<readonly [string, Texture]> = await Promise.all(

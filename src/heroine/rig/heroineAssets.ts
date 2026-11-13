@@ -42,10 +42,22 @@ import expr0Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-AS
 import expr1Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-eye_r_closed-B.png?url";
 import expr2Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_open-A.png?url";
 import expr3Url from "../../../art-studio/production/BLOCK-1-FINISH-CHARACTER-ASSETS/BUILD-v01/states/state-mouth_smile-A.png?url";
-import naturalHairBackUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-hair-back.png?url";
-import naturalBlouseUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-blouse.png?url";
-import naturalArmLUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-l.png?url";
-import naturalArmRUrl from "../../../art-studio/production/BLOCK-C-ARMS-INTEGRATION/natural-arm-r.png?url";
+import naturalHairBackUrl from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/natural-hair-back.png?url";
+import naturalBlouseUrl from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/natural-blouse.png?url";
+import naturalArmLUrl from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/natural-arm-l.png?url";
+import naturalArmRUrl from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/natural-arm-r.png?url";
+import cleanLeg03Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/03_leg_l.png?url";
+import cleanLeg04Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/04_leg_r.png?url";
+import cleanTorso05Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/05_torso.png?url";
+import cleanCollar09Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/09_outfit_collar.png?url";
+import cleanRibbon10Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/10_outfit_ribbon.png?url";
+import cleanSkirt11Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/11_outfit_skirt_01.png?url";
+import cleanSkirt12Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/12_outfit_skirt_02.png?url";
+import cleanHead13Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/13_head.png?url";
+import cleanHairSide17Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/17_hair_side_l.png?url";
+import cleanHairSide18Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/18_hair_side_r.png?url";
+import cleanHairFront19Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/19_hair_front_01.png?url";
+import cleanHairFront20Url from "../../../art-studio/production/BLOCK-F-NATURAL-EDGE-CLEANUP/20_hair_front_02.png?url";
 
 export interface SlotDefinition {
   z: number;
@@ -144,6 +156,28 @@ export const NATURAL_POSE_URLS = {
   armL: naturalArmLUrl,
   armR: naturalArmRUrl,
 } as const;
+
+/**
+ * BLOCK F: outer-silhouette edge cleanup, NATURAL pose only.  Copies of the
+ * approved slots with the baked background halo trimmed, matte speckles
+ * despeckled and the outer alpha edge smoothed — ONLY within 6px of the
+ * union silhouette, so every interior junction contour stays bit-identical
+ * and no seams can open.  `?pose=classic` never requests these URLs.
+ */
+export const NATURAL_CLEAN_LAYER_URLS: Readonly<Record<number, string>> = {
+  3: cleanLeg03Url,
+  4: cleanLeg04Url,
+  5: cleanTorso05Url,
+  9: cleanCollar09Url,
+  10: cleanRibbon10Url,
+  11: cleanSkirt11Url,
+  12: cleanSkirt12Url,
+  13: cleanHead13Url,
+  17: cleanHairSide17Url,
+  18: cleanHairSide18Url,
+  19: cleanHairFront19Url,
+  20: cleanHairFront20Url,
+};
 
 export const ALL_RUNTIME_TEXTURE_URLS: readonly string[] = [
   UNDERLAY_UNION_URL,
