@@ -1,11 +1,17 @@
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 import roomLyingUrl from "../../assets/environment/room-lying.webp?url";
+import roomShelfUrl from "../../assets/environment/room-shelf.webp?url";
 import roomStandingUrl from "../../assets/environment/room-standing.webp?url";
 import {
   BED_ZONE_ECONOMY,
   BedHeroine,
   type BedTouchZone,
 } from "../../heroine/bed/BedHeroine.ts";
+import {
+  SHELF_ZONE_ECONOMY,
+  ShelfHeroine,
+  type ShelfTouchZone,
+} from "../../heroine/shelf/ShelfHeroine.ts";
 import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
 import {
   createStyledButton,
@@ -51,9 +57,13 @@ export class MainScene extends Container {
   /** BLOCK D bed scene (lying pose); reachable through the ЛЕЧЬ toggle. */
   private readonly bedHeroine: BedHeroine;
   private readonly bedToggle: StyledButton;
-  private bedMode = false;
+  /** BLOCK H shelf scene (reaching the top shelf); К ПОЛКЕ toggle. */
+  private readonly shelfHeroine: ShelfHeroine;
+  private readonly shelfToggle: StyledButton;
+  private sceneMode: "standing" | "bed" | "shelf" = "standing";
   private roomStandingTexture: Texture | null = null;
   private roomLyingTexture: Texture | null = null;
+  private roomShelfTexture: Texture | null = null;
   private readonly ambient = new Graphics();
   private readonly heroine: ProductionHeroineRig;
   private readonly statusHud: StatusHud;
@@ -106,11 +116,13 @@ export class MainScene extends Container {
       void Promise.all([
         Assets.load<Texture>(roomStandingUrl),
         Assets.load<Texture>(roomLyingUrl),
+        Assets.load<Texture>(roomShelfUrl),
       ])
-        .then(([standing, lying]) => {
+        .then(([standing, lying, shelf]) => {
           this.roomStandingTexture = standing;
           this.roomLyingTexture = lying;
-          this.roomBackdrop.texture = this.bedMode ? lying : standing;
+          this.roomShelfTexture = shelf;
+          this.roomBackdrop.texture = this.roomTextureForMode() ?? standing;
           this.layoutBackdrop();
         })
         .catch(() => {
@@ -128,6 +140,11 @@ export class MainScene extends Container {
     );
     this.bedHeroine.visible = false;
     this.addChild(this.bedHeroine);
+    this.shelfHeroine = new ShelfHeroine((zone, globalX, globalY) =>
+      this.onShelfTap(zone, globalX, globalY),
+    );
+    this.shelfHeroine.visible = false;
+    this.addChild(this.shelfHeroine);
     this.bedToggle = createStyledButton("ЛЕЧЬ", {
       width: 58,
       height: 34,
@@ -135,12 +152,27 @@ export class MainScene extends Container {
       fill: 0x673b8f,
       stroke: 0xd187e8,
       radius: 12,
-      onPress: () => this.setBedMode(!this.bedMode),
+      onPress: () =>
+        this.setSceneMode(this.sceneMode === "bed" ? "standing" : "bed"),
     });
     this.bedToggle.node.visible = this.roomEnabled;
+    this.shelfToggle = createStyledButton("К ПОЛКЕ", {
+      width: 58,
+      height: 34,
+      fontSize: 8,
+      fill: 0x673b8f,
+      stroke: 0xd187e8,
+      radius: 12,
+      onPress: () =>
+        this.setSceneMode(this.sceneMode === "shelf" ? "standing" : "shelf"),
+    });
+    this.shelfToggle.node.visible = this.roomEnabled;
     if (this.roomEnabled) {
       void this.bedHeroine.load().catch(() => {
         this.bedToggle.setEnabled(false);
+      });
+      void this.shelfHeroine.load().catch(() => {
+        this.shelfToggle.setEnabled(false);
       });
     }
 
@@ -163,6 +195,7 @@ export class MainScene extends Container {
       this.hearts,
       this.floatingPanel,
       this.bedToggle.node,
+      this.shelfToggle.node,
       this.upgradePanel,
       this.interactionHint,
       this.statusHud,
@@ -174,8 +207,10 @@ export class MainScene extends Container {
 
   update(elapsedMs: number): void {
     if (this.paused || !Number.isFinite(elapsedMs) || elapsedMs <= 0) return;
-    if (this.bedMode) {
+    if (this.sceneMode === "bed") {
       this.bedHeroine.update(elapsedMs);
+    } else if (this.sceneMode === "shelf") {
+      this.shelfHeroine.update(elapsedMs);
     } else {
       this.heroine.update(elapsedMs);
     }
@@ -266,6 +301,7 @@ export class MainScene extends Container {
         : Math.max(112, heroineCenterY - 35);
       this.floatingPanel.resize(10, panelY);
       this.bedToggle.node.position.set(10, panelY + 104);
+      this.shelfToggle.node.position.set(10, panelY + 104 + 42);
       this.bedHeroine.layoutScene(widthSafe, areaTop, cardTop - 10);
       this.interactionHint.position.set(widthSafe / 2, cardTop - 18);
     } else {
@@ -287,6 +323,10 @@ export class MainScene extends Container {
       this.bedToggle.node.position.set(
         8,
         Math.max(90, heroineCenterY - 44) + 104,
+      );
+      this.shelfToggle.node.position.set(
+        8,
+        Math.max(90, heroineCenterY - 44) + 104 + 42,
       );
       this.bedHeroine.layoutScene(
         Math.min(widthSafe, (availableHeight * 1152) / 1330),
@@ -322,16 +362,42 @@ export class MainScene extends Container {
     this.backdropScrim.clear();
     const texture = this.roomBackdrop.texture;
     if (texture === Texture.EMPTY || texture.width <= 1) return;
-    const scale = Math.max(
-      this.screenWidth / texture.width,
-      this.screenHeight / texture.height,
-    );
-    this.roomBackdrop.scale.set(scale);
-    this.roomBackdrop.position.set(
-      (this.screenWidth - texture.width * scale) / 2,
-      (this.screenHeight - texture.height * scale) / 2,
-    );
     const portrait = this.screenWidth <= this.screenHeight;
+    if (this.sceneMode === "shelf") {
+      // The shelf scene shows the WHOLE room above the bottom UI band
+      // (contain-fit, bottom-anchored): with the cover crop her feet and
+      // the raised stockinged heels — the point of the pose — would sit
+      // behind the upgrade card.  The camera "steps back" instead.
+      const bottomLimit = portrait
+        ? this.screenHeight - 66 - 82 - 8 + 6
+        : this.screenHeight - 62;
+      const scale = Math.min(
+        this.screenWidth / texture.width,
+        Math.max(120, bottomLimit) / texture.height,
+      );
+      this.roomBackdrop.scale.set(scale);
+      this.roomBackdrop.position.set(
+        (this.screenWidth - texture.width * scale) / 2,
+        bottomLimit - texture.height * scale,
+      );
+    } else {
+      const scale = Math.max(
+        this.screenWidth / texture.width,
+        this.screenHeight / texture.height,
+      );
+      this.roomBackdrop.scale.set(scale);
+      this.roomBackdrop.position.set(
+        (this.screenWidth - texture.width * scale) / 2,
+        (this.screenHeight - texture.height * scale) / 2,
+      );
+    }
+    // The shelf heroine lives in backdrop coordinates: glue her to the
+    // baked-in bookshelf for the current backdrop transform.
+    this.shelfHeroine.alignToBackdrop(
+      this.roomBackdrop.position.x,
+      this.roomBackdrop.position.y,
+      this.roomBackdrop.scale.x,
+    );
     const bottomBandTop = portrait
       ? this.screenHeight - 66 - 82 - 8 - 30
       : this.screenHeight - 68 - 24;
@@ -387,24 +453,78 @@ export class MainScene extends Container {
     this.floatingPanel.setRate(passiveIncomePerSecond(state));
   }
 
-  /** Switches between the standing room scene and the BLOCK D bed scene. */
-  private setBedMode(enabled: boolean): void {
-    if (enabled && !this.bedHeroine.ready) return;
-    this.bedMode = enabled;
-    this.heroine.visible = !enabled;
-    this.bedHeroine.visible = enabled;
-    this.bedToggle.setLabel(enabled ? "ВСТАТЬ" : "ЛЕЧЬ");
-    this.interactionHint.text = enabled
-      ? "КАСАНИЕ: ГОЛОВА · ЖИВОТ · НОГИ · СТУПНИ"
-      : "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
-    const room = enabled ? this.roomLyingTexture : this.roomStandingTexture;
+  /** Room backdrop matching the current scene mode (null until loaded). */
+  private roomTextureForMode(): Texture | null {
+    if (this.sceneMode === "bed") return this.roomLyingTexture;
+    if (this.sceneMode === "shelf") return this.roomShelfTexture;
+    return this.roomStandingTexture;
+  }
+
+  /**
+   * Switches between the standing room scene, the BLOCK D bed scene and
+   * the BLOCK H shelf scene.
+   */
+  private setSceneMode(mode: "standing" | "bed" | "shelf"): void {
+    if (mode === "bed" && !this.bedHeroine.ready) return;
+    if (mode === "shelf" && !this.shelfHeroine.ready) return;
+    if (mode === this.sceneMode) return;
+    this.sceneMode = mode;
+    this.heroine.visible = mode === "standing";
+    this.bedHeroine.visible = mode === "bed";
+    this.shelfHeroine.visible = mode === "shelf";
+    this.bedToggle.setLabel(mode === "bed" ? "ВСТАТЬ" : "ЛЕЧЬ");
+    this.shelfToggle.setLabel(mode === "shelf" ? "ОТОЙТИ" : "К ПОЛКЕ");
+    this.interactionHint.text =
+      mode === "bed"
+        ? "КАСАНИЕ: ГОЛОВА · ЖИВОТ · НОГИ · СТУПНИ"
+        : mode === "shelf"
+          ? "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · БЁДРА · СТУПНИ"
+          : "КАСАНИЕ: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
+    const room = this.roomTextureForMode();
     if (room) {
       this.roomBackdrop.texture = room;
       this.layoutBackdrop();
     }
     this.liveRegion.announce(
-      enabled ? "Героиня легла на кровать." : "Героиня встала с кровати.",
+      mode === "bed"
+        ? "Героиня легла на кровать."
+        : mode === "shelf"
+          ? "Героиня подошла к книжному шкафу и тянется к верхней полке."
+          : "Героиня вернулась на середину комнаты.",
     );
+  }
+
+  private onShelfTap(
+    zone: ShelfTouchZone,
+    globalX: number,
+    globalY: number,
+  ): void {
+    const outcome = this.session.tap(SHELF_ZONE_ECONOMY[zone]);
+    const toastX = Math.max(110, Math.min(this.screenWidth - 110, globalX));
+    this.hearts.burst(globalX, globalY);
+    tapHaptic();
+    this.feedback.show(
+      `+${outcome.currencyDelta} credits`,
+      toastX,
+      this.rewardToastY,
+    );
+    this.feedback.show(
+      `+${outcome.affectionDelta} affection`,
+      toastX,
+      this.rewardToastY,
+    );
+    if (outcome.leveledUp) {
+      this.showStatus(`AFFECTION TIER ${outcome.nextLevel} · NEW MILESTONE`);
+    }
+    this.liveRegion.announce(
+      `${zone}. Получено ${outcome.currencyDelta} кредитов и ${outcome.affectionDelta} affection.`,
+    );
+    if (outcome.nextLevel > outcome.previousLevel) {
+      this.liveRegion.announce(
+        `Новый уровень отношений: ${outcome.nextLevel}.`,
+      );
+    }
+    this.renderState();
   }
 
   private onBedTap(zone: BedTouchZone, globalX: number, globalY: number): void {
