@@ -1,4 +1,6 @@
-import { Container, Graphics, Text } from "pixi.js";
+import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import roomStandingUrl from "../../assets/environment/room-standing.webp?url";
+import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
 import { GAME_BALANCE } from "../../content/upgrades/balance.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
@@ -23,6 +25,15 @@ export class MainScene extends Container {
   private readonly session: GameSession;
   private readonly callbacks: MainSceneCallbacks;
   private readonly background = new Graphics();
+  /**
+   * Approved student-room art (BLOCK D) behind the natural pose.  The classic
+   * `?pose=classic` variant keeps the original dark backdrop untouched.
+   */
+  private readonly roomBackdrop = new Sprite(Texture.EMPTY);
+  /** Dark scrim over the room art so HUD text and toasts stay readable. */
+  private readonly backdropScrim = new Graphics();
+  private readonly roomEnabled =
+    resolvePoseVariant(window.location.search) === "natural";
   private readonly ambient = new Graphics();
   private readonly heroine: ProductionHeroineRig;
   private readonly statusHud: StatusHud;
@@ -61,8 +72,25 @@ export class MainScene extends Container {
     this.session = session;
     this.callbacks = callbacks;
     this.background.eventMode = "none";
+    this.roomBackdrop.eventMode = "none";
+    this.backdropScrim.eventMode = "none";
     this.ambient.eventMode = "none";
-    this.addChild(this.background, this.ambient);
+    this.addChild(
+      this.background,
+      this.roomBackdrop,
+      this.backdropScrim,
+      this.ambient,
+    );
+    if (this.roomEnabled) {
+      void Assets.load<Texture>(roomStandingUrl)
+        .then((texture) => {
+          this.roomBackdrop.texture = texture;
+          this.layoutBackdrop();
+        })
+        .catch(() => {
+          // Keep the plain dark backdrop if the room art fails to load.
+        });
+    }
 
     this.heroine = new ProductionHeroineRig((zone, localX, localY) =>
       this.onHeroineTap(zone, localX, localY),
@@ -121,27 +149,32 @@ export class MainScene extends Container {
       .rect(0, 0, widthSafe, heightSafe)
       .fill({ color: 0x100b20 });
     this.ambient.clear();
-    this.ambient
-      .circle(
-        widthSafe * 0.5,
-        heightSafe * 0.43,
-        Math.min(widthSafe, heightSafe) * 0.37,
-      )
-      .fill({ color: 0x63388c, alpha: 0.12 });
-    this.ambient
-      .circle(
-        widthSafe * 0.5,
-        heightSafe * 0.43,
-        Math.min(widthSafe, heightSafe) * 0.31,
-      )
-      .stroke({ color: 0x9564b2, alpha: 0.12, width: 1 });
-    for (let index = 0; index < 14; index += 1) {
-      const x = ((index * 83 + 23) % Math.max(1, widthSafe - 20)) + 10;
-      const y = ((index * 127 + 41) % Math.max(1, heightSafe - 110)) + 64;
+    if (!this.roomEnabled) {
+      // The purple glow and star specks belong to the abstract dark backdrop
+      // of the classic variant; over the approved room art they read as dirt.
       this.ambient
-        .circle(x, y, index % 3 === 0 ? 1.5 : 1)
-        .fill({ color: index % 2 === 0 ? 0xd8a1ff : 0x8fe7ff, alpha: 0.42 });
+        .circle(
+          widthSafe * 0.5,
+          heightSafe * 0.43,
+          Math.min(widthSafe, heightSafe) * 0.37,
+        )
+        .fill({ color: 0x63388c, alpha: 0.12 });
+      this.ambient
+        .circle(
+          widthSafe * 0.5,
+          heightSafe * 0.43,
+          Math.min(widthSafe, heightSafe) * 0.31,
+        )
+        .stroke({ color: 0x9564b2, alpha: 0.12, width: 1 });
+      for (let index = 0; index < 14; index += 1) {
+        const x = ((index * 83 + 23) % Math.max(1, widthSafe - 20)) + 10;
+        const y = ((index * 127 + 41) % Math.max(1, heightSafe - 110)) + 64;
+        this.ambient
+          .circle(x, y, index % 3 === 0 ? 1.5 : 1)
+          .fill({ color: index % 2 === 0 ? 0xd8a1ff : 0x8fe7ff, alpha: 0.42 });
+      }
     }
+    this.layoutBackdrop();
 
     this.statusHud.resize(widthSafe);
     this.bottomNavigation.resize(widthSafe, heightSafe);
@@ -200,6 +233,41 @@ export class MainScene extends Container {
     this.heroine.setTagBottomLimit(null);
     this.dialogue.resize(widthSafe, heightSafe);
     this.renderState();
+  }
+
+  /** Cover-fit the approved room art and refresh the readability scrim. */
+  private layoutBackdrop(): void {
+    if (!this.roomEnabled) return;
+    this.backdropScrim.clear();
+    const texture = this.roomBackdrop.texture;
+    if (texture === Texture.EMPTY || texture.width <= 1) return;
+    const scale = Math.max(
+      this.screenWidth / texture.width,
+      this.screenHeight / texture.height,
+    );
+    this.roomBackdrop.scale.set(scale);
+    this.roomBackdrop.position.set(
+      (this.screenWidth - texture.width * scale) / 2,
+      (this.screenHeight - texture.height * scale) / 2,
+    );
+    const portrait = this.screenWidth <= this.screenHeight;
+    const bottomBandTop = portrait
+      ? this.screenHeight - 66 - 82 - 8 - 30
+      : this.screenHeight - 68 - 24;
+    this.backdropScrim
+      .rect(0, 0, this.screenWidth, this.screenHeight)
+      .fill({ color: 0x100b20, alpha: 0.2 });
+    this.backdropScrim
+      .rect(0, 0, this.screenWidth, 96)
+      .fill({ color: 0x100b20, alpha: 0.34 });
+    this.backdropScrim
+      .rect(
+        0,
+        bottomBandTop,
+        this.screenWidth,
+        this.screenHeight - bottomBandTop,
+      )
+      .fill({ color: 0x100b20, alpha: 0.34 });
   }
 
   applyOfflineProgress(
