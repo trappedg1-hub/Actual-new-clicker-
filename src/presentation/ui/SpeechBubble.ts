@@ -1,11 +1,19 @@
 import { Action } from "pixijs-actions";
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
-import { heroineTitle } from "../../content/relationship/relationship.ts";
+import {
+  heroineTitle,
+  poseHeatBand,
+} from "../../content/relationship/relationship.ts";
 
 const liquidDialogueUrl = new URL(
   "../../assets/ui/liquid-dialogue.png",
   import.meta.url,
 ).href;
+
+/** Nameplate pill fill per heat band: pink -> hot pink -> neon rose. */
+const HEAT_PILL_COLORS: readonly number[] = [0xff6ec0, 0xff4fae, 0xff2e92];
+/** Body text fill per heat band — warms toward a blushing pink. */
+const HEAT_BODY_FILLS: readonly string[] = ["#fff7ff", "#fff0fa", "#ffe4f3"];
 
 /**
  * Her voice window: an AI-painted Liquid-Glass message card pinned
@@ -22,6 +30,8 @@ export class SpeechBubble extends Container {
   private readonly body: Text;
   private screenWidth = 320;
   private screenHeight = 568;
+  /** Current heat band (0 cool / 1 warm / 2 hot) — tints the pill. */
+  private heat = 0;
 
   constructor(onSpeakingChange?: (speaking: boolean) => void) {
     super();
@@ -120,7 +130,10 @@ export class SpeechBubble extends Container {
         20,
         10,
       )
-      .fill({ color: 0xff6ec0, alpha: 0.55 })
+      .fill({
+        color: HEAT_PILL_COLORS[this.heat] ?? 0xff6ec0,
+        alpha: 0.55 + this.heat * 0.08,
+      })
       .stroke({ color: 0xffffff, alpha: 0.75, width: 1 });
     this.body.style.wordWrapWidth = w - 56;
     this.body.position.set(30, h * 0.34);
@@ -136,6 +149,9 @@ export class SpeechBubble extends Container {
   /** Shows `text` on the glass card; `level` drives her nameplate. */
   say(text: string, level: number): void {
     this.removeAllActions();
+    this.heat = poseHeatBand(level);
+    // The hotter the stage, the warmer her text glows.
+    this.body.style.fill = HEAT_BODY_FILLS[this.heat] ?? "#fff7ff";
     this.title.text = heroineTitle(level);
     this.body.text = text;
     this.layoutPlate();

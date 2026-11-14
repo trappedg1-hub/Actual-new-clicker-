@@ -16,6 +16,8 @@ import {
   pickTapLine,
   POSE_TAP_LINES,
   ZONE_TAP_LINES,
+  IDLE_TEASE_LINES,
+  pickIdleLine,
   RELATIONSHIP_STAGES,
   relationshipLadderIsConsistent,
   upgradeRomanticName,
@@ -175,6 +177,21 @@ test("zone reactions cover every touch zone with three heat bands", () => {
   // Legacy draw without a zone keeps the old 50/50 contract.
   const legacy = pickTapLine(8, "bed", () => 0.2);
   assert.ok(POSE_TAP_LINES.bed[2]?.includes(legacy));
+});
+
+test("idle teases exist for all three heat bands and stay pose-agnostic", () => {
+  assert.equal(IDLE_TEASE_LINES.length, 3);
+  for (const band of IDLE_TEASE_LINES) {
+    assert.ok(band.length >= 3);
+    for (const line of band) {
+      assert.ok(line.length > 0);
+      assert.ok(!/чулок|чулоч/i.test(line), "idle lines must be pose-agnostic");
+    }
+  }
+  // The picker lands in the band of the current stage.
+  assert.ok(IDLE_TEASE_LINES[0]?.includes(pickIdleLine(2, () => 0.2)));
+  assert.ok(IDLE_TEASE_LINES[1]?.includes(pickIdleLine(6, () => 0.2)));
+  assert.ok(IDLE_TEASE_LINES[2]?.includes(pickIdleLine(10, () => 0.99)));
 });
 
 test("stocking lines live only in poses where a stocking actually slips", () => {

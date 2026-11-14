@@ -30,6 +30,7 @@ import {
   type UpgradeKind,
 } from "../../content/upgrades/balance.ts";
 import {
+  pickIdleLine,
   pickTapLine,
   relationshipStage,
   RELATIONSHIP_STAGES,
@@ -110,6 +111,8 @@ export class MainScene extends Container {
   });
   /** Wall-clock time of her last spoken tap line (bubble spam guard). */
   private lastSpokenAtMs = 0;
+  /** Ms since the player last touched her — drives her idle teases. */
+  private idleMs = 0;
   private readonly feedback: RewardFeedback;
   private readonly hearts = new HeartBurst();
   private readonly liveRegion = new LiveRegion();
@@ -283,6 +286,7 @@ export class MainScene extends Container {
     }
     this.hearts.update(elapsedMs);
     this.session.tick(elapsedMs);
+    this.updateIdleTease(elapsedMs);
     this.uiAccumulatorMs += elapsedMs;
     this.autosaveAccumulatorMs += elapsedMs;
 
@@ -625,6 +629,26 @@ export class MainScene extends Container {
   }
 
   /**
+   * She does not like being ignored: after ~22s without a tap she
+   * teases the player herself, hotter with every relationship stage.
+   * Never interrupts an open line and never fires twice in a row
+   * faster than the tap-speech cooldown.
+   */
+  private updateIdleTease(elapsedMs: number): void {
+    this.idleMs += elapsedMs;
+    if (this.idleMs < 22_000) return;
+    this.idleMs = 0;
+    const now = performance.now();
+    if (now - this.lastSpokenAtMs < 12_000) return;
+    if (Math.random() > 0.65) return;
+    const level = affectionProgress(this.session.state.affection).level;
+    const line = pickIdleLine(level, Math.random);
+    this.speechBubble.say(line, level);
+    this.lastSpokenAtMs = now;
+    this.liveRegion.announce(`Она говорит: ${line}`);
+  }
+
+  /**
    * Shared aftermath of every heroine tap: reward toasts, her voice
    * line (hotter with every relationship stage), milestone status and
    * accessibility announcements.
@@ -641,6 +665,7 @@ export class MainScene extends Container {
     // cluttered the premium look).
     this.hearts.burst(globalX, globalY);
     tapHaptic();
+    this.idleMs = 0;
     const now = performance.now();
     if (outcome.leveledUp) {
       const stage = relationshipStage(outcome.nextLevel);
