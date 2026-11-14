@@ -57,6 +57,8 @@ export const CARPET_PATCHES = {
   stocking: { x: 523, y: 707 },
   /** One paper page caught mid-turn, curling above the open book. */
   page: { x: 38, y: 152 },
+  /** Relationship mood plates (tsundere / lovestruck), one face window. */
+  mood: { x: 130, y: 80 },
 } as const;
 
 /**

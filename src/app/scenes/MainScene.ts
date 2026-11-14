@@ -650,6 +650,7 @@ export class MainScene extends Container {
     this.standingHeroine.setHeatBand(band);
     this.shelfHeroine.setHeatBand(band);
     this.bedHeroine.setHeatBand(band);
+    this.carpetHeroine.setHeatBand(band);
   }
 
   /** Room backdrop matching the current scene mode (null until loaded). */

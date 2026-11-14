@@ -3,6 +3,8 @@ import carpetBlinkUrl from "../../assets/environment/carpet-blink.png?url";
 import carpetBlushUrl from "../../assets/environment/carpet-blush.png?url";
 import carpetHeroineUrl from "../../assets/environment/carpet-heroine.webp?url";
 import carpetLegsAUrl from "../../assets/environment/carpet-legs-a.png?url";
+import carpetMoodLoveUrl from "../../assets/environment/carpet-mood-love.png?url";
+import carpetMoodTsunUrl from "../../assets/environment/carpet-mood-tsun.png?url";
 import carpetLegsUrl from "../../assets/environment/carpet-legs.png?url";
 import carpetPageUrl from "../../assets/environment/carpet-page.png?url";
 import carpetStockingUrl from "../../assets/environment/carpet-stocking.png?url";
@@ -53,7 +55,11 @@ export class CarpetHeroine extends Container {
   private readonly artRoot = new Container();
   private readonly shadowLayer = new Container();
   private readonly art = new Sprite(Texture.EMPTY);
+  private readonly moodTsun = new Sprite(Texture.EMPTY);
+  private readonly moodLove = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
+  /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
+  private heatBand: 0 | 1 | 2 = 0;
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
   /** Swap frame A: the base crossed shins (fills the base plate hole). */
   private readonly legsFrameA = new Sprite(Texture.EMPTY);
@@ -83,6 +89,8 @@ export class CarpetHeroine extends Container {
 
     this.art.eventMode = "none";
     for (const [patch, place] of [
+      [this.moodTsun, CARPET_PATCHES.mood],
+      [this.moodLove, CARPET_PATCHES.mood],
       [this.blushPatch, CARPET_PATCHES.blush],
       [this.blinkPatch, CARPET_PATCHES.blink],
       [this.legsFrameA, CARPET_PATCHES.legs],
@@ -102,9 +110,13 @@ export class CarpetHeroine extends Container {
     // patches are disjoint regions.  Contact shadows render UNDER the
     // art so the body overlaps their cores and only the soft rim spills
     // onto the floor boards.
+    this.moodTsun.label = "mood tsundere";
+    this.moodLove.label = "mood lovestruck";
     this.artRoot.addChild(
       this.shadowLayer,
       this.art,
+      this.moodTsun,
+      this.moodLove,
       this.legsFrameA,
       this.legsPatch,
       this.blushPatch,
@@ -119,20 +131,34 @@ export class CarpetHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, legsA, legs, stocking, page, shadow] =
-      await Promise.all([
-        Assets.load<Texture>(carpetHeroineUrl),
-        Assets.load<Texture>(carpetBlinkUrl),
-        Assets.load<Texture>(carpetBlushUrl),
-        Assets.load<Texture>(carpetLegsAUrl),
-        Assets.load<Texture>(carpetLegsUrl),
-        Assets.load<Texture>(carpetStockingUrl),
-        Assets.load<Texture>(carpetPageUrl),
-        Assets.load<Texture>(shelfShadowUrl),
-      ]);
+    const [
+      art,
+      blink,
+      blush,
+      legsA,
+      legs,
+      stocking,
+      page,
+      moodTsun,
+      moodLove,
+      shadow,
+    ] = await Promise.all([
+      Assets.load<Texture>(carpetHeroineUrl),
+      Assets.load<Texture>(carpetBlinkUrl),
+      Assets.load<Texture>(carpetBlushUrl),
+      Assets.load<Texture>(carpetLegsAUrl),
+      Assets.load<Texture>(carpetLegsUrl),
+      Assets.load<Texture>(carpetStockingUrl),
+      Assets.load<Texture>(carpetPageUrl),
+      Assets.load<Texture>(carpetMoodTsunUrl),
+      Assets.load<Texture>(carpetMoodLoveUrl),
+      Assets.load<Texture>(shelfShadowUrl),
+    ]);
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
+    this.moodTsun.texture = moodTsun;
+    this.moodLove.texture = moodLove;
     this.legsFrameA.texture = legsA;
     this.legsPatch.texture = legs;
     this.stockingPatch.texture = stocking;
@@ -190,6 +216,8 @@ export class CarpetHeroine extends Container {
     const kicked = carpetKickShowsFrameB(t - this.kickAt);
     this.legsPatch.alpha = kicked ? 1 : 0;
     this.legsFrameA.alpha = kicked ? 0 : 1;
+    this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
+    this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
     this.blinkPatch.alpha = blinkOverlayAt(t).weight;
     this.blushPatch.alpha = carpetEnvelopeAt(
       t - this.blushPulseAt,
@@ -203,6 +231,11 @@ export class CarpetHeroine extends Container {
   }
 
   /** Visible reaction of one tapped zone; economy stays in the scene. */
+  /** Relationship mood of the resting face (0 tsundere / 1 warm / 2 love). */
+  setHeatBand(band: 0 | 1 | 2): void {
+    this.heatBand = band;
+  }
+
   private reactToTap(zone: CarpetTouchZone): void {
     this.pulseAt = this.timeMs;
     switch (zone) {
