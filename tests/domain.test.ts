@@ -262,3 +262,49 @@ test("affection tiers and save migration are derived from persisted source value
   assert.equal(migrated.upgrades["sweet-words"], 1);
   assert.equal(migrated.storyFlags.introTranscript, "");
 });
+
+test("standing scene registry: envelopes rest at zero and zones map to the economy", async () => {
+  const {
+    STANDING_ZONE_ECONOMY,
+    STANDING_GLANCE_AMBIENT,
+    STANDING_WINK_ENVELOPE,
+    standingAmbientGlanceAt,
+    standingEnvelopeAt,
+    standingPulseAt,
+  } = await import("../src/heroine/standing/standingScene.ts");
+
+  // All six touch zones reward through the four persisted economy zones.
+  const zones = Object.keys(STANDING_ZONE_ECONOMY);
+  assert.deepEqual(zones.sort(), [
+    "belly",
+    "body",
+    "hair",
+    "head",
+    "legs",
+    "thighs",
+  ]);
+  for (const zone of zones) {
+    assert.ok(
+      ["head", "hair", "body", "arms"].includes(
+        STANDING_ZONE_ECONOMY[zone as keyof typeof STANDING_ZONE_ECONOMY],
+      ),
+    );
+  }
+
+  // Idle frames never jitter: everything is exactly zero at rest.
+  assert.equal(standingPulseAt(-1), 0);
+  assert.equal(standingPulseAt(10_000), 0);
+  assert.equal(standingEnvelopeAt(-5, STANDING_WINK_ENVELOPE), 0);
+  assert.equal(standingEnvelopeAt(999_999, STANDING_WINK_ENVELOPE), 0);
+  // The shy glance peaks mid-cycle and releases before the loop restarts.
+  const mid =
+    STANDING_GLANCE_AMBIENT.startMs +
+    STANDING_GLANCE_AMBIENT.periodMs * 0 +
+    600;
+  assert.equal(standingAmbientGlanceAt(STANDING_GLANCE_AMBIENT.startMs - 1), 0);
+  assert.ok(standingAmbientGlanceAt(mid) > 0.9);
+  assert.equal(
+    standingAmbientGlanceAt(STANDING_GLANCE_AMBIENT.periodMs - 1),
+    0,
+  );
+});

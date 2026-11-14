@@ -24,6 +24,15 @@ import {
   type ShelfTouchZone,
 } from "../../heroine/shelf/ShelfHeroine.ts";
 import { SHELF_CAMERA, SHELF_ROOM } from "../../heroine/shelf/shelfScene.ts";
+import {
+  StandingHeroine,
+  STANDING_ZONE_ECONOMY,
+  type StandingTouchZone,
+} from "../../heroine/standing/StandingHeroine.ts";
+import {
+  STANDING_CAMERA,
+  STANDING_ROOM,
+} from "../../heroine/standing/standingScene.ts";
 import { resolvePoseVariant } from "../../heroine/poses/naturalBasePose.ts";
 import {
   createStyledButton,
@@ -91,6 +100,8 @@ export class MainScene extends Container {
   /** BLOCK D bed scene (lying pose); reachable through the ЛЕЧЬ toggle. */
   private readonly bedHeroine: BedHeroine;
   private readonly bedToggle: StyledButton;
+  /** BLOCK K standing scene (the redrawn calm pose over the room). */
+  private readonly standingHeroine: StandingHeroine;
   /** BLOCK H shelf scene (reaching the top shelf); К ПОЛКЕ toggle. */
   private readonly shelfHeroine: ShelfHeroine;
   private readonly shelfToggle: StyledButton;
@@ -185,6 +196,26 @@ export class MainScene extends Container {
       this.onHeroineTap(zone, localX, localY),
     );
     this.addChild(this.heroine);
+    // BLOCK K: over the room art the calm pose is the painted standing
+    // scene; the layered rig stays as the classic-variant fallback.
+    this.standingHeroine = new StandingHeroine((zone, globalX, globalY) =>
+      this.onStandingTap(zone, globalX, globalY),
+    );
+    this.standingHeroine.visible = false;
+    this.addChild(this.standingHeroine);
+    if (this.roomEnabled) {
+      this.heroine.visible = false;
+      void this.standingHeroine
+        .load()
+        .then(() => {
+          this.standingHeroine.visible = this.sceneMode === "standing";
+          this.layoutBackdrop();
+        })
+        .catch(() => {
+          // If the painted pose fails to load, the rig steps back in.
+          this.heroine.visible = this.sceneMode === "standing";
+        });
+    }
 
     this.bedHeroine = new BedHeroine((zone, globalX, globalY) =>
       this.onBedTap(zone, globalX, globalY),
@@ -299,6 +330,8 @@ export class MainScene extends Container {
       this.shelfHeroine.update(elapsedMs);
     } else if (this.sceneMode === "carpet") {
       this.carpetHeroine.update(elapsedMs);
+    } else if (this.standingHeroine.visible) {
+      this.standingHeroine.update(elapsedMs);
     } else {
       this.heroine.update(elapsedMs);
     }
@@ -532,14 +565,25 @@ export class MainScene extends Container {
         );
       }
     } else {
-      const scale = Math.max(
-        this.screenWidth / texture.width,
-        this.screenHeight / texture.height,
-      );
+      // Standing scene: cover-fit centered on the figure, her feet
+      // anchored just above the bottom dock (clamped to the art bounds).
+      const scale =
+        Math.max(
+          this.screenWidth / texture.width,
+          this.screenHeight / texture.height,
+        ) * STANDING_CAMERA.zoom;
+      const minX = this.screenWidth - texture.width * scale;
+      const focusX = this.screenWidth / 2 - STANDING_CAMERA.focusX * scale;
+      const footMargin = portrait
+        ? STANDING_CAMERA.footMarginPortrait
+        : STANDING_CAMERA.footMarginLandscape;
+      const footY =
+        this.screenHeight - footMargin - STANDING_ROOM.footY * scale;
+      const minY = this.screenHeight - texture.height * scale;
       this.roomBackdrop.scale.set(scale);
       this.roomBackdrop.position.set(
-        (this.screenWidth - texture.width * scale) / 2,
-        (this.screenHeight - texture.height * scale) / 2,
+        Math.min(0, Math.max(minX, focusX)),
+        Math.min(0, Math.max(minY, footY)),
       );
     }
     // The shelf and carpet heroines live in backdrop coordinates: glue
@@ -550,6 +594,11 @@ export class MainScene extends Container {
       this.roomBackdrop.scale.x,
     );
     this.carpetHeroine.alignToBackdrop(
+      this.roomBackdrop.position.x,
+      this.roomBackdrop.position.y,
+      this.roomBackdrop.scale.x,
+    );
+    this.standingHeroine.alignToBackdrop(
       this.roomBackdrop.position.x,
       this.roomBackdrop.position.y,
       this.roomBackdrop.scale.x,
@@ -615,7 +664,10 @@ export class MainScene extends Container {
     if (mode === "carpet" && !this.carpetHeroine.ready) return;
     if (mode === this.sceneMode) return;
     this.sceneMode = mode;
-    this.heroine.visible = mode === "standing";
+    this.heroine.visible =
+      mode === "standing" && !(this.roomEnabled && this.standingHeroine.ready);
+    this.standingHeroine.visible =
+      mode === "standing" && this.roomEnabled && this.standingHeroine.ready;
     this.bedHeroine.visible = mode === "bed";
     this.shelfHeroine.visible = mode === "shelf";
     this.carpetHeroine.visible = mode === "carpet";
@@ -629,7 +681,9 @@ export class MainScene extends Container {
           ? "ТАП: ГОЛОВА · ВОЛОСЫ · БЁДРА · СТУПНИ"
           : mode === "carpet"
             ? "ТАП: ГОЛОВА · ВОЛОСЫ · БЁДРА · НОЖКИ"
-            : "ТАП: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
+            : this.standingHeroine.ready && this.roomEnabled
+              ? "ТАП: ГОЛОВА · ВОЛОСЫ · ЖИВОТИК · НОЖКИ"
+              : "ТАП: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ";
     const room = this.roomTextureForMode();
     if (room) {
       this.roomBackdrop.texture = room;
@@ -733,6 +787,24 @@ export class MainScene extends Container {
   private onBedTap(zone: BedTouchZone, globalX: number, globalY: number): void {
     const outcome = this.session.tap(BED_ZONE_ECONOMY[zone]);
     this.afterHeroineTap(outcome, zone, "bed", globalX, globalY);
+  }
+
+  private onStandingTap(
+    zone: StandingTouchZone,
+    globalX: number,
+    globalY: number,
+  ): void {
+    const outcome = this.session.tap(STANDING_ZONE_ECONOMY[zone]);
+    // The hot band earns the flirty wink on sweet taps.
+    if (
+      poseHeatBand(outcome.nextLevel) === 2 &&
+      (zone === "head" || zone === "body" || zone === "belly") &&
+      Math.random() < 0.6
+    ) {
+      this.standingHeroine.wink();
+    }
+    this.afterHeroineTap(outcome, zone, "classic", globalX, globalY);
+    void this.saveWithNotice(false);
   }
 
   private onHeroineTap(
