@@ -10,6 +10,7 @@ import {
 import bedBlinkPatchUrl from "../../assets/environment/bed-blink-patch.png?url";
 import bedMoodLoveUrl from "../../assets/environment/bed-mood-love.png?url";
 import bedMoodTsunUrl from "../../assets/environment/bed-mood-tsun.png?url";
+import bedStrapUrl from "../../assets/environment/bed-strap.png?url";
 import bedBlushUrl from "../../assets/environment/bed-blush.png?url";
 import bedMouthOpenUrl from "../../assets/environment/bed-mouth-open.png?url";
 import bedToesCurledUrl from "../../assets/environment/bed-toes-curled.png?url";
@@ -28,6 +29,23 @@ const MOUTH_PATCH = { x: 659, y: 228 } as const;
 const TOES_PATCH = { x: 15, y: 758 } as const;
 /** Relationship mood plates (tsundere / lovestruck), one face window. */
 const MOOD_PATCH = { x: 512, y: 72 } as const;
+/** The camisole strap slipped off her near shoulder onto the arm. */
+const STRAP_PATCH = { x: 505, y: 225 } as const;
+
+/**
+ * Peek escalation: how long the slipped strap stays before she fixes it,
+ * by relationship heat band — snapped back with a huff at the cold band,
+ * left hanging without any hurry at the hot band.
+ */
+const STRAP_ENVELOPES: readonly [
+  ReactionEnvelope,
+  ReactionEnvelope,
+  ReactionEnvelope,
+] = [
+  { attackMs: 140, holdMs: 600, releaseMs: 380 },
+  { attackMs: 160, holdMs: 1_700, releaseMs: 650 },
+  { attackMs: 180, holdMs: 3_400, releaseMs: 950 },
+];
 
 /**
  * Lying-pose breathing field: zero at and outside [topY, bottomY] so the
@@ -163,6 +181,7 @@ export class BedHeroine extends Container {
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly mouthPatch = new Sprite(Texture.EMPTY);
   private readonly toesPatch = new Sprite(Texture.EMPTY);
+  private readonly strapPatch = new Sprite(Texture.EMPTY);
   /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
   private heatBand: 0 | 1 | 2 = 0;
   private readonly hitLayer = new Container();
@@ -176,6 +195,9 @@ export class BedHeroine extends Container {
   private toesPulseAt = Number.NEGATIVE_INFINITY;
   private blushPulseAt = Number.NEGATIVE_INFINITY;
   private mouthPulseAt = Number.NEGATIVE_INFINITY;
+  private strapPulseAt = Number.NEGATIVE_INFINITY;
+  /** Heat band when the strap peek started (freezes its envelope). */
+  private strapBand: 0 | 1 | 2 = 0;
 
   constructor(
     onTap: (zone: BedTouchZone, globalX: number, globalY: number) => void,
@@ -229,6 +251,7 @@ export class BedHeroine extends Container {
       [this.toesPatch, TOES_PATCH],
       [this.moodTsun, MOOD_PATCH],
       [this.moodLove, MOOD_PATCH],
+      [this.strapPatch, STRAP_PATCH],
     ] as const) {
       patch.eventMode = "none";
       patch.position.set(place.x, place.y);
@@ -243,6 +266,7 @@ export class BedHeroine extends Container {
       this.art,
       this.moodTsun,
       this.moodLove,
+      this.strapPatch,
       this.blushPatch,
       this.blinkPatch,
       this.mouthPatch,
@@ -262,6 +286,7 @@ export class BedHeroine extends Container {
       toesTexture,
       moodTsunTexture,
       moodLoveTexture,
+      strapTexture,
     ] = await Promise.all([
       Assets.load<Texture>(lyingHeroineUrl),
       Assets.load<Texture>(bedBlinkPatchUrl),
@@ -270,6 +295,7 @@ export class BedHeroine extends Container {
       Assets.load<Texture>(bedToesCurledUrl),
       Assets.load<Texture>(bedMoodTsunUrl),
       Assets.load<Texture>(bedMoodLoveUrl),
+      Assets.load<Texture>(bedStrapUrl),
     ]);
     this.art.texture = artTexture;
     this.blinkPatch.texture = blinkTexture;
@@ -278,6 +304,7 @@ export class BedHeroine extends Container {
     this.toesPatch.texture = toesTexture;
     this.moodTsun.texture = moodTsunTexture;
     this.moodLove.texture = moodLoveTexture;
+    this.strapPatch.texture = strapTexture;
     this.loaded = true;
   }
 
@@ -304,6 +331,10 @@ export class BedHeroine extends Container {
     // her pout and the lovestruck face already smiles on its own.
     this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
     this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
+    this.strapPatch.alpha = envelopeAt(
+      this.timeMs - this.strapPulseAt,
+      STRAP_ENVELOPES[this.strapBand],
+    );
     this.mouthPatch.alpha =
       this.heatBand === 1
         ? Math.max(
@@ -316,6 +347,16 @@ export class BedHeroine extends Container {
   /** Relationship mood of the resting face (0 tsundere / 1 warm / 2 love). */
   setHeatBand(band: 0 | 1 | 2): void {
     this.heatBand = band;
+  }
+
+  /**
+   * Sweet taps sometimes nudge the camisole strap off her shoulder; how
+   * long she leaves it hanging depends on the relationship heat band.
+   */
+  private teaseStrap(): void {
+    if (Math.random() >= 0.45) return;
+    this.strapBand = this.heatBand;
+    this.strapPulseAt = this.timeMs;
   }
 
   /** Vertical chest/belly lift via the grid mesh, zero outside her torso. */
@@ -354,10 +395,12 @@ export class BedHeroine extends Container {
       case "head":
         this.blushPulseAt = this.timeMs;
         this.mouthPulseAt = this.timeMs;
+        this.teaseStrap();
         break;
       case "belly":
       case "legs":
         this.blushPulseAt = this.timeMs;
+        this.teaseStrap();
         break;
     }
   }

@@ -53,6 +53,8 @@ export const STANDING_PATCHES = {
   eyes: { x: 318, y: 146 },
   /** Relationship mood plates (tsundere / lovestruck), one window. */
   mood: { x: 310, y: 70 },
+  /** The near stocking's lace top rolled down into a ring at mid-thigh. */
+  stocking: { x: 410, y: 715 },
 } as const;
 
 /**
@@ -115,6 +117,21 @@ export const STANDING_WINK_ENVELOPE: StandingEnvelope = {
   holdMs: 1_300,
   releaseMs: 320,
 };
+
+/**
+ * Peek escalation: how long the rolled stocking stays before she fixes
+ * it, by relationship heat band — at the cold band she snaps it back up
+ * instantly with a huff, at the hot band she is in no hurry at all.
+ */
+export const STANDING_STOCKING_ENVELOPES: readonly [
+  StandingEnvelope,
+  StandingEnvelope,
+  StandingEnvelope,
+] = [
+  { attackMs: 140, holdMs: 600, releaseMs: 380 },
+  { attackMs: 160, holdMs: 1_700, releaseMs: 650 },
+  { attackMs: 180, holdMs: 3_400, releaseMs: 950 },
+];
 
 /** Ambient shy glance: she drifts aside on a long watched-you rhythm. */
 export const STANDING_GLANCE_AMBIENT = {

@@ -6,6 +6,7 @@ import standingGlanceUrl from "../../assets/environment/standing-glance.png?url"
 import standingHeroineUrl from "../../assets/environment/standing-heroine.webp?url";
 import standingMoodLoveUrl from "../../assets/environment/standing-mood-love.png?url";
 import standingMoodTsunUrl from "../../assets/environment/standing-mood-tsun.png?url";
+import standingStockingUrl from "../../assets/environment/standing-stocking.png?url";
 import standingWinkUrl from "../../assets/environment/standing-wink.png?url";
 import { blinkOverlayAt } from "../rig/animationMath.ts";
 import {
@@ -18,6 +19,7 @@ import {
   STANDING_ROOM,
   STANDING_ROOM_ART_SCALE,
   STANDING_SHADOWS,
+  STANDING_STOCKING_ENVELOPES,
   STANDING_WINK_ENVELOPE,
   standingAmbientGlanceAt,
   standingEnvelopeAt,
@@ -57,6 +59,7 @@ export class StandingHeroine extends Container {
   private readonly art = new Sprite(Texture.EMPTY);
   private readonly moodTsun = new Sprite(Texture.EMPTY);
   private readonly moodLove = new Sprite(Texture.EMPTY);
+  private readonly stockingPatch = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly glancePatch = new Sprite(Texture.EMPTY);
   private readonly winkPatch = new Sprite(Texture.EMPTY);
@@ -73,6 +76,9 @@ export class StandingHeroine extends Container {
   private blushPulseAt = Number.NEGATIVE_INFINITY;
   private glancePulseAt = Number.NEGATIVE_INFINITY;
   private winkPulseAt = Number.NEGATIVE_INFINITY;
+  private stockingPulseAt = Number.NEGATIVE_INFINITY;
+  /** Heat band when the stocking peek started (freezes its envelope). */
+  private stockingBand: 0 | 1 | 2 = 0;
   /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
   private heatBand: 0 | 1 | 2 = 0;
 
@@ -102,6 +108,12 @@ export class StandingHeroine extends Container {
     }
     this.moodTsun.label = "mood tsundere";
     this.moodLove.label = "mood lovestruck";
+    this.stockingPatch.eventMode = "none";
+    this.stockingPatch.position.set(
+      STANDING_PATCHES.stocking.x,
+      STANDING_PATCHES.stocking.y,
+    );
+    this.stockingPatch.alpha = 0;
     this.artRoot.pivot.set(STANDING_ART_W / 2, STANDING_ART_H);
     this.shadowLayer.eventMode = "none";
     // All four face plates share one window; stacking order resolves
@@ -116,6 +128,7 @@ export class StandingHeroine extends Container {
       this.glancePatch,
       this.winkPatch,
       this.blinkPatch,
+      this.stockingPatch,
       this.hitLayer,
     );
     this.addChild(this.artRoot);
@@ -124,17 +137,27 @@ export class StandingHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, glance, wink, moodTsun, moodLove, shadow] =
-      await Promise.all([
-        Assets.load<Texture>(standingHeroineUrl),
-        Assets.load<Texture>(standingBlinkUrl),
-        Assets.load<Texture>(standingBlushUrl),
-        Assets.load<Texture>(standingGlanceUrl),
-        Assets.load<Texture>(standingWinkUrl),
-        Assets.load<Texture>(standingMoodTsunUrl),
-        Assets.load<Texture>(standingMoodLoveUrl),
-        Assets.load<Texture>(shelfShadowUrl),
-      ]);
+    const [
+      art,
+      blink,
+      blush,
+      glance,
+      wink,
+      moodTsun,
+      moodLove,
+      stocking,
+      shadow,
+    ] = await Promise.all([
+      Assets.load<Texture>(standingHeroineUrl),
+      Assets.load<Texture>(standingBlinkUrl),
+      Assets.load<Texture>(standingBlushUrl),
+      Assets.load<Texture>(standingGlanceUrl),
+      Assets.load<Texture>(standingWinkUrl),
+      Assets.load<Texture>(standingMoodTsunUrl),
+      Assets.load<Texture>(standingMoodLoveUrl),
+      Assets.load<Texture>(standingStockingUrl),
+      Assets.load<Texture>(shelfShadowUrl),
+    ]);
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
@@ -142,6 +165,7 @@ export class StandingHeroine extends Container {
     this.winkPatch.texture = wink;
     this.moodTsun.texture = moodTsun;
     this.moodLove.texture = moodLove;
+    this.stockingPatch.texture = stocking;
     for (const spec of STANDING_SHADOWS) {
       const sprite = new Sprite(shadow);
       sprite.anchor.set(0.5);
@@ -204,6 +228,10 @@ export class StandingHeroine extends Container {
     // shy glance only plays in the warm middle band where it belongs.
     this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
     this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
+    this.stockingPatch.alpha = standingEnvelopeAt(
+      t - this.stockingPulseAt,
+      STANDING_STOCKING_ENVELOPES[this.stockingBand],
+    );
     this.winkPatch.alpha = wink;
     // The wink owns the face while it plays: the glance yields and the
     // auto-blink pauses, otherwise closed lids would stomp the open eye.
@@ -240,7 +268,12 @@ export class StandingHeroine extends Container {
         this.glancePulseAt = this.timeMs;
         break;
       case "hair":
+        break;
       case "legs":
+        // Leg taps tease the stocking down; how long she leaves it
+        // depends on how far the relationship has come.
+        this.stockingBand = this.heatBand;
+        this.stockingPulseAt = this.timeMs;
         break;
     }
   }
