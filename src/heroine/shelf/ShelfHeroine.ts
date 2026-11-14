@@ -2,6 +2,8 @@ import { Assets, Container, Graphics, Sprite, Texture } from "pixi.js";
 import shelfBlinkUrl from "../../assets/environment/shelf-blink.png?url";
 import shelfBlushUrl from "../../assets/environment/shelf-blush.png?url";
 import shelfHeroineUrl from "../../assets/environment/shelf-heroine.webp?url";
+import shelfMoodLoveUrl from "../../assets/environment/shelf-mood-love.png?url";
+import shelfMoodTsunUrl from "../../assets/environment/shelf-mood-tsun.png?url";
 import shelfShadowUrl from "../../assets/environment/shelf-shadow.png?url";
 import shelfStockingUrl from "../../assets/environment/shelf-stocking.png?url";
 import { blinkOverlayAt } from "../rig/animationMath.ts";
@@ -47,9 +49,13 @@ export class ShelfHeroine extends Container {
   private readonly artRoot = new Container();
   private readonly shadowLayer = new Container();
   private readonly art = new Sprite(Texture.EMPTY);
+  private readonly moodTsun = new Sprite(Texture.EMPTY);
+  private readonly moodLove = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
   private readonly stockingPatch = new Sprite(Texture.EMPTY);
+  /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
+  private heatBand: 0 | 1 | 2 = 0;
   private readonly hitLayer = new Container();
   private readonly onTap: (
     zone: ShelfTouchZone,
@@ -74,11 +80,15 @@ export class ShelfHeroine extends Container {
       [this.blushPatch, SHELF_PATCHES.blush],
       [this.blinkPatch, SHELF_PATCHES.blink],
       [this.stockingPatch, SHELF_PATCHES.stocking],
+      [this.moodTsun, SHELF_PATCHES.mood],
+      [this.moodLove, SHELF_PATCHES.mood],
     ] as const) {
       patch.eventMode = "none";
       patch.position.set(place.x, place.y);
       patch.alpha = 0;
     }
+    this.moodTsun.label = "mood tsundere";
+    this.moodLove.label = "mood lovestruck";
     this.artRoot.pivot.set(SHELF_ART_W / 2, SHELF_ART_H);
     this.shadowLayer.eventMode = "none";
     // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
@@ -88,6 +98,8 @@ export class ShelfHeroine extends Container {
     this.artRoot.addChild(
       this.shadowLayer,
       this.art,
+      this.moodTsun,
+      this.moodLove,
       this.blushPatch,
       this.blinkPatch,
       this.stockingPatch,
@@ -99,17 +111,22 @@ export class ShelfHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, stocking, shadow] = await Promise.all([
-      Assets.load<Texture>(shelfHeroineUrl),
-      Assets.load<Texture>(shelfBlinkUrl),
-      Assets.load<Texture>(shelfBlushUrl),
-      Assets.load<Texture>(shelfStockingUrl),
-      Assets.load<Texture>(shelfShadowUrl),
-    ]);
+    const [art, blink, blush, stocking, moodTsun, moodLove, shadow] =
+      await Promise.all([
+        Assets.load<Texture>(shelfHeroineUrl),
+        Assets.load<Texture>(shelfBlinkUrl),
+        Assets.load<Texture>(shelfBlushUrl),
+        Assets.load<Texture>(shelfStockingUrl),
+        Assets.load<Texture>(shelfMoodTsunUrl),
+        Assets.load<Texture>(shelfMoodLoveUrl),
+        Assets.load<Texture>(shelfShadowUrl),
+      ]);
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
     this.stockingPatch.texture = stocking;
+    this.moodTsun.texture = moodTsun;
+    this.moodLove.texture = moodLove;
     for (const spec of SHELF_SHADOWS) {
       const sprite = new Sprite(shadow);
       sprite.anchor.set(0.5);
@@ -159,6 +176,8 @@ export class ShelfHeroine extends Container {
       Math.sin((2 * Math.PI * t) / SHELF_MOTION.swayPeriodMs) *
       SHELF_MOTION.swaySkew;
 
+    this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
+    this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
     this.blinkPatch.alpha = blinkOverlayAt(t).weight;
     this.blushPatch.alpha = shelfEnvelopeAt(
       t - this.blushPulseAt,
@@ -168,6 +187,11 @@ export class ShelfHeroine extends Container {
       shelfAmbientStockingAt(t),
       shelfEnvelopeAt(t - this.stockingPulseAt, SHELF_STOCKING_ENVELOPE),
     );
+  }
+
+  /** Relationship mood of the resting face (0 tsundere / 1 warm / 2 love). */
+  setHeatBand(band: 0 | 1 | 2): void {
+    this.heatBand = band;
   }
 
   /** Visible reaction of one tapped zone; economy stays in the scene. */

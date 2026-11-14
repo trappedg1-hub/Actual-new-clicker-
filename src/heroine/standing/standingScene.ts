@@ -46,8 +46,13 @@ export const STANDING_CAMERA = {
  * the base plate never swaps, overlays fade above it).
  */
 export const STANDING_PATCHES = {
-  /** Shared face window of blink / blush / glance / wink plates. */
+  /** Shared face window of blush / glance / wink plates. */
   face: { x: 312, y: 92 },
+  /** Tight eyes-only window of the blink plate, so closed lids never
+   * wipe the mood plate's cheeks mid-blink. */
+  eyes: { x: 318, y: 146 },
+  /** Relationship mood plates (tsundere / lovestruck), one window. */
+  mood: { x: 310, y: 70 },
 } as const;
 
 /**

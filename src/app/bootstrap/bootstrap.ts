@@ -38,6 +38,7 @@ export async function bootstrapGame(): Promise<void> {
   const qaWindow = window as unknown as {
     __pixiApp?: Application;
     __heroineRig?: unknown;
+    __qaScene?: unknown;
     __qaFreezeTicker?: boolean;
   };
 
@@ -229,6 +230,7 @@ export async function bootstrapGame(): Promise<void> {
   if (import.meta.env.DEV && new URLSearchParams(location.search).has("qa")) {
     qaWindow.__pixiApp = app;
     qaWindow.__heroineRig = (scene as unknown as { heroine: unknown }).heroine;
+    qaWindow.__qaScene = scene;
     qaWindow.__qaFreezeTicker = false;
   }
 }

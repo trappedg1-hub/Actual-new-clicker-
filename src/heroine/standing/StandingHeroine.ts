@@ -4,6 +4,8 @@ import standingBlinkUrl from "../../assets/environment/standing-blink.png?url";
 import standingBlushUrl from "../../assets/environment/standing-blush.png?url";
 import standingGlanceUrl from "../../assets/environment/standing-glance.png?url";
 import standingHeroineUrl from "../../assets/environment/standing-heroine.webp?url";
+import standingMoodLoveUrl from "../../assets/environment/standing-mood-love.png?url";
+import standingMoodTsunUrl from "../../assets/environment/standing-mood-tsun.png?url";
 import standingWinkUrl from "../../assets/environment/standing-wink.png?url";
 import { blinkOverlayAt } from "../rig/animationMath.ts";
 import {
@@ -53,6 +55,8 @@ export class StandingHeroine extends Container {
   private readonly artRoot = new Container();
   private readonly shadowLayer = new Container();
   private readonly art = new Sprite(Texture.EMPTY);
+  private readonly moodTsun = new Sprite(Texture.EMPTY);
+  private readonly moodLove = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly glancePatch = new Sprite(Texture.EMPTY);
   private readonly winkPatch = new Sprite(Texture.EMPTY);
@@ -69,6 +73,8 @@ export class StandingHeroine extends Container {
   private blushPulseAt = Number.NEGATIVE_INFINITY;
   private glancePulseAt = Number.NEGATIVE_INFINITY;
   private winkPulseAt = Number.NEGATIVE_INFINITY;
+  /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
+  private heatBand: 0 | 1 | 2 = 0;
 
   constructor(
     onTap: (zone: StandingTouchZone, globalX: number, globalY: number) => void,
@@ -78,16 +84,24 @@ export class StandingHeroine extends Container {
     this.onTap = onTap;
 
     this.art.eventMode = "none";
-    for (const patch of [
-      this.blushPatch,
-      this.glancePatch,
-      this.winkPatch,
-      this.blinkPatch,
-    ]) {
+    for (const patch of [this.blushPatch, this.glancePatch, this.winkPatch]) {
       patch.eventMode = "none";
       patch.position.set(STANDING_PATCHES.face.x, STANDING_PATCHES.face.y);
       patch.alpha = 0;
     }
+    this.blinkPatch.eventMode = "none";
+    this.blinkPatch.position.set(
+      STANDING_PATCHES.eyes.x,
+      STANDING_PATCHES.eyes.y,
+    );
+    this.blinkPatch.alpha = 0;
+    for (const mood of [this.moodTsun, this.moodLove]) {
+      mood.eventMode = "none";
+      mood.position.set(STANDING_PATCHES.mood.x, STANDING_PATCHES.mood.y);
+      mood.alpha = 0;
+    }
+    this.moodTsun.label = "mood tsundere";
+    this.moodLove.label = "mood lovestruck";
     this.artRoot.pivot.set(STANDING_ART_W / 2, STANDING_ART_H);
     this.shadowLayer.eventMode = "none";
     // All four face plates share one window; stacking order resolves
@@ -96,6 +110,8 @@ export class StandingHeroine extends Container {
     this.artRoot.addChild(
       this.shadowLayer,
       this.art,
+      this.moodTsun,
+      this.moodLove,
       this.blushPatch,
       this.glancePatch,
       this.winkPatch,
@@ -108,19 +124,24 @@ export class StandingHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [art, blink, blush, glance, wink, shadow] = await Promise.all([
-      Assets.load<Texture>(standingHeroineUrl),
-      Assets.load<Texture>(standingBlinkUrl),
-      Assets.load<Texture>(standingBlushUrl),
-      Assets.load<Texture>(standingGlanceUrl),
-      Assets.load<Texture>(standingWinkUrl),
-      Assets.load<Texture>(shelfShadowUrl),
-    ]);
+    const [art, blink, blush, glance, wink, moodTsun, moodLove, shadow] =
+      await Promise.all([
+        Assets.load<Texture>(standingHeroineUrl),
+        Assets.load<Texture>(standingBlinkUrl),
+        Assets.load<Texture>(standingBlushUrl),
+        Assets.load<Texture>(standingGlanceUrl),
+        Assets.load<Texture>(standingWinkUrl),
+        Assets.load<Texture>(standingMoodTsunUrl),
+        Assets.load<Texture>(standingMoodLoveUrl),
+        Assets.load<Texture>(shelfShadowUrl),
+      ]);
     this.art.texture = art;
     this.blinkPatch.texture = blink;
     this.blushPatch.texture = blush;
     this.glancePatch.texture = glance;
     this.winkPatch.texture = wink;
+    this.moodTsun.texture = moodTsun;
+    this.moodLove.texture = moodLove;
     for (const spec of STANDING_SHADOWS) {
       const sprite = new Sprite(shadow);
       sprite.anchor.set(0.5);
@@ -178,10 +199,16 @@ export class StandingHeroine extends Container {
       standingAmbientGlanceAt(t),
       standingEnvelopeAt(t - this.glancePulseAt, STANDING_GLANCE_ENVELOPE),
     );
+    // Relationship mood owns the resting face: the tsundere pout at the
+    // cold band, the lovestruck gaze at the hot band.  The neutral-eyed
+    // shy glance only plays in the warm middle band where it belongs.
+    this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
+    this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
     this.winkPatch.alpha = wink;
     // The wink owns the face while it plays: the glance yields and the
     // auto-blink pauses, otherwise closed lids would stomp the open eye.
-    this.glancePatch.alpha = glance * (1 - wink);
+    this.glancePatch.alpha =
+      glance * (1 - wink) * (this.heatBand === 1 ? 1 : 0);
     this.blinkPatch.alpha = blinkOverlayAt(t).weight * (1 - wink);
     this.blushPatch.alpha = standingEnvelopeAt(
       t - this.blushPulseAt,
@@ -192,6 +219,11 @@ export class StandingHeroine extends Container {
   /** Flirty wink — the scene owner calls it at the hot relationship band. */
   wink(): void {
     this.winkPulseAt = this.timeMs;
+  }
+
+  /** Relationship mood of the resting face (0 tsundere / 1 warm / 2 love). */
+  setHeatBand(band: 0 | 1 | 2): void {
+    this.heatBand = band;
   }
 
   /** Visible reaction of one tapped zone; economy stays in the scene. */

@@ -642,6 +642,14 @@ export class MainScene extends Container {
     this.statusHud.render(state);
     this.romanceShop.render(state);
     this.floatingPanel.setRate(passiveIncomePerSecond(state));
+    // Her resting face follows the relationship: tsundere pout at the
+    // cold band, warm base in the middle, lovestruck gaze when she is
+    // (almost) yours — in every pose.
+    const band = poseHeatBand(affectionProgress(state.affection).level) as
+      0 | 1 | 2;
+    this.standingHeroine.setHeatBand(band);
+    this.shelfHeroine.setHeatBand(band);
+    this.bedHeroine.setHeatBand(band);
   }
 
   /** Room backdrop matching the current scene mode (null until loaded). */

@@ -61,6 +61,8 @@ export const SHELF_PATCHES = {
   blush: { x: 224, y: 84 },
   /** The near stocking rolled down into a soft ring above the knee. */
   stocking: { x: 215, y: 624 },
+  /** Relationship mood plates (tsundere / lovestruck), one face window. */
+  mood: { x: 190, y: 48 },
 } as const;
 
 /**

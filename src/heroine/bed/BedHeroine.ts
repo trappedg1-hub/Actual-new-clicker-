@@ -8,6 +8,8 @@ import {
   Texture,
 } from "pixi.js";
 import bedBlinkPatchUrl from "../../assets/environment/bed-blink-patch.png?url";
+import bedMoodLoveUrl from "../../assets/environment/bed-mood-love.png?url";
+import bedMoodTsunUrl from "../../assets/environment/bed-mood-tsun.png?url";
 import bedBlushUrl from "../../assets/environment/bed-blush.png?url";
 import bedMouthOpenUrl from "../../assets/environment/bed-mouth-open.png?url";
 import bedToesCurledUrl from "../../assets/environment/bed-toes-curled.png?url";
@@ -24,6 +26,8 @@ const BLINK_PATCH = { x: 597, y: 140 } as const;
 const BLUSH_PATCH = { x: 600, y: 161 } as const;
 const MOUTH_PATCH = { x: 659, y: 228 } as const;
 const TOES_PATCH = { x: 15, y: 758 } as const;
+/** Relationship mood plates (tsundere / lovestruck), one face window. */
+const MOOD_PATCH = { x: 512, y: 72 } as const;
 
 /**
  * Lying-pose breathing field: zero at and outside [topY, bottomY] so the
@@ -153,10 +157,14 @@ export class BedHeroine extends Container {
   private readonly artGeometry: MeshGeometry;
   private readonly artPositions: Float32Array;
   private readonly art: Mesh;
+  private readonly moodTsun = new Sprite(Texture.EMPTY);
+  private readonly moodLove = new Sprite(Texture.EMPTY);
   private readonly blinkPatch = new Sprite(Texture.EMPTY);
   private readonly blushPatch = new Sprite(Texture.EMPTY);
   private readonly mouthPatch = new Sprite(Texture.EMPTY);
   private readonly toesPatch = new Sprite(Texture.EMPTY);
+  /** Relationship heat band (0 tsundere / 1 warm / 2 lovestruck). */
+  private heatBand: 0 | 1 | 2 = 0;
   private readonly hitLayer = new Container();
   private readonly onTap: (
     zone: BedTouchZone,
@@ -219,6 +227,8 @@ export class BedHeroine extends Container {
       [this.blinkPatch, BLINK_PATCH],
       [this.mouthPatch, MOUTH_PATCH],
       [this.toesPatch, TOES_PATCH],
+      [this.moodTsun, MOOD_PATCH],
+      [this.moodLove, MOOD_PATCH],
     ] as const) {
       patch.eventMode = "none";
       patch.position.set(place.x, place.y);
@@ -227,8 +237,12 @@ export class BedHeroine extends Container {
     // Blink sits ABOVE blush so the closed-eyes plate wins over the blush
     // plate's open eyes while she blinks; the mouth and toes patches do not
     // overlap the eyes band meaningfully and sit on top.
+    this.moodTsun.label = "mood tsundere";
+    this.moodLove.label = "mood lovestruck";
     this.addChild(
       this.art,
+      this.moodTsun,
+      this.moodLove,
       this.blushPatch,
       this.blinkPatch,
       this.mouthPatch,
@@ -240,19 +254,30 @@ export class BedHeroine extends Container {
 
   /** Loads all plates; safe to call once from the scene constructor. */
   async load(): Promise<void> {
-    const [artTexture, blinkTexture, blushTexture, mouthTexture, toesTexture] =
-      await Promise.all([
-        Assets.load<Texture>(lyingHeroineUrl),
-        Assets.load<Texture>(bedBlinkPatchUrl),
-        Assets.load<Texture>(bedBlushUrl),
-        Assets.load<Texture>(bedMouthOpenUrl),
-        Assets.load<Texture>(bedToesCurledUrl),
-      ]);
+    const [
+      artTexture,
+      blinkTexture,
+      blushTexture,
+      mouthTexture,
+      toesTexture,
+      moodTsunTexture,
+      moodLoveTexture,
+    ] = await Promise.all([
+      Assets.load<Texture>(lyingHeroineUrl),
+      Assets.load<Texture>(bedBlinkPatchUrl),
+      Assets.load<Texture>(bedBlushUrl),
+      Assets.load<Texture>(bedMouthOpenUrl),
+      Assets.load<Texture>(bedToesCurledUrl),
+      Assets.load<Texture>(bedMoodTsunUrl),
+      Assets.load<Texture>(bedMoodLoveUrl),
+    ]);
     this.art.texture = artTexture;
     this.blinkPatch.texture = blinkTexture;
     this.blushPatch.texture = blushTexture;
     this.mouthPatch.texture = mouthTexture;
     this.toesPatch.texture = toesTexture;
+    this.moodTsun.texture = moodTsunTexture;
+    this.moodLove.texture = moodLoveTexture;
     this.loaded = true;
   }
 
@@ -274,10 +299,23 @@ export class BedHeroine extends Container {
       this.timeMs - this.blushPulseAt,
       BLUSH_ENVELOPE,
     );
-    this.mouthPatch.alpha = Math.max(
-      this.ambientMouthWeight(),
-      envelopeAt(this.timeMs - this.mouthPulseAt, MOUTH_TAP_ENVELOPE),
-    );
+    // Relationship mood owns the resting face; the neutral open-mouth
+    // smile cycle only plays in the warm middle band — the tsundere keeps
+    // her pout and the lovestruck face already smiles on its own.
+    this.moodTsun.alpha = this.heatBand === 0 ? 1 : 0;
+    this.moodLove.alpha = this.heatBand === 2 ? 1 : 0;
+    this.mouthPatch.alpha =
+      this.heatBand === 1
+        ? Math.max(
+            this.ambientMouthWeight(),
+            envelopeAt(this.timeMs - this.mouthPulseAt, MOUTH_TAP_ENVELOPE),
+          )
+        : 0;
+  }
+
+  /** Relationship mood of the resting face (0 tsundere / 1 warm / 2 love). */
+  setHeatBand(band: 0 | 1 | 2): void {
+    this.heatBand = band;
   }
 
   /** Vertical chest/belly lift via the grid mesh, zero outside her torso. */
