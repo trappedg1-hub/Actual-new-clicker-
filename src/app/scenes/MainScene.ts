@@ -35,6 +35,7 @@ import {
   RELATIONSHIP_STAGES,
   upgradeRomanticName,
   type HeroinePose,
+  type TapZone,
 } from "../../content/relationship/relationship.ts";
 import type { HeroineTouchZone } from "../../domain/economy/types.ts";
 import { passiveIncomePerSecond } from "../../domain/economy/economy.ts";
@@ -630,7 +631,7 @@ export class MainScene extends Container {
    */
   private afterHeroineTap(
     outcome: ReturnType<GameSession["tap"]>,
-    zoneName: string,
+    zoneName: TapZone,
     pose: HeroinePose,
     globalX: number,
     globalY: number,
@@ -653,13 +654,13 @@ export class MainScene extends Container {
       now - this.lastSpokenAtMs > 6_000 &&
       (this.lastSpokenAtMs === 0 || Math.random() < 0.35)
     ) {
-      const line = pickTapLine(outcome.nextLevel, pose, Math.random);
+      const line = pickTapLine(outcome.nextLevel, pose, Math.random, zoneName);
       this.speechBubble.say(line, outcome.nextLevel);
       this.lastSpokenAtMs = now;
       this.liveRegion.announce(`Она говорит: ${line}`);
     }
     this.liveRegion.announce(
-      `${zoneName}. Получено ${outcome.currencyDelta} монет и ${outcome.affectionDelta} сердечек.`,
+      `${zoneName}. Получено ${outcome.currencyDelta} монет и ${outcome.affectionDelta} симпатии.`,
     );
     this.renderState();
   }

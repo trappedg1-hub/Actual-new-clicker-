@@ -15,6 +15,7 @@ import { GAME_BALANCE } from "../src/content/upgrades/balance.ts";
 import {
   pickTapLine,
   POSE_TAP_LINES,
+  ZONE_TAP_LINES,
   RELATIONSHIP_STAGES,
   relationshipLadderIsConsistent,
   upgradeRomanticName,
@@ -140,6 +141,40 @@ test("the relationship ladder has ten fan-service stages with hotter lines", () 
     assert.ok(POSE_TAP_LINES[pose][2]?.includes(poseLine));
     assert.ok(relationshipStage(8).tapLines.includes(stageLine));
   }
+});
+
+test("zone reactions cover every touch zone with three heat bands", () => {
+  const zones = [
+    "head",
+    "hair",
+    "body",
+    "arms",
+    "belly",
+    "legs",
+    "feet",
+    "thighs",
+  ] as const;
+  for (const zone of zones) {
+    assert.equal(ZONE_TAP_LINES[zone].length, 3, `${zone} needs 3 bands`);
+    for (const band of ZONE_TAP_LINES[zone]) {
+      assert.ok(band.length >= 3, `${zone} band needs lines`);
+    }
+    // Zone banks are pose-agnostic: no pose props allowed there.
+    for (const line of ZONE_TAP_LINES[zone].flat()) {
+      assert.ok(!/чулок|чулоч/i.test(line), `${zone} mentions a stocking`);
+    }
+  }
+  // Zone-aware draw: low roll lands in the zone bank, middle roll in
+  // the pose bank, high roll in the stage bank.
+  const zoneLine = pickTapLine(8, "bed", () => 0.1, "belly");
+  assert.ok(ZONE_TAP_LINES.belly[2]?.includes(zoneLine));
+  const poseLine = pickTapLine(8, "bed", () => 0.5, "belly");
+  assert.ok(POSE_TAP_LINES.bed[2]?.includes(poseLine));
+  const stageLine = pickTapLine(8, "bed", () => 0.9, "belly");
+  assert.ok(relationshipStage(8).tapLines.includes(stageLine));
+  // Legacy draw without a zone keeps the old 50/50 contract.
+  const legacy = pickTapLine(8, "bed", () => 0.2);
+  assert.ok(POSE_TAP_LINES.bed[2]?.includes(legacy));
 });
 
 test("stocking lines live only in poses where a stocking actually slips", () => {
