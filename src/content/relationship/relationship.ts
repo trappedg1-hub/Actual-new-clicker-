@@ -155,7 +155,7 @@ export const RELATIONSHIP_STAGES: readonly RelationshipStage[] = [
   },
   {
     name: "Её парень",
-    unlockLine: "Всё. Ты мой. Теперь я тебя никому не отдам. ❤️",
+    unlockLine: "Всё. Ты мой. Теперь я тебя никому не отдам. Слышишь? Никому.",
     tapLines: [
       "Милый, иди ко мне…",
       "Люблю, когда ты меня так касаешься…",

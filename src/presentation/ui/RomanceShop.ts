@@ -1,4 +1,5 @@
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import { UI_FONT } from "./nikkeKit.ts";
 
 const UPGRADE_ICON_URLS = {
   tap: new URL("../../assets/ui/icon-hands.png", import.meta.url).href,
@@ -40,7 +41,7 @@ function makeText(
   return new Text({
     text,
     style: {
-      fontFamily: "Arial",
+      fontFamily: UI_FONT,
       fontSize: size,
       fontWeight: weight,
       fill: color,
@@ -135,14 +136,14 @@ export class RomanceShop extends Container {
       const icon = new Sprite(Texture.EMPTY);
       icon.anchor.set(0.5);
       const name = makeText("", 13, "#fff7ff", "700");
-      const flavor = makeText("", 9, "#cdb6d6");
+      const flavor = makeText("", 10, "#cdb6d6");
       flavor.style.wordWrap = true;
       const stat = makeText("", 10, "#ffb7df", "700");
       const lockNote = makeText("", 10, "#9b8bae", "700");
       const buy = createStyledButton("", {
         width: 92,
         height: 44,
-        fontSize: 10,
+        fontSize: 11,
         fill: 0x8b44c2,
         stroke: ACCENTS[kind],
         chamfer: true,

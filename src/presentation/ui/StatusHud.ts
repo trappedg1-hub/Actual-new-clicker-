@@ -1,4 +1,5 @@
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import { UI_FONT } from "./nikkeKit.ts";
 const liquidHeartsUrl = new URL(
   "../../assets/ui/liquid-hearts.png",
   import.meta.url,
@@ -32,7 +33,7 @@ function makeText(
   return new Text({
     text,
     style: {
-      fontFamily: "Arial",
+      fontFamily: UI_FONT,
       fontSize: size,
       fontWeight: weight,
       fill: color,
@@ -70,12 +71,12 @@ export class StatusHud extends Container {
   private readonly coinIcon = new Sprite(Texture.EMPTY);
   private readonly gearIcon = new Sprite(Texture.EMPTY);
   private readonly progress = new Graphics();
-  private readonly heartsLabel = makeText("СИМПАТИЯ", 7, "#ffd3ec", "700");
+  private readonly heartsLabel = makeText("СИМПАТИЯ", 8, "#ffd3ec", "700");
   private readonly heartsValue = makeText("0", 13, "#fff7ff", "700");
-  private readonly stageValue = makeText("Незнакомец", 9, "#ffe3f4", "700");
-  private readonly levelLabel = makeText("LV", 7, "#e3d8ff", "700");
+  private readonly stageValue = makeText("Незнакомец", 10, "#ffe3f4", "700");
+  private readonly levelLabel = makeText("LV", 8, "#e3d8ff", "700");
   private readonly levelValue = makeText("1", 15, "#fff7ff", "700");
-  private readonly moneyLabel = makeText("ДЕНЬГИ", 7, "#ffe2ad", "700");
+  private readonly moneyLabel = makeText("ДЕНЬГИ", 8, "#ffe2ad", "700");
   private readonly moneyValue = makeText("0.0", 13, "#fff3dd", "700");
   private readonly settings: StyledButton;
   private heartsWidth = 150;

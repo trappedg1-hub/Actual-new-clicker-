@@ -1,4 +1,5 @@
 import { Container, Graphics, Text } from "pixi.js";
+import { UI_FONT } from "./nikkeKit.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
 
 export class FloatingPanel extends Container {
@@ -12,7 +13,7 @@ export class FloatingPanel extends Container {
     this.storyButton = createStyledButton("ИСТОРИЯ", {
       width: 58,
       height: 52,
-      fontSize: 8,
+      fontSize: 10,
       fill: 0x673b8f,
       stroke: 0xd187e8,
       chamfer: true,
@@ -21,12 +22,12 @@ export class FloatingPanel extends Container {
     this.rateLabel = new Text({
       text: "+0.25\n/сек",
       style: {
-        fontFamily: "Arial",
-        fontSize: 8,
+        fontFamily: UI_FONT,
+        fontSize: 9,
         fontWeight: "700",
         fill: "#ffd4f4",
         align: "center",
-        lineHeight: 11,
+        lineHeight: 12,
       },
     });
     this.rateLabel.anchor.set(0.5);

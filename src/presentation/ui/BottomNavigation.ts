@@ -7,12 +7,12 @@ const liquidDockUrl = new URL(
 ).href;
 
 const NAV_ITEMS = [
-  "HOME",
-  "STORY",
-  "SHOP",
-  "LOOKS",
-  "MEMORY",
-  "PROFILE",
+  "ДОМ",
+  "СЮЖЕТ",
+  "МАГАЗИН",
+  "ОБРАЗЫ",
+  "ПАМЯТЬ",
+  "ПРОФИЛЬ",
 ] as const;
 
 export class BottomNavigation extends Container {
@@ -40,14 +40,14 @@ export class BottomNavigation extends Container {
       .catch(() => {
         // The dock stays usable without the glass art.
       });
-    // HOME and SHOP are live sections; the rest stay teased but disabled.
-    const enabled = new Set(["HOME", "SHOP"]);
+    // ДОМ and МАГАЗИН are live sections; the rest stay teased but disabled.
+    const enabled = new Set(["ДОМ", "МАГАЗИН"]);
     for (const [index, label] of NAV_ITEMS.entries()) {
       const active = enabled.has(label);
       const button = createStyledButton(label, {
         width: 44,
         height: 50,
-        fontSize: label.length > 5 ? 7 : 8,
+        fontSize: 9,
         fill: index === 0 ? 0x593779 : active ? 0x2c1d40 : 0x1b1228,
         stroke: index === 0 ? 0xff6ec0 : active ? 0x8a5cb8 : 0x42305a,
         textColor: index === 0 || active ? "#fff7ff" : "#998ba9",

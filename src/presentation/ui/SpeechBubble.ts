@@ -1,4 +1,5 @@
 import { Action } from "pixijs-actions";
+import { UI_FONT } from "./nikkeKit.ts";
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
 import {
   heroineTitle,
@@ -42,7 +43,7 @@ export class SpeechBubble extends Container {
     this.title = new Text({
       text: "Одноклассница",
       style: {
-        fontFamily: "Arial",
+        fontFamily: UI_FONT,
         fontSize: 9,
         fontWeight: "700",
         fill: "#ffffff",
@@ -59,7 +60,7 @@ export class SpeechBubble extends Container {
     this.body = new Text({
       text: "",
       style: {
-        fontFamily: "Arial",
+        fontFamily: UI_FONT,
         fontSize: 14,
         fontWeight: "600",
         fill: "#fff7ff",

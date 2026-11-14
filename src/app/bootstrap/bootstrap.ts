@@ -1,3 +1,6 @@
+import "@fontsource/nunito/600.css";
+import "@fontsource/nunito/700.css";
+import "@fontsource/nunito/800.css";
 import "@pixi/layout";
 import { Action, registerPixiJSActionsMixin } from "pixijs-actions";
 import { Application, Container } from "pixi.js";
@@ -15,6 +18,21 @@ function announceBootError(message: string): void {
 }
 
 export async function bootstrapGame(): Promise<void> {
+  // PIXI rasterizes Text into canvas textures at construction time, so
+  // the UI font must be resident BEFORE the first scene builds.  The
+  // race keeps startup fast if the font cache is cold or offline.
+  try {
+    await Promise.race([
+      Promise.all([
+        document.fonts.load("600 14px Nunito"),
+        document.fonts.load("700 14px Nunito"),
+        document.fonts.load("800 14px Nunito"),
+      ]),
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+    ]);
+  } catch {
+    // Arial fallback still renders every label.
+  }
   const host = document.getElementById("pixi-container");
   if (!host) throw new Error("Missing #pixi-container mount point.");
   const qaWindow = window as unknown as {

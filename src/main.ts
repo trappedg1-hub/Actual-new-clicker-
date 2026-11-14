@@ -15,7 +15,7 @@ void bootstrapGame().catch((error: unknown) => {
     message.textContent =
       "Не удалось запустить PixiJS. Откройте консоль браузера для диагностики.";
     message.style.cssText =
-      "padding:24px;color:#fff;background:#100b20;font:16px Arial,sans-serif";
+      "padding:24px;color:#fff;background:#100b20;font:16px Nunito,Arial,sans-serif,sans-serif";
     host.appendChild(message);
   }
 });

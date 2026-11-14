@@ -39,9 +39,9 @@ export class HeartBurst extends Container {
   }
 
   /** Spawns a burst of hearts at stage coordinates (screen CSS px). */
-  burst(x: number, y: number, strength = 1): void {
+  burst(x: number, y: number, strength = 1, extra = 0): void {
     if (!this.loaded) return;
-    const count = Math.min(3 + Math.floor(Math.random() * 3), 5);
+    const count = Math.min(3 + extra + Math.floor(Math.random() * 3), 9);
     for (let i = 0; i < count; i += 1) {
       if (this.particles.length >= MAX_HEARTS) {
         const oldest = this.particles.shift();

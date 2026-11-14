@@ -1,8 +1,12 @@
 import { Assets, Container, Graphics, Sprite, Text, Texture } from "pixi.js";
+import { UI_FONT } from "../../presentation/ui/nikkeKit.ts";
 import roomFloorUrl from "../../assets/environment/room-floor.webp?url";
 import roomLyingUrl from "../../assets/environment/room-lying.webp?url";
 import roomShelfUrl from "../../assets/environment/room-shelf.webp?url";
 import roomStandingUrl from "../../assets/environment/room-standing.webp?url";
+import iconHeartUrl from "../../assets/ui/icon-heart.png?url";
+import iconLockUrl from "../../assets/ui/icon-lock.png?url";
+import iconGiftUrl from "../../assets/ui/icon-gift.png?url";
 import {
   BED_ZONE_ECONOMY,
   BedHeroine,
@@ -32,6 +36,7 @@ import {
 import {
   pickIdleLine,
   pickTapLine,
+  poseHeatBand,
   relationshipStage,
   RELATIONSHIP_STAGES,
   upgradeRomanticName,
@@ -115,12 +120,14 @@ export class MainScene extends Container {
   private idleMs = 0;
   private readonly feedback: RewardFeedback;
   private readonly hearts = new HeartBurst();
+  /** Generated kawaii toast icons (heart/lock/gift) — the game renders no emoji glyphs. */
+  private readonly toastIcons = new Map<"heart" | "lock" | "gift", Texture>();
   private readonly liveRegion = new LiveRegion();
   private readonly interactionHint = new Text({
     text: "ТАП: ГОЛОВА · ВОЛОСЫ · КОРПУС · РУКИ",
     style: {
-      fontFamily: "Arial",
-      fontSize: 8,
+      fontFamily: UI_FONT,
+      fontSize: 9,
       fontWeight: "700",
       fill: "#d6bce9",
       align: "center",
@@ -197,7 +204,7 @@ export class MainScene extends Container {
     this.bedToggle = createStyledButton("ЛЕЧЬ", {
       width: 58,
       height: 34,
-      fontSize: 8,
+      fontSize: 10,
       fill: 0x673b8f,
       stroke: 0xd187e8,
       chamfer: true,
@@ -208,7 +215,7 @@ export class MainScene extends Container {
     this.shelfToggle = createStyledButton("К ПОЛКЕ", {
       width: 58,
       height: 34,
-      fontSize: 8,
+      fontSize: 10,
       fill: 0x673b8f,
       stroke: 0xd187e8,
       chamfer: true,
@@ -219,7 +226,7 @@ export class MainScene extends Container {
     this.carpetToggle = createStyledButton("НА ПОЛ", {
       width: 58,
       height: 34,
-      fontSize: 8,
+      fontSize: 10,
       fill: 0x673b8f,
       stroke: 0xd187e8,
       chamfer: true,
@@ -252,6 +259,17 @@ export class MainScene extends Container {
     void this.hearts.load().catch(() => {
       // Hearts are cosmetic; the game keeps running without the texture.
     });
+    for (const [key, url] of [
+      ["heart", iconHeartUrl],
+      ["lock", iconLockUrl],
+      ["gift", iconGiftUrl],
+    ] as const) {
+      void Assets.load<Texture>(url)
+        .then((texture) => this.toastIcons.set(key, texture))
+        .catch(() => {
+          // Toast icons are cosmetic; text alone stays legible.
+        });
+    }
 
     this.interactionHint.anchor.set(0.5, 0);
     this.interactionHint.alpha = 0.82;
@@ -636,12 +654,13 @@ export class MainScene extends Container {
    */
   private updateIdleTease(elapsedMs: number): void {
     this.idleMs += elapsedMs;
-    if (this.idleMs < 22_000) return;
+    const level = affectionProgress(this.session.state.affection).level;
+    // At the hot band she gets impatient faster.
+    if (this.idleMs < (poseHeatBand(level) === 2 ? 15_000 : 22_000)) return;
     this.idleMs = 0;
     const now = performance.now();
     if (now - this.lastSpokenAtMs < 12_000) return;
     if (Math.random() > 0.65) return;
-    const level = affectionProgress(this.session.state.affection).level;
     const line = pickIdleLine(level, Math.random);
     this.speechBubble.say(line, level);
     this.lastSpokenAtMs = now;
@@ -663,13 +682,16 @@ export class MainScene extends Container {
     // No floating "+5/+1" toasts: the heart burst and the counting HUD
     // are the tap feedback (the toasts doubled the heart particles and
     // cluttered the premium look).
-    this.hearts.burst(globalX, globalY);
+    // The burst grows with the heat band: at the hot stages every tap
+    // showers noticeably more and bigger hearts.
+    const heat = poseHeatBand(outcome.nextLevel);
+    this.hearts.burst(globalX, globalY, 1 + heat * 0.22, heat * 2);
     tapHaptic();
     this.idleMs = 0;
     const now = performance.now();
     if (outcome.leveledUp) {
       const stage = relationshipStage(outcome.nextLevel);
-      this.showStatus(`💘 НОВАЯ СТАДИЯ: ${stage.name.toUpperCase()}`);
+      this.showStatus(`НОВАЯ СТАДИЯ: ${stage.name.toUpperCase()}`, "heart");
       this.speechBubble.say(stage.unlockLine, outcome.nextLevel);
       this.lastSpokenAtMs = now;
       this.liveRegion.announce(
@@ -677,7 +699,7 @@ export class MainScene extends Container {
       );
     } else if (
       now - this.lastSpokenAtMs > 6_000 &&
-      (this.lastSpokenAtMs === 0 || Math.random() < 0.35)
+      (this.lastSpokenAtMs === 0 || Math.random() < (heat === 2 ? 0.55 : 0.35))
     ) {
       const line = pickTapLine(outcome.nextLevel, pose, Math.random, zoneName);
       this.speechBubble.say(line, outcome.nextLevel);
@@ -733,7 +755,7 @@ export class MainScene extends Container {
       if (result.reason === "locked") {
         const stage =
           RELATIONSHIP_STAGES[definition.unlockStage - 1]?.name ?? "";
-        this.showStatus(`🔒 «${romanticName}» · нужна стадия «${stage}»`);
+        this.showStatus(`«${romanticName}» · нужна стадия «${stage}»`, "lock");
         this.liveRegion.announce(
           `Улучшение ${romanticName} откроется на стадии ${stage}.`,
         );
@@ -743,7 +765,7 @@ export class MainScene extends Container {
       }
       return;
     }
-    this.showStatus(`💝 «${romanticName}» · УРОВЕНЬ ${result.newLevel}`);
+    this.showStatus(`«${romanticName}» · УРОВЕНЬ ${result.newLevel}`, "gift");
     this.renderState();
     void this.saveWithNotice(false);
     this.liveRegion.announce(
@@ -844,16 +866,16 @@ export class MainScene extends Container {
   }
 
   private showPlaceholder(section: string): void {
-    if (section === "HOME") {
+    if (section === "ДОМ") {
       this.closeShop();
       this.showStatus("Главная сцена активна.");
       return;
     }
-    if (section === "SHOP") {
+    if (section === "МАГАЗИН") {
       this.openShop();
       return;
     }
-    this.showStatus(`${section}: placeholder раздела v0.1`);
+    this.showStatus(`«${section}» — скоро!`);
   }
 
   private openShop(): void {
@@ -866,12 +888,13 @@ export class MainScene extends Container {
     this.romanceShop.close();
   }
 
-  private showStatus(message: string): void {
+  private showStatus(message: string, icon?: "heart" | "lock" | "gift"): void {
     this.feedback.show(
       message,
       this.screenWidth / 2,
       this.statusToastY,
       "milestone",
+      icon ? this.toastIcons.get(icon) : undefined,
     );
   }
 

@@ -1,4 +1,5 @@
 import { ButtonContainer } from "@pixi/ui";
+import { UI_FONT } from "./nikkeKit.ts";
 import { Graphics, Rectangle, Text } from "pixi.js";
 
 export interface StyledButtonOptions {
@@ -35,7 +36,7 @@ export function createStyledButton(
   const label = new Text({
     text,
     style: {
-      fontFamily: "Arial",
+      fontFamily: UI_FONT,
       fontSize: options.fontSize ?? 13,
       fontWeight: "700",
       fill: options.textColor ?? "#fff7ff",
@@ -86,6 +87,16 @@ export function createStyledButton(
       });
     }
     label.style.fill = enabled ? (options.textColor ?? "#fff7ff") : "#aaa0b7";
+    // Premium guard: a label must never escape its glass plate — shrink
+    // overlong text to fit instead of letting it overflow. Canvas text
+    // metrics are unavailable in headless tests, hence the document check.
+    if (typeof document !== "undefined") {
+      label.scale.set(1);
+      const maxWidth = width - 8;
+      if (label.width > maxWidth && maxWidth > 0) {
+        label.scale.set(maxWidth / label.width);
+      }
+    }
     label.position.set(width / 2, height / 2);
     button.hitArea = new Rectangle(0, 0, width, height);
   };
@@ -121,6 +132,8 @@ export function createStyledButton(
       label.text = nextText;
       // The container label is what accessibility tooling and hit-test debugging read.
       button.label = nextText;
+      // Refit: a longer caption must not spill past the plate edge.
+      draw(button.enabled);
     },
     setSize(nextWidth, nextHeight) {
       width = nextWidth;

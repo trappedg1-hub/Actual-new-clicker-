@@ -1,10 +1,13 @@
 import { Action } from "pixijs-actions";
-import { Container, Text, TextStyle } from "pixi.js";
+import { UI_FONT } from "../ui/nikkeKit.ts";
+import { Container, Sprite, Text, TextStyle, Texture } from "pixi.js";
 
 type FeedbackTone = "reward" | "milestone";
 
 interface PooledMessage {
-  node: Text;
+  node: Container;
+  text: Text;
+  icon: Sprite;
   tone: FeedbackTone;
 }
 
@@ -20,6 +23,9 @@ const MAX_POOLED = 8;
  * Each toast used to create a fresh `Text` and destroy the previous one after the
  * animation, which added a GPU texture per message and leaked past a few dozen taps.
  * Toasts are now pooled per tone and replayed, so the texture count stays flat.
+ *
+ * A toast can carry a generated kawaii icon (heart, lock, gift) to the left of
+ * the text — the game never renders emoji glyphs, only AI-painted art.
  */
 export class RewardFeedback {
   private readonly parent: Container;
@@ -37,6 +43,7 @@ export class RewardFeedback {
     x: number,
     y: number,
     tone: FeedbackTone = "reward",
+    iconTexture?: Texture,
   ): void {
     const message = this.take(tone);
     // Two reward messages from one tap used to land on the same baseline when
@@ -46,7 +53,8 @@ export class RewardFeedback {
     let lane = 0;
     while (occupied.has(lane)) lane += 1;
     this.activeLanes.set(message, lane);
-    message.node.text = text;
+    message.text.text = text;
+    this.layout(message, tone, iconTexture);
     message.node.position.set(x, y + lane * 28);
     // A pooled node was faded out by the previous toast; reset it before replaying.
     message.node.removeAllActions();
@@ -80,34 +88,65 @@ export class RewardFeedback {
     for (const timer of this.releaseTimers) clearTimeout(timer);
     this.releaseTimers.clear();
     this.activeLanes.clear();
-    for (const message of this.pool) message.node.destroy();
+    for (const message of this.pool) message.node.destroy({ children: true });
     this.pool.length = 0;
     this.styleCache.clear();
+  }
+
+  /** Centers the icon+text row on the node origin (icon hidden when absent). */
+  private layout(
+    message: PooledMessage,
+    tone: FeedbackTone,
+    iconTexture?: Texture,
+  ): void {
+    const hasIcon = Boolean(iconTexture) && iconTexture !== Texture.EMPTY;
+    message.icon.visible = hasIcon;
+    if (!hasIcon || !iconTexture) {
+      // Text-only toast: skip the canvas-backed width measurement entirely
+      // (it also keeps headless test environments canvas-free).
+      message.text.position.set(0, 0);
+      return;
+    }
+    message.icon.texture = iconTexture;
+    const size = tone === "milestone" ? 24 : 20;
+    const scale = size / Math.max(iconTexture.width, iconTexture.height, 1);
+    message.icon.scale.set(scale);
+    const iconWidth = iconTexture.width * scale;
+    const gap = 6;
+    const textWidth = message.text.width;
+    const total = iconWidth + gap + textWidth;
+    message.icon.position.set(-total / 2 + iconWidth / 2, 0);
+    message.text.position.set(total / 2 - textWidth / 2, 0);
   }
 
   private take(tone: FeedbackTone): PooledMessage {
     const index = this.pool.findIndex((entry) => entry.tone === tone);
     const reused = index >= 0 ? this.pool.splice(index, 1)[0] : undefined;
     if (reused) return reused;
-    return { node: this.createNode(tone), tone };
+    return this.createMessage(tone);
   }
 
-  private createNode(tone: FeedbackTone): Text {
-    const node = new Text({ text: "", style: this.styleFor(tone) });
-    node.anchor.set(0.5);
-    node.roundPixels = true;
+  private createMessage(tone: FeedbackTone): PooledMessage {
+    const node = new Container();
     node.eventMode = "none";
     node.visible = false;
-    return node;
+    const text = new Text({ text: "", style: this.styleFor(tone) });
+    text.anchor.set(0.5);
+    text.roundPixels = true;
+    const icon = new Sprite(Texture.EMPTY);
+    icon.anchor.set(0.5);
+    icon.visible = false;
+    node.addChild(icon, text);
+    return { node, text, icon, tone };
   }
 
   private styleFor(tone: FeedbackTone): TextStyle {
     const cached = this.styleCache.get(tone);
     if (cached) return cached;
     const style = new TextStyle({
-      fontFamily: "Arial",
-      fontSize: tone === "milestone" ? 18 : 16,
-      fontWeight: "700",
+      fontFamily: UI_FONT,
+      fontSize: tone === "milestone" ? 17 : 15,
+      fontWeight: "800",
       fill: tone === "milestone" ? "#ffd7fa" : "#ffffff",
       // A dark 4px outline drawn directly on the light hair/skin was read as
       // "black dots and lines" on tap. A soft light halo keeps the toast
@@ -132,7 +171,7 @@ export class RewardFeedback {
     message.node.position.set(0, 0);
     message.node.removeAllActions();
     if (this.pool.length >= MAX_POOLED) {
-      message.node.destroy();
+      message.node.destroy({ children: true });
       return;
     }
     const timer = setTimeout(() => {

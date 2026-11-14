@@ -1,6 +1,13 @@
 import { Graphics } from "pixi.js";
 
 /**
+ * The one UI font of the game: Nunito (bundled via @fontsource, full
+ * Cyrillic) — a rounded premium face that matches the kawaii art.
+ * Arial stays as the metric-compatible fallback while woff2 loads.
+ */
+export const UI_FONT = "Nunito, Arial, sans-serif";
+
+/**
  * Hand-drawn NIKKE-style UI kit: angular glass plates with chamfered
  * (diagonally cut) corners, thin luminous edges, accent strips and
  * tech ticks — everything is vector-drawn so it stays razor sharp at

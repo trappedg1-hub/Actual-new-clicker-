@@ -1,4 +1,5 @@
 import { Container, Graphics, Rectangle, Text } from "pixi.js";
+import { UI_FONT } from "./nikkeKit.ts";
 import { createStyledButton, type StyledButton } from "./button.ts";
 
 export interface DialoguePresentation {
@@ -30,7 +31,7 @@ export class DialogueOverlay extends Container {
     this.speaker = new Text({
       text: "HEROINE-01",
       style: {
-        fontFamily: "Arial",
+        fontFamily: UI_FONT,
         fontSize: 10,
         fontWeight: "700",
         fill: "#f0a9e4",
@@ -40,7 +41,7 @@ export class DialogueOverlay extends Container {
     this.body = new Text({
       text: "",
       style: {
-        fontFamily: "Arial",
+        fontFamily: UI_FONT,
         fontSize: 14,
         fontWeight: "500",
         fill: "#fff7ff",
