@@ -61,6 +61,13 @@ export interface MainSceneCallbacks {
   save: () => Promise<void>;
 }
 
+/**
+ * Geometry of room-lying.webp: a tall seamless portrait extension of the
+ * 1152px-wide bed art — `artTop` rows of outpainted wall/curtains sit above
+ * the exact art window, followed by outpainted bedsheets below it.
+ */
+const BED_BACKDROP = { artWidth: 1152, artTop: 820 } as const;
+
 export class MainScene extends Container {
   private readonly session: GameSession;
   private readonly callbacks: MainSceneCallbacks;
@@ -325,7 +332,6 @@ export class MainScene extends Container {
           .fill({ color: index % 2 === 0 ? 0xd8a1ff : 0x8fe7ff, alpha: 0.42 });
       }
     }
-    this.layoutBackdrop();
 
     this.statusHud.resize(widthSafe);
     this.bottomNavigation.resize(widthSafe, heightSafe);
@@ -416,6 +422,9 @@ export class MainScene extends Container {
     // The production rig has no placeholder caption; the method is retained as
     // a no-op for the existing scene layout contract.
     this.heroine.setTagBottomLimit(null);
+    // After the pose layouts: the bed backdrop glues itself to the
+    // laid-out BedHeroine rect, so it must run once the rect is final.
+    this.layoutBackdrop();
     this.dialogue.resize(widthSafe, heightSafe);
     this.speechBubble.resize(widthSafe, heightSafe);
     this.renderState();
@@ -468,6 +477,37 @@ export class MainScene extends Container {
         Math.min(0, Math.max(minX, focusX)),
         Math.min(0, (this.screenHeight - texture.height * scale) / 2),
       );
+    } else if (this.sceneMode === "bed") {
+      // room-lying.webp is a tall seamless extension of the bed art:
+      // BED_BACKDROP.artTop rows of wall/curtains above the art window
+      // and sheet rows below it, at the art's own 1152px width.  Gluing
+      // the backdrop to the laid-out BedHeroine rect lets the scene run
+      // edge to edge with no tone break — the former "grey bands".
+      const scale =
+        (BED_BACKDROP.artWidth / texture.width) * this.bedHeroine.scale.x;
+      const x = this.bedHeroine.position.x;
+      const y = this.bedHeroine.position.y - BED_BACKDROP.artTop * scale;
+      const covered =
+        x <= 0.5 &&
+        y <= 0.5 &&
+        x + texture.width * scale >= this.screenWidth - 0.5 &&
+        y + texture.height * scale >= this.screenHeight - 0.5;
+      if (covered) {
+        this.roomBackdrop.scale.set(scale);
+        this.roomBackdrop.position.set(x, y);
+      } else {
+        // Extreme viewport (very wide landscape): plain cover-fit on
+        // the art window region keeps the bed centered.
+        const cover = Math.max(
+          this.screenWidth / texture.width,
+          this.screenHeight / texture.height,
+        );
+        this.roomBackdrop.scale.set(cover);
+        this.roomBackdrop.position.set(
+          (this.screenWidth - texture.width * cover) / 2,
+          (this.screenHeight - texture.height * cover) / 2,
+        );
+      }
     } else {
       const scale = Math.max(
         this.screenWidth / texture.width,
